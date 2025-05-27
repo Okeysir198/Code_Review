@@ -24,6 +24,8 @@ from langchain_core.runnables import Runnable, RunnableBinding, RunnableSequence
 from langgraph.utils.runnable import RunnableCallable
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.tools.tavily_search import TavilySearchResults
+from langgraph.types import Command
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -172,15 +174,23 @@ def create_basic_agent(
 ) -> CompiledGraph:
     """
     Create a basic agent with tools and memory capabilities.
-    
+
     Args:
         model: The language model to use for the agent
         tools: List of tools the agent can use
         prompt: Prompt to use for the agent (str, SystemMessage, ChatPromptTemplate, callable, or Runnable)
         checkpointer: Component for persisting conversation state
         store: Component for cross-conversation memory
-        pre_processing_node: Optional function to process state before the agent node
-        post_processing_node: Optional function to process state after the agent node
+        pre_processing_node: Optional function to process state before the agent node.
+            Should return either:
+            - Dict[str, Any]: Updates state and continues to agent (LLM) node
+            - Command: Controls workflow routing and state updates
+                * Command(update={...}, goto="__end__"): Skip LLM, end workflow
+                * Command(update={...}, goto="tools"): Skip LLM, go to tools
+                * Command(update={...}, goto="post_processing"): Skip LLM, go to post-processing
+                * Command(update={...}, goto="agent"): Explicit routing to LLM (same as returning Dict)
+        post_processing_node: Optional function to process state after the agent node.
+            Should return Dict[str, Any] with state updates
         state_schema: Optional custom state schema (defaults to BasicAgentState)
         config_schema: Optional schema for configuration
         interrupt_before: List of node names to interrupt before
@@ -189,9 +199,31 @@ def create_basic_agent(
         verbose: Whether to log detailed information
         config: Additional configuration parameters
         name: Optional name for the compiled graph
-        
+
     Returns:
         Compiled LangGraph that can be used for chat interactions
+
+    Example:
+        ```python
+        # Pre-processing that continues to LLM
+        def prep_node(state):
+            return {"prepared_data": "some_value"}
+        
+        # Pre-processing that bypasses LLM
+        def prep_node(state):
+            if should_skip_llm():
+                return Command(
+                    update={"messages": [AIMessage(content="Response")]},
+                    goto="__end__"
+                )
+            return {"prepared_data": "some_value"}
+        
+        agent = create_basic_agent(
+            model=llm,
+            pre_processing_node=prep_node,
+            tools=[some_tool]
+        )
+        ```
     """
     # Validate inputs
     tools = tools or []
@@ -297,7 +329,10 @@ def create_basic_agent(
             # Log the final prompt if verbose mode is enabled
             if verbose:
                 logger.info(f"Final prompt to LLM: {system_prompt}")
-                logger.info(f"Messages: {messages}")
+                logger.info(f"Messages content as below:")
+                for msg in messages:
+                    logger.info(f"{msg.type.upper()}: {msg.content}")
+                
                 logger.info(f"Len of Messages: {len(messages)}")
             
             # Get response from LLM (with tools if available)
@@ -404,7 +439,6 @@ def create_basic_agent(
         if pre_processing_node:
             workflow.add_node(NodeName.PRE_PROCESSING.value, pre_processing_node)
             workflow.add_edge(START, NodeName.PRE_PROCESSING.value)
-            workflow.add_edge(NodeName.PRE_PROCESSING.value, NodeName.AGENT.value)
         else:
             workflow.add_edge(START, NodeName.AGENT.value)
         

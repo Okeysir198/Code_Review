@@ -5,7 +5,7 @@ Introduction Agent for Call Center.
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
-from langchain_core.messages import SystemMessage, AIMessage
+from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
 from langgraph.graph.graph import CompiledGraph
 from langgraph.graph import END
 from langgraph.types import Command
@@ -32,14 +32,14 @@ def create_introduction_agent(
         client_full_name = client_data["profile"]["client_info"]['client_full_name']
         client_title = client_data["profile"]["client_info"]['title']
 
-        messages = AIMessage(content=f"Good day!, you are speaking to {agent_name} from Cartrack Accounts Department. May I speak to {client_title} {client_full_name}, please?")
+        messages = HumanMessage(content=f"Good day!, you are speaking to {agent_name} from Cartrack Accounts Department. May I speak to {client_title} {client_full_name}, please?")
+        
         return Command(
             # state update
             update={
-                "messages": messages,
+                "messages": [messages],
                 "current_step": CallStep.NAME_VERIFICATION.value
                 },
-            # control flow
             goto="__end__"
         )
 
