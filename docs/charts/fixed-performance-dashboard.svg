@@ -1,0 +1,240 @@
+<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background and title -->
+  <rect width="1000" height="700" fill="#f8f9fa" />
+  <rect x="10" y="10" width="980" height="60" rx="5" fill="#4285F4" />
+  <text x="30" y="50" font-family="Arial" font-size="24" fill="white">Call Center AI Agent Performance Dashboard</text>
+  
+  <!-- Key Performance Indicators Section -->
+  <rect x="10" y="80" width="980" height="100" rx="5" fill="white" stroke="#ddd" stroke-width="1" />
+  <text x="30" y="105" font-family="Arial" font-size="18" fill="#333">Key Performance Indicators</text>
+  
+  <!-- KPI 1: Payment Success Rate -->
+  <rect x="40" y="115" width="170" height="50" rx="5" fill="#e8f0fe" />
+  <text x="50" y="135" font-family="Arial" font-size="14" fill="#555">Payment Success Rate</text>
+  <text x="50" y="155" font-family="Arial" font-size="22" font-weight="bold" fill="#4285F4">78%</text>
+  <text x="120" y="155" font-family="Arial" font-size="12" fill="#888">Target: 70%</text>
+  
+  <!-- KPI 2: Verification Success -->
+  <rect x="230" y="115" width="170" height="50" rx="5" fill="#e8f0fe" />
+  <text x="240" y="135" font-family="Arial" font-size="14" fill="#555">Verification Success</text>
+  <text x="240" y="155" font-family="Arial" font-size="22" font-weight="bold" fill="#4285F4">92%</text>
+  <text x="310" y="155" font-family="Arial" font-size="12" fill="#888">Target: 90%</text>
+  
+  <!-- KPI 3: Avg Conversation Turns -->
+  <rect x="420" y="115" width="170" height="50" rx="5" fill="#e8f0fe" />
+  <text x="430" y="135" font-family="Arial" font-size="14" fill="#555">Avg Conversation Turns</text>
+  <text x="430" y="155" font-family="Arial" font-size="22" font-weight="bold" fill="#4285F4">8.3</text>
+  <text x="490" y="155" font-family="Arial" font-size="12" fill="#888">Target: &lt;12</text>
+  
+  <!-- KPI 4: Step Completion Rate -->
+  <rect x="610" y="115" width="170" height="50" rx="5" fill="#e8f0fe" />
+  <text x="620" y="135" font-family="Arial" font-size="14" fill="#555">Step Completion Rate</text>
+  <text x="620" y="155" font-family="Arial" font-size="22" font-weight="bold" fill="#4285F4">95%</text>
+  <text x="690" y="155" font-family="Arial" font-size="12" fill="#888">Target: 100%</text>
+  
+  <!-- KPI 5: Avg Response Time -->
+  <rect x="800" y="115" width="170" height="50" rx="5" fill="#e8f0fe" />
+  <text x="810" y="135" font-family="Arial" font-size="14" fill="#555">Avg Response Time</text>
+  <text x="810" y="155" font-family="Arial" font-size="22" font-weight="bold" fill="#4285F4">1.8s</text>
+  <text x="880" y="155" font-family="Arial" font-size="12" fill="#888">Target: &lt;3s</text>
+  
+  <!-- Success Rate by Persona Section -->
+  <rect x="10" y="190" width="480" height="240" rx="5" fill="white" stroke="#ddd" stroke-width="1" />
+  <text x="30" y="215" font-family="Arial" font-size="18" fill="#333">Success Rate by Persona</text>
+  
+  <!-- Persona Success Rate Bar Chart -->
+  <!-- Y-axis -->
+  <line x1="60" y1="240" x2="60" y2="400" stroke="#555" stroke-width="1" />
+  <text x="40" y="240" font-family="Arial" font-size="10" fill="#555" text-anchor="end">100%</text>
+  <text x="40" y="280" font-family="Arial" font-size="10" fill="#555" text-anchor="end">75%</text>
+  <text x="40" y="320" font-family="Arial" font-size="10" fill="#555" text-anchor="end">50%</text>
+  <text x="40" y="360" font-family="Arial" font-size="10" fill="#555" text-anchor="end">25%</text>
+  <text x="40" y="400" font-family="Arial" font-size="10" fill="#555" text-anchor="end">0%</text>
+  
+  <!-- X-axis -->
+  <line x1="60" y1="400" x2="460" y2="400" stroke="#555" stroke-width="1" />
+  
+  <!-- Bars -->
+  <rect x="80" y="240" width="50" height="160" fill="#4285F4" opacity="0.9" />
+  <rect x="140" y="268" width="50" height="132" fill="#4285F4" opacity="0.9" />
+  <rect x="200" y="316" width="50" height="84" fill="#4285F4" opacity="0.9" />
+  <rect x="260" y="280" width="50" height="120" fill="#4285F4" opacity="0.9" />
+  <rect x="320" y="340" width="50" height="60" fill="#4285F4" opacity="0.9" />
+  <rect x="380" y="400" width="50" height="0" fill="#4285F4" opacity="0.9" />
+  
+  <!-- Labels -->
+  <text x="105" y="415" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Cooperative</text>
+  <text x="165" y="415" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Hesitant</text>
+  <text x="225" y="415" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Resistant</text>
+  <text x="285" y="415" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Confused</text>
+  <text x="345" y="415" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Distracted</text>
+  <text x="405" y="415" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Special</text>
+  
+  <!-- Percentage Labels -->
+  <text x="105" y="235" font-family="Arial" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">93%</text>
+  <text x="165" y="263" font-family="Arial" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">82%</text>
+  <text x="225" y="311" font-family="Arial" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">58%</text>
+  <text x="285" y="275" font-family="Arial" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">70%</text>
+  <text x="345" y="335" font-family="Arial" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">37%</text>
+  <text x="405" y="395" font-family="Arial" font-size="10" fill="#555" text-anchor="middle" font-weight="bold">0%</text>
+  
+  <!-- Payment Preference Matrix Section -->
+  <rect x="500" y="190" width="490" height="240" rx="5" fill="white" stroke="#ddd" stroke-width="1" />
+  <text x="520" y="215" font-family="Arial" font-size="18" fill="#333">Payment Preference Success Matrix</text>
+  
+  <!-- Matrix Headers -->
+  <text x="560" y="245" font-family="Arial" font-size="12" fill="#555" transform="rotate(-45, 560, 245)">Immediate</text>
+  <text x="600" y="245" font-family="Arial" font-size="12" fill="#555" transform="rotate(-45, 600, 245)">Debit Order</text>
+  <text x="640" y="245" font-family="Arial" font-size="12" fill="#555" transform="rotate(-45, 640, 245)">Portal</text>
+  <text x="680" y="245" font-family="Arial" font-size="12" fill="#555" transform="rotate(-45, 680, 245)">Installment</text>
+  <text x="720" y="245" font-family="Arial" font-size="12" fill="#555" transform="rotate(-45, 720, 245)">Will Call</text>
+  <text x="760" y="245" font-family="Arial" font-size="12" fill="#555" transform="rotate(-45, 760, 245)">Dispute</text>
+  <text x="800" y="245" font-family="Arial" font-size="12" fill="#555" transform="rotate(-45, 800, 245)">Refuses</text>
+  
+  <text x="520" y="290" font-family="Arial" font-size="12" fill="#555">Cooperative</text>
+  <text x="520" y="320" font-family="Arial" font-size="12" fill="#555">Hesitant</text>
+  <text x="520" y="350" font-family="Arial" font-size="12" fill="#555">Resistant</text>
+  <text x="520" y="380" font-family="Arial" font-size="12" fill="#555">Confused</text>
+  <text x="520" y="410" font-family="Arial" font-size="12" fill="#555">Distracted</text>
+  
+  <!-- Matrix Cells (Higher value = darker color) -->
+  <!-- Row 1: Cooperative -->
+  <rect x="560" y="280" width="30" height="20" fill="#4285F4" opacity="0.95" />
+  <rect x="600" y="280" width="30" height="20" fill="#4285F4" opacity="0.90" />
+  <rect x="640" y="280" width="30" height="20" fill="#4285F4" opacity="0.85" />
+  <rect x="680" y="280" width="30" height="20" fill="#4285F4" opacity="0.85" />
+  <rect x="720" y="280" width="30" height="20" fill="#4285F4" opacity="0.70" />
+  <rect x="760" y="280" width="30" height="20" fill="#4285F4" opacity="0.50" />
+  <rect x="800" y="280" width="30" height="20" fill="#4285F4" opacity="0.35" />
+  
+  <!-- Row 2: Hesitant -->
+  <rect x="560" y="310" width="30" height="20" fill="#4285F4" opacity="0.75" />
+  <rect x="600" y="310" width="30" height="20" fill="#4285F4" opacity="0.85" />
+  <rect x="640" y="310" width="30" height="20" fill="#4285F4" opacity="0.80" />
+  <rect x="680" y="310" width="30" height="20" fill="#4285F4" opacity="0.75" />
+  <rect x="720" y="310" width="30" height="20" fill="#4285F4" opacity="0.60" />
+  <rect x="760" y="310" width="30" height="20" fill="#4285F4" opacity="0.40" />
+  <rect x="800" y="310" width="30" height="20" fill="#4285F4" opacity="0.20" />
+  
+  <!-- Row 3: Resistant -->
+  <rect x="560" y="340" width="30" height="20" fill="#4285F4" opacity="0.50" />
+  <rect x="600" y="340" width="30" height="20" fill="#4285F4" opacity="0.60" />
+  <rect x="640" y="340" width="30" height="20" fill="#4285F4" opacity="0.55" />
+  <rect x="680" y="340" width="30" height="20" fill="#4285F4" opacity="0.65" />
+  <rect x="720" y="340" width="30" height="20" fill="#4285F4" opacity="0.35" />
+  <rect x="760" y="340" width="30" height="20" fill="#4285F4" opacity="0.20" />
+  <rect x="800" y="340" width="30" height="20" fill="#4285F4" opacity="0.10" />
+  
+  <!-- Row 4: Confused -->
+  <rect x="560" y="370" width="30" height="20" fill="#4285F4" opacity="0.65" />
+  <rect x="600" y="370" width="30" height="20" fill="#4285F4" opacity="0.70" />
+  <rect x="640" y="370" width="30" height="20" fill="#4285F4" opacity="0.75" />
+  <rect x="680" y="370" width="30" height="20" fill="#4285F4" opacity="0.60" />
+  <rect x="720" y="370" width="30" height="20" fill="#4285F4" opacity="0.40" />
+  <rect x="760" y="370" width="30" height="20" fill="#4285F4" opacity="0.25" />
+  <rect x="800" y="370" width="30" height="20" fill="#4285F4" opacity="0.15" />
+  
+  <!-- Row 5: Distracted -->
+  <rect x="560" y="400" width="30" height="20" fill="#4285F4" opacity="0.40" />
+  <rect x="600" y="400" width="30" height="20" fill="#4285F4" opacity="0.35" />
+  <rect x="640" y="400" width="30" height="20" fill="#4285F4" opacity="0.45" />
+  <rect x="680" y="400" width="30" height="20" fill="#4285F4" opacity="0.30" />
+  <rect x="720" y="400" width="30" height="20" fill="#4285F4" opacity="0.20" />
+  <rect x="760" y="400" width="30" height="20" fill="#4285F4" opacity="0.15" />
+  <rect x="800" y="400" width="30" height="20" fill="#4285F4" opacity="0.05" />
+  
+  <!-- Legend -->
+  <text x="850" y="385" font-family="Arial" font-size="10" fill="#555">Success Rate:</text>
+  <rect x="850" y="390" width="20" height="10" fill="#4285F4" opacity="0.9" />
+  <rect x="850" y="405" width="20" height="10" fill="#4285F4" opacity="0.5" />
+  <rect x="850" y="420" width="20" height="10" fill="#4285F4" opacity="0.1" />
+  <text x="875" y="398" font-family="Arial" font-size="10" fill="#555">High</text>
+  <text x="875" y="413" font-family="Arial" font-size="10" fill="#555">Medium</text>
+  <text x="875" y="428" font-family="Arial" font-size="10" fill="#555">Low</text>
+  
+  <!-- Call Flow Compliance Chart -->
+  <rect x="10" y="440" width="490" height="250" rx="5" fill="white" stroke="#ddd" stroke-width="1" />
+  <text x="30" y="465" font-family="Arial" font-size="18" fill="#333">Call Flow Compliance</text>
+  
+  <!-- Call Steps -->
+  <text x="30" y="495" font-family="Arial" font-size="12" fill="#555">Introduction</text>
+  <text x="30" y="525" font-family="Arial" font-size="12" fill="#555">Name Verification</text>
+  <text x="30" y="555" font-family="Arial" font-size="12" fill="#555">Details Verification</text>
+  <text x="30" y="585" font-family="Arial" font-size="12" fill="#555">Reason for Call</text>
+  <text x="30" y="615" font-family="Arial" font-size="12" fill="#555">Negotiation</text>
+  <text x="30" y="645" font-family="Arial" font-size="12" fill="#555">Promise to Pay</text>
+  <text x="30" y="675" font-family="Arial" font-size="12" fill="#555">Closing Steps</text>
+  
+  <!-- Compliance Bars -->
+  <rect x="180" y="485" width="250" height="15" rx="5" fill="#f0f0f0" />
+  <rect x="180" y="485" width="250" height="15" rx="5" fill="#4285F4" opacity="0.9" />
+  
+  <rect x="180" y="515" width="250" height="15" rx="5" fill="#f0f0f0" />
+  <rect x="180" y="515" width="237" height="15" rx="5" fill="#4285F4" opacity="0.9" />
+  
+  <rect x="180" y="545" width="250" height="15" rx="5" fill="#f0f0f0" />
+  <rect x="180" y="545" width="230" height="15" rx="5" fill="#4285F4" opacity="0.9" />
+  
+  <rect x="180" y="575" width="250" height="15" rx="5" fill="#f0f0f0" />
+  <rect x="180" y="575" width="250" height="15" rx="5" fill="#4285F4" opacity="0.9" />
+  
+  <rect x="180" y="605" width="250" height="15" rx="5" fill="#f0f0f0" />
+  <rect x="180" y="605" width="238" height="15" rx="5" fill="#4285F4" opacity="0.9" />
+  
+  <rect x="180" y="635" width="250" height="15" rx="5" fill="#f0f0f0" />
+  <rect x="180" y="635" width="225" height="15" rx="5" fill="#4285F4" opacity="0.9" />
+  
+  <rect x="180" y="665" width="250" height="15" rx="5" fill="#f0f0f0" />
+  <rect x="180" y="665" width="220" height="15" rx="5" fill="#4285F4" opacity="0.9" />
+  
+  <!-- Compliance Percentages -->
+  <text x="440" y="497" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">100%</text>
+  <text x="440" y="527" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">95%</text>
+  <text x="440" y="557" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">92%</text>
+  <text x="440" y="587" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">100%</text>
+  <text x="440" y="617" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">95%</text>
+  <text x="440" y="647" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">90%</text>
+  <text x="440" y="677" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">88%</text>
+  
+  <!-- Common Failure Analysis Section -->
+  <rect x="510" y="440" width="480" height="250" rx="5" fill="white" stroke="#ddd" stroke-width="1" />
+  <text x="530" y="465" font-family="Arial" font-size="18" fill="#333">Common Failure Analysis</text>
+  
+  <!-- Pie Chart for Failure Types -->
+  <circle cx="650" cy="565" r="80" fill="none" stroke="#ddd" stroke-width="1" />
+  
+  <!-- Pie Slices -->
+  <path d="M650,565 L650,485 A80,80 0 0,1 702,495 Z" fill="#EA4335" />
+  <path d="M650,565 L702,495 A80,80 0 0,1 728,554 Z" fill="#FBBC05" />
+  <path d="M650,565 L728,554 A80,80 0 0,1 702,636 Z" fill="#34A853" />
+  <path d="M650,565 L702,636 A80,80 0 0,1 650,645 Z" fill="#4285F4" />
+  <path d="M650,565 L650,645 A80,80 0 0,1 598,636 Z" fill="#9C27B0" />
+  <path d="M650,565 L598,636 A80,80 0 0,1 572,554 Z" fill="#FF6D00" />
+  <path d="M650,565 L572,554 A80,80 0 0,1 598,495 Z" fill="#00BCD4" />
+  <path d="M650,565 L598,495 A80,80 0 0,1 650,485 Z" fill="#795548" />
+  
+  <!-- Legend for Pie Chart -->
+  <rect x="770" y="495" width="12" height="12" fill="#EA4335" />
+  <text x="790" y="506" font-family="Arial" font-size="12" fill="#555">Verification Failure (25%)</text>
+  
+  <rect x="770" y="520" width="12" height="12" fill="#FBBC05" />
+  <text x="790" y="531" font-family="Arial" font-size="12" fill="#555">Payment Refused (20%)</text>
+  
+  <rect x="770" y="545" width="12" height="12" fill="#34A853" />
+  <text x="790" y="556" font-family="Arial" font-size="12" fill="#555">Objection Handling (15%)</text>
+  
+  <rect x="770" y="570" width="12" height="12" fill="#4285F4" />
+  <text x="790" y="581" font-family="Arial" font-size="12" fill="#555">Script Deviation (10%)</text>
+  
+  <rect x="770" y="595" width="12" height="12" fill="#9C27B0" />
+  <text x="790" y="606" font-family="Arial" font-size="12" fill="#555">Query Misinterpretation (10%)</text>
+  
+  <rect x="770" y="620" width="12" height="12" fill="#FF6D00" />
+  <text x="790" y="631" font-family="Arial" font-size="12" fill="#555">Amount Dispute (10%)</text>
+  
+  <rect x="770" y="645" width="12" height="12" fill="#00BCD4" />
+  <text x="790" y="656" font-family="Arial" font-size="12" fill="#555">Call Terminated Early (5%)</text>
+  
+  <rect x="770" y="670" width="12" height="12" fill="#795548" />
+  <text x="790" y="681" font-family="Arial" font-size="12" fill="#555">Other (5%)</text>
+</svg>

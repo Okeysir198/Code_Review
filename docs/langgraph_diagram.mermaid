@@ -1,0 +1,109 @@
+flowchart TD
+    Start([Start Call]) --> Router[Router]
+    
+    %% Initial Call Flow
+    Router -->|Initial Call| Intro[Introduction]
+    Intro --> End
+    
+    %% Name Verification Flow
+    Router -->|After Introduction| NameVerificationTool[Name Verification Tool]
+    
+    %% Main verification success path
+    NameVerificationTool -->|Verified| DetailsVerificationTool[Details Verification Tool]
+    DetailsVerificationTool -->|Verified| ReasonForCall[Reason For Call]
+    
+    %% Name Verification retry path
+    NameVerificationTool -->|Insufficient Info| NameRetryCheck{Attempts < Max?}
+    NameRetryCheck -->|Yes| NameVerification[Name Verification Response]
+    NameVerification --> End
+    NameRetryCheck -->|No| FailedVerification[Failed Verification]
+    
+    %% Third Party path
+    NameVerificationTool -->|Third Party| ThirdPartyCheck{Confirm Third Party}
+    ThirdPartyCheck -->|Confirmed| ThirdParty[Third Party Message]
+    ThirdParty --> EndCall[End Call]
+    ThirdPartyCheck -->|Retry Verification| NameVerification
+    
+    %% Unavailable path
+    NameVerificationTool -->|Unavailable| UnavailableCheck{Confirm Unavailable}
+    UnavailableCheck -->|Confirmed| NotAvailable[Not Available Message]
+    NotAvailable --> EndCall
+    UnavailableCheck -->|Retry Verification| NameVerification
+    
+    %% Wrong Person path
+    NameVerificationTool -->|Wrong Person| WrongPersonCheck{Confirm Wrong Person}
+    WrongPersonCheck -->|Confirmed| WrongPerson[Wrong Person Message]
+    WrongPerson --> EndCall
+    WrongPersonCheck -->|Retry Verification| NameVerification
+    
+    %% Details Verification path
+    DetailsVerificationTool -->|Insufficient Info| DetailsRetryCheck{Attempts < Max?}
+    DetailsRetryCheck -->|Yes| DetailsVerification[Details Verification Response]
+    DetailsVerification --> End
+    DetailsRetryCheck -->|No| FailedVerification
+    FailedVerification --> EndCall
+    
+    %% Main Call Flow after Verification
+    ReasonForCall --> End
+    
+    %% Direct path from router based on current step
+    Router -->|After Reason For Call| Negotiation[Negotiation]
+    Negotiation --> End
+    
+    Router -->|After Negotiation| PaymentArrangement[Payment Arrangement]
+    PaymentArrangement --> End
+    
+    %% Payment Path Options - Arranged horizontally
+    Router -->|Debit Order Selected| DebiCheckSetup[DebiCheck Setup]
+    DebiCheckSetup --> End
+    
+    Router -->|Online Payment Selected| PaymentPortal[Payment Portal]
+    PaymentPortal --> End
+    
+    Router -->|After DebiCheck| SubscriptionReminder[Subscription Reminder]
+    SubscriptionReminder --> End
+    
+    %% Final Steps
+    Router -->|After Payment Setup| ClientDetailsUpdate[Client Details Update]
+    ClientDetailsUpdate --> End
+    
+    Router -->|After Details Update| Referrals[Referrals]
+    Referrals --> End
+    
+    Router -->|After Referrals| FurtherAssistance[Further Assistance]
+    FurtherAssistance --> End
+    
+    Router -->|Complete Call| Closing[Closing]
+    Closing --> EndCall
+    
+    %% Query Handler
+    Router -->|Query Detected| QueryHandler[Query Handler]
+    QueryHandler --> End
+    
+    %% End Call Flow
+    EndCall --> End
+    
+    %% Direct End
+    Router -->|Call Ended| End([End])
+    
+    %% Node styling
+    classDef router fill:#ffad99, stroke:#990000, stroke-width:2px, color:#000000;
+    classDef process fill:#b3d9ff, stroke:#0052cc, stroke-width:1px, color:#000000;
+    classDef verification fill:#c2f0c2, stroke:#2d862d, stroke-width:1px, color:#000000;
+    classDef tool fill:#fff2b3, stroke:#b37700, stroke-width:1px, color:#000000;
+    classDef special fill:#ffcccc, stroke:#cc0000, stroke-width:1px, color:#000000;
+    classDef terminal fill:#e6e6e6, stroke:#404040, stroke-width:2px, color:#000000;
+    classDef wrongPerson fill:#f9e7d2, stroke:#d35400, stroke-width:1px, color:#000000;
+    classDef endCall fill:#ff6b6b, stroke:#c0392b, stroke-width:2px, color:#000000;
+    classDef decision fill:#fcf8e3, stroke:#faebcc, stroke-width:1px, color:#000000;
+    
+    class Router router;
+    class Intro,ReasonForCall,Negotiation,PaymentArrangement,DebiCheckSetup,SubscriptionReminder,PaymentPortal,ClientDetailsUpdate,Referrals,FurtherAssistance,Closing process;
+    class NameVerification,DetailsVerification verification;
+    class NameVerificationTool,DetailsVerificationTool tool;
+    class ThirdParty,NotAvailable,QueryHandler special;
+    class WrongPerson wrongPerson;
+    class Start,End terminal;
+    class EndCall endCall;
+    class NameRetryCheck,ThirdPartyCheck,UnavailableCheck,WrongPersonCheck,DetailsRetryCheck decision;
+    class FailedVerification special;

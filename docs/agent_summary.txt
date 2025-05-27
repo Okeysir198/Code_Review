@@ -1,0 +1,129 @@
+# Deterministic Call Center AI Agent Design Specification
+
+## 1. Overview & Core Requirements
+
+The Call Center AI Agent is a structured conversational system designed to handle debt collection calls for Cartrack. The agent follows a predetermined conversation flow with clear state transitions, using rule-based decision making to navigate through the call steps while using an LLM to generate appropriate natural-sounding responses within each conversational node.
+
+## 2. Architecture
+
+### 2.1 LangGraph Implementation
+- **Deterministic StateGraph**: A flow graph with explicit, rule-based transitions between nodes
+- **Context-Preserving Design**: Uses `MemorySaver` to maintain conversation continuity across turns
+- **Rule-Based Router**: Central router that determines next steps based on current state and verification tool outputs
+
+### 2.2 Conversation State and Understanding
+- **Enhanced State Tracking**: The system maintains minimal but essential state markers:
+  - `current_call_step`: Current conversation phase
+  - Verification status flags
+  - Counters for verification attempts
+  - Matched verification items
+- **Rule-Based State Transitions**: Explicit rules determine which node should be executed next
+- **Tool-Driven Verification**: Verification tools produce classifications that directly determine routing
+
+### 2.3 LLM Integration
+- **Response Generation Only**: LLM is used primarily for generating natural responses within nodes
+- **Tool Augmentation**: Specialized tools handle critical decision points such as verification
+- **Dynamic Knowledge Injection**: Script templates and client information are injected into prompts situationally
+
+## 3. Conversation Flow
+
+### 3.1 Structured Turn-Based Execution
+1. **Fixed Flow Pattern**: Each conversation turn strictly follows Start → Router → Process Node(s) → End pattern
+2. **State-Driven Transitions**: All transitions between conversation stages follow predetermined rules based on current state
+3. **Tool-Then-LLM Sequence**: For critical nodes like verification, tools execute first to classify user input and determine routing, then LLM generates appropriate responses
+4. **Confirmation Thresholds**: Special cases (WRONG_PERSON, UNAVAILABLE, THIRD_PARTY) require confirmation counters to reach threshold before closing the call
+
+### 3.2 Deterministic Conversation Routing
+1. **Rule-Based Routing**: Next node selection is determined by predefined rules, not LLM interpretation
+2. **State-Based Decisions**: Transition decisions are based on current state and tool outputs
+3. **Explicit Path Selection**: Conversation flow follows explicit paths defined in the flow diagram
+4. **Verification-Driven Routing**: Verification tool outputs directly determine next steps
+
+### 3.3 Call Steps
+The agent follows a structured call flow with these main phases:
+- **Introduction & Verification**: Establish identity before discussing account details
+- **Account Discussion**: Explain outstanding payments and consequences
+- **Negotiation & Resolution**: Secure payment or arrangement
+- **Follow-up Administration**: Handle account updates and call documentation
+
+### 3.4 Special Case Handling
+- **Confirmation-Required Cases**: For THIRD_PARTY, UNAVAILABLE, and WRONG_PERSON classifications, system requires second confirmation before closing call
+- **Named Node Transitions**: Explicit routing to specialized nodes (third_party, not_available, wrong_person) only after confirmation threshold is met
+- **Early Call Termination**: Upon confirmed special cases, call flow routes to end_call node with appropriate disposition
+
+### 3.5 Query Handling
+- **Query Detection**: System detects queries using pattern recognition rather than LLM interpretation
+- **Predefined Responses**: Common queries are handled through predefined response templates
+- **Structured Returns**: After query resolution, system returns to the main conversation flow at predetermined points
+
+## 4. Verification Approach
+
+### 4.1 Tool-First Name Verification
+- **Mandatory Tool Execution**: The `verify_client_name` tool is **always** executed first to analyze and classify client responses
+- **Six-Category Classification System**: Tool produces one of six classifications (VERIFIED, THIRD_PARTY, WRONG_PERSON, INSUFFICIENT_INFO, UNAVAILABLE, VERIFICATION_FAILED)
+- **Confirmation Counter Logic**: Special classifications (THIRD_PARTY, WRONG_PERSON, UNAVAILABLE) require confirmation threshold (counter >= 1) before accepting
+- **Maximum Attempt Enforcement**: System enforces maximum verification attempts before moving to VERIFICATION_FAILED
+
+### 4.2 Two-Phase Details Verification
+- **Tool-Then-Response Pattern**: First the `verify_client_details` tool analyzes responses and determines routing, then appropriate response is generated
+- **Sequential One-by-One Verification**:
+  - Ask for ONE verification item at a time with short, clear questions
+  - When one item is successfully matched, reset verification attempt counter for the next item
+- **Strict Verification Options**: 
+  - Either Full ID/passport number (single sufficient identifier)
+  - OR THREE specific items from predefined set (username, vehicle registration, make, model, color, email)
+- **Iterative Verification Process**:
+  - Start with most reliable verification items
+  - Upon each successful match, add to list of matched items
+  - Continue until either THREE items match or full ID/passport provided
+- **Mandated Security Protocol**: Account details are never discussed until verification is complete
+
+## 5. Prompt Engineering
+
+### 5.1 Node-Specific System Prompts
+- **Task-Focused Prompts**: Each node has specific prompts for its particular task
+- **State-Aware Content**: Dynamic prompts incorporate current conversation state
+- **Conversation History**: Relevant conversation history is provided for context and continuity
+
+### 5.2 Specialized Knowledge Injection
+- **Script Frameworks**: Different collection scenarios (Ratio 1, Pre-Legal, etc.) provide appropriate frameworks
+- **Client-Specific Information**: Relevant client details are incorporated into prompts
+- **Step-Specific Guidance**: Prompts include specific objectives for the current conversation phase
+
+## 6. Implementation Highlights
+
+### 6.2 Tool Implementation
+- **Verification Tools**: Explicit tools for name and details verification
+- **Action Execution**: Tools enable system actions (payment processing, account updates)
+- **Information Retrieval**: Tools provide additional client information when needed
+
+## 7. Script Integration
+
+### 7.1 Script Framework
+- **Deterministic Script Application**: Scripts provide specific response templates for each step
+- **Rule-Based Selection**: Script sections are selected based on current state and conversation phase
+- **LLM-Guided Customization**: Scripts provide the structure, LLM adds natural language and personalization
+
+### 7.2 Script Customization
+- **Scenario-Based Templates**: Different scripts for various collection scenarios
+- **State-Based Selection**: Appropriate script sections are selected based on current state
+- **Natural Integration**: Script elements are woven naturally into responses
+
+## 8. Response Generation
+
+### 8.1 Natural Language Generation
+- **State-Aware Responses**: LLM generates natural responses based on current state and script guidance
+- **Personalization**: Responses include client-specific details for personalization
+- **Contextual Appropriateness**: Tone and content adapt based on verification status and call phase
+
+### 8.2 Contextual Adaptation
+- **Template-Based Adaptation**: Different response templates for different situations
+- **Objection Handling**: Predefined strategies for common objections
+- **Conversation Repair**: Templates for handling misunderstandings or topic shifts
+
+### 8.3 Business Logic Integration
+- **Process Awareness**: System understands business processes (payment methods, verification requirements)
+- **Compliance Maintenance**: Adheres to requirements while maintaining conversation flow
+- **Outcome Documentation**: Synthesizes conversation into meaningful business outcomes
+
+This specification describes a call center agent that uses deterministic, rule-based routing between conversational nodes, with LLM used primarily for natural language response generation within those nodes. The system follows a strict predefined flow where verification tool outputs and state flags directly determine the conversation path, creating a predictable, controlled conversation flow while still leveraging LLM capabilities for natural-sounding responses.

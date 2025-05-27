@@ -1,0 +1,109 @@
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1000" height="500" fill="#f8f9fa" />
+  <rect x="10" y="10" width="980" height="60" rx="5" fill="#4285F4" />
+  <text x="30" y="50" font-family="Arial" font-size="24" fill="white">Agent Performance Comparative Analysis</text>
+  
+  <!-- Left Panel: A/B Testing Comparison -->
+  <rect x="20" y="90" width="470" height="390" rx="5" fill="white" stroke="#ddd" stroke-width="1" />
+  <text x="40" y="120" font-family="Arial" font-size="18" fill="#333">A/B Testing Results: Script Variations</text>
+  
+  <!-- Comparison Chart -->
+  <line x1="70" y1="350" x2="450" y2="350" stroke="#555" stroke-width="2" />
+  <line x1="70" y1="350" x2="70" y2="150" stroke="#555" stroke-width="2" />
+  
+  <!-- X-axis Labels (Script Variations) -->
+  <text x="130" y="370" font-family="Arial" font-size="12" fill="#555" text-anchor="middle">Baseline</text>
+  <text x="210" y="370" font-family="Arial" font-size="12" fill="#555" text-anchor="middle">Var A</text>
+  <text x="290" y="370" font-family="Arial" font-size="12" fill="#555" text-anchor="middle">Var B</text>
+  <text x="370" y="370" font-family="Arial" font-size="12" fill="#555" text-anchor="middle">Var C</text>
+  
+  <!-- Y-axis Labels (Success Rates) -->
+  <text x="60" y="350" font-family="Arial" font-size="10" fill="#555" text-anchor="end">0%</text>
+  <text x="60" y="300" font-family="Arial" font-size="10" fill="#555" text-anchor="end">25%</text>
+  <text x="60" y="250" font-family="Arial" font-size="10" fill="#555" text-anchor="end">50%</text>
+  <text x="60" y="200" font-family="Arial" font-size="10" fill="#555" text-anchor="end">75%</text>
+  <text x="60" y="150" font-family="Arial" font-size="10" fill="#555" text-anchor="end">100%</text>
+  
+  <!-- Success Rate Bars -->
+  <rect x="100" y="230" width="60" height="120" fill="#4285F4" opacity="0.8" />
+  <rect x="180" y="200" width="60" height="150" fill="#4285F4" opacity="0.8" />
+  <rect x="260" y="180" width="60" height="170" fill="#4285F4" opacity="0.8" />
+  <rect x="340" y="210" width="60" height="140" fill="#4285F4" opacity="0.8" />
+  
+  <!-- Success Rate Labels -->
+  <text x="130" y="225" font-family="Arial" font-size="12" fill="#fff" font-weight="bold" text-anchor="middle">60%</text>
+  <text x="210" y="195" font-family="Arial" font-size="12" fill="#fff" font-weight="bold" text-anchor="middle">75%</text>
+  <text x="290" y="175" font-family="Arial" font-size="12" fill="#fff" font-weight="bold" text-anchor="middle">83%</text>
+  <text x="370" y="205" font-family="Arial" font-size="12" fill="#fff" font-weight="bold" text-anchor="middle">70%</text>
+  
+  <!-- A/B Test Description -->
+  <text x="40" y="400" font-family="Arial" font-size="12" fill="#333">Key Findings:</text>
+  <text x="40" y="420" font-family="Arial" font-size="12" fill="#555">• Variation B shows 23% improvement over baseline</text>
+  <text x="40" y="440" font-family="Arial" font-size="12" fill="#555">• More direct payment request language in Ver B</text>
+  <text x="40" y="460" font-family="Arial" font-size="12" fill="#555">• Enhanced objection handling in Ver B most effective</text>
+  
+  <!-- Right Panel: AI vs Human Agent -->
+  <rect x="510" y="90" width="470" height="390" rx="5" fill="white" stroke="#ddd" stroke-width="1" />
+  <text x="530" y="120" font-family="Arial" font-size="18" fill="#333">AI vs Human Agent Performance</text>
+  
+  <!-- Radar Chart -->
+  <circle cx="745" cy="270" r="160" fill="none" stroke="#ddd" stroke-width="1" />
+  <circle cx="745" cy="270" r="120" fill="none" stroke="#ddd" stroke-width="1" />
+  <circle cx="745" cy="270" r="80" fill="none" stroke="#ddd" stroke-width="1" />
+  <circle cx="745" cy="270" r="40" fill="none" stroke="#ddd" stroke-width="1" />
+  
+  <!-- Radar Axis -->
+  <line x1="745" y1="270" x2="745" y2="110" stroke="#ddd" stroke-width="1" />
+  <line x1="745" y1="270" x2="883" y2="200" stroke="#ddd" stroke-width="1" />
+  <line x1="745" y1="270" x2="848" y2="376" stroke="#ddd" stroke-width="1" />
+  <line x1="745" y1="270" x2="642" y2="376" stroke="#ddd" stroke-width="1" />
+  <line x1="745" y1="270" x2="607" y2="200" stroke="#ddd" stroke-width="1" />
+  
+  <!-- Radar Labels -->
+  <text x="745" y="100" font-family="Arial" font-size="12" fill="#555" text-anchor="middle">Success Rate</text>
+  <text x="893" y="195" font-family="Arial" font-size="12" fill="#555" text-anchor="start">Avg Response Time</text>
+  <text x="858" y="390" font-family="Arial" font-size="12" fill="#555" text-anchor="start">Step Compliance</text>
+  <text x="632" y="390" font-family="Arial" font-size="12" fill="#555" text-anchor="end">Call Duration</text>
+  <text x="597" y="195" font-family="Arial" font-size="12" fill="#555" text-anchor="end">Cost Efficiency</text>
+  
+  <!-- Score Values -->
+  <text x="745" y="130" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">100%</text>
+  <text x="847" y="211" font-family="Arial" font-size="10" fill="#555" text-anchor="start">100%</text>
+  <text x="825" y="355" font-family="Arial" font-size="10" fill="#555" text-anchor="start">100%</text>
+  <text x="665" y="355" font-family="Arial" font-size="10" fill="#555" text-anchor="end">100%</text>
+  <text x="643" y="211" font-family="Arial" font-size="10" fill="#555" text-anchor="end">100%</text>
+  
+  <!-- AI Agent Performance Polygon -->
+  <polygon points="745,126 865,208 835,355 655,355 625,208" 
+           fill="#4285F4" fill-opacity="0.5" stroke="#4285F4" stroke-width="2" />
+  
+  <!-- Human Agent Performance Polygon -->
+  <polygon points="745,142 818,223 812,338 678,338 672,223" 
+           fill="#EA4335" fill-opacity="0.5" stroke="#EA4335" stroke-width="2" />
+  
+  <!-- Performance Metrics Table -->
+  <text x="550" y="440" font-family="Arial" font-size="12" fill="#333" font-weight="bold">Metric</text>
+  <text x="670" y="440" font-family="Arial" font-size="12" fill="#333" font-weight="bold">AI Agent</text>
+  <text x="790" y="440" font-family="Arial" font-size="12" fill="#333" font-weight="bold">Human Agent</text>
+  <text x="900" y="440" font-family="Arial" font-size="12" fill="#333" font-weight="bold">Difference</text>
+  
+  <line x1="550" y1="450" x2="940" y2="450" stroke="#ddd" stroke-width="1" />
+  
+  <text x="550" y="465" font-family="Arial" font-size="10" fill="#555">Success Rate</text>
+  <text x="670" y="465" font-family="Arial" font-size="10" fill="#555">78%</text>
+  <text x="790" y="465" font-family="Arial" font-size="10" fill="#555">82%</text>
+  <text x="900" y="465" font-family="Arial" font-size="10" fill="#555">-4%</text>
+  
+  <text x="550" y="480" font-family="Arial" font-size="10" fill="#555">Avg Response Time</text>
+  <text x="670" y="480" font-family="Arial" font-size="10" fill="#555">1.8s</text>
+  <text x="790" y="480" font-family="Arial" font-size="10" fill="#555">5.2s</text>
+  <text x="900" y="480" font-family="Arial" font-size="10" fill="#555">+65%</text>
+  
+  <!-- Legend -->
+  <rect x="650" y="380" width="12" height="12" fill="#4285F4" fill-opacity="0.5" stroke="#4285F4" stroke-width="2" />
+  <text x="670" y="390" font-family="Arial" font-size="10" fill="#555">AI Agent</text>
+  
+  <rect x="750" y="380" width="12" height="12" fill="#EA4335" fill-opacity="0.5" stroke="#EA4335" stroke-width="2" />
+  <text x="770" y="390" font-family="Arial" font-size="10" fill="#555">Human Agent</text>
+</svg>

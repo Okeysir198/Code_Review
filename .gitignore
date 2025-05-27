@@ -1,0 +1,8 @@
+# Ignore all files beginning with a dot
+.*
+# But don't ignore the .gitignore file itself
+!.gitignore
+# Ignore __pycache__ directories
+__pycache__/
+# Ignore all .pyc files
+*.pyc

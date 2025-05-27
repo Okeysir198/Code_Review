@@ -1,0 +1,114 @@
+flowchart TD
+    Start([Start Call]) --> Intro[1• Introduction<br>• Identify yourself and department<br>• Request to speak with client]
+    
+    Intro --> NameVerification[2• Name Verification<br>• Confirm speaking to correct person]
+    
+    NameVerification --> NameCheck{Identity<br>Check}
+    NameCheck -->|Verified| DetailsVerification[3• Details Verification<br>• Notify call is recorded<br>• Verify ANY 3 items OR<br>• Full ID/Passport number]
+    NameCheck -->|Third Party| ThirdParty[Leave Message<br>• Ask third party to have client<br>call 011 250 3000]
+    NameCheck -->|Unavailable| NotAvailable[Schedule Callback<br>• Arrange convenient time]
+    NameCheck -->|Wrong Person| WrongPerson[End Call Politely<br>• Apologize for error]
+    NameCheck -->|Insufficient Info| NameRetry{Retry<br>Verification?}
+    
+    NameRetry -->|Yes| NameVerification
+    NameRetry -->|No| FailedVerification[Failed Verification<br>• End call politely]
+    
+    DetailsVerification --> DetailsCheck{Details<br>Verified?}
+    DetailsCheck -->|Yes| ReasonForCall[4• Reason for Call<br>• Inform about missed payment<br>• State account is overdue<br>• Specify payment amount required]
+    DetailsCheck -->|No, try again| DetailsRetry[Request Additional Details<br>• Try alternative verification items]
+    DetailsCheck -->|No, max attempts| FailedVerification
+    
+    DetailsRetry --> DetailsVerification
+    
+    ReasonForCall --> Negotiation[5• Negotiation]
+    Negotiation --> Consequences[Explain Consequences<br>• App access suspension<br>• No vehicle positioning<br>• No vehicle notifications]
+    Consequences --> Benefits[Explain Benefits<br>• Account restored to good standing<br>• All services reinstated]
+    Benefits --> QueryCheck{Client Has<br>Questions?}
+    
+    QueryCheck -->|Yes| QueryHandler[Handle Query<br>• Address concerns completely]
+    QueryCheck -->|No| PTP[6• Promise to Pay<br>• Request immediate debit permission]
+    
+    QueryHandler --> ReturnToPrevious[Return to Process]
+    ReturnToPrevious --> PTP
+    
+    PTP --> PaymentOption{Immediate<br>Debit?}
+    
+    PaymentOption -->|Yes| CheckTime{Before<br>2PM?}
+    CheckTime -->|Yes| ImmediateDebit[Process Same-Day Payment<br>• Capture in CAMS]
+    CheckTime -->|No| NextDayDebit[Schedule Next-Day Payment<br>• Capture in CAMS]
+    
+    PaymentOption -->|No| CheckBankDetails{Same Failed<br>Bank Details?}
+    
+    CheckBankDetails -->|Yes| FailedPTPMessage[Explain Previous Failures<br>• Request correct details]
+    CheckBankDetails -->|No| CheckReversalHistory{Previous<br>Reversal?}
+    
+    CheckReversalHistory -->|Yes| ReversalMessage[Address Reversal History<br>• Emphasize payment importance]
+    CheckReversalHistory -->|No| BankDetailsChanged{Details<br>Changed?}
+    
+    BankDetailsChanged -->|Yes| UpdateCAMS[Update CAMS<br>• Update banking information<br>• Capture salary date]
+    BankDetailsChanged -->|No| DebiCheckProcess[7• Setup DebiCheck]
+    
+    FailedPTPMessage --> GetNewDetails[Collect New Banking Details<br>• Obtain salary account information]
+    GetNewDetails --> DebiCheckProcess
+    
+    ReversalMessage --> GetNewDetails
+    UpdateCAMS --> DebiCheckProcess
+    
+    DebiCheckProcess --> ExplainAuthentication[Explain Authentication<br>• Bank will send approval request]
+    ExplainAuthentication --> NotifyFee[Advise of R10 Fee<br>• Confirm total amount]
+    NotifyFee --> VerifyBankDetails[Verify Details<br>• Check for accuracy]
+    
+    ImmediateDebit --> Subscription[8• Subscription Reminder<br>• Clarify this payment covers arrears<br>• Explain monthly subscription details]
+    NextDayDebit --> Subscription
+    VerifyBankDetails --> Subscription
+    
+    Subscription --> PaymentPortal[9• Payment Portal Introduction<br>• Explain functionality]
+    PaymentPortal --> SMSCheck{SMS<br>Received?}
+    SMSCheck -->|Yes| GuideThroughPortal[Guide Through Portal<br>• Provide step-by-step instructions]
+    SMSCheck -->|No| SendSMS[Send Payment Link<br>• Generate from CAMS]
+    SendSMS --> GuideThroughPortal
+    
+    GuideThroughPortal --> ExplainPaymentMethods[Review Payment Options<br>• Card, Ozow, CapitecPay, Pay@]
+    ExplainPaymentMethods --> ExplainPostPayment[Explain Follow-up Process<br>• Future payment scheduling]
+    ExplainPostPayment --> ClientUpdate[10• Client Details Update<br>• Verify and update all contact info]
+    
+    ClientUpdate --> Referrals[11• Referrals<br>• Explain 2-month free benefit]
+    Referrals --> ReferralCheck{Has<br>Referrals?}
+    ReferralCheck -->|Yes| CaptureReferrals[Record Referral Details<br>• Process in portal]
+    ReferralCheck -->|No| FurtherAssistance[12• Further Assistance<br>• Offer additional help]
+    CaptureReferrals --> FurtherAssistance
+    
+    FurtherAssistance --> AssistanceCheck{Needs More<br>Help?}
+    AssistanceCheck -->|Yes| ProvideAssistance[Provide Additional Support<br>• Address remaining concerns]
+    AssistanceCheck -->|No| DetailedNote[13• Document Interaction<br>• Record detailed notes]
+    ProvideAssistance --> DetailedNote
+    
+    DetailedNote --> Disposition[14• Disposition Call<br>• Select appropriate outcome code<br>• Close case properly]
+    
+    Disposition --> CancellationQuery{Wants to<br>Cancel?}
+    CancellationQuery -->|Yes| Cancellation[15• Cancellation Process<br>• Identify contract & reason<br>• Advise of cancellation value]
+    CancellationQuery -->|No| EndCall1([End Call])
+    
+    Cancellation --> LogTicket[Create Helpdesk Ticket<br>• Document cancellation details<br>• Escalate to Client Services]
+    LogTicket --> EndCall2([End Call])
+    
+    ThirdParty --> EndCall3([End Call])
+    NotAvailable --> EndCall4([End Call])
+    WrongPerson --> EndCall5([End Call])
+    FailedVerification --> EndCall6([End Call])
+    
+    classDef process fill:#c4e3f3,stroke:#5bc0de,stroke-width:1px,color:#000000;
+    classDef decision fill:#fcf8e3,stroke:#faebcc,stroke-width:1px,color:#000000;
+    classDef terminal fill:#d9edf7,stroke:#31708f,stroke-width:2px,color:#000000;
+    classDef alert fill:#f2dede,stroke:#ebccd1,stroke-width:1px,color:#000000;
+    classDef highlight fill:#dff0d8,stroke:#d6e9c6,stroke-width:2px,color:#000000;
+    classDef verification fill:#e8daef,stroke:#8e44ad,stroke-width:2px,color:#000000;
+    classDef wrongPerson fill:#f9e7d2,stroke:#d35400,stroke-width:2px,color:#000000;
+    
+    class Start,EndCall1,EndCall2,EndCall3,EndCall4,EndCall5,EndCall6 terminal;
+    class NameCheck,DetailsCheck,NameRetry,PaymentOption,CheckTime,CheckBankDetails,CheckReversalHistory,BankDetailsChanged,CancellationQuery,QueryCheck,ReferralCheck,AssistanceCheck,SMSCheck decision;
+    class FailedPTPMessage,ReversalMessage,FailedVerification alert;
+    class DebiCheckProcess,ExplainAuthentication,NotifyFee,VerifyBankDetails,PaymentPortal,SendSMS,GuideThroughPortal,ExplainPaymentMethods,ExplainPostPayment highlight;
+    class NameVerification,DetailsVerification,DetailsRetry verification;
+    class WrongPerson wrongPerson;
+    class Intro,ReasonForCall,Negotiation,Consequences,Benefits,PTP,ImmediateDebit,NextDayDebit,Subscription,ClientUpdate,Referrals,FurtherAssistance,DetailedNote,Disposition,Cancellation,LogTicket,ThirdParty,NotAvailable,QueryHandler,ReturnToPrevious,GetNewDetails,CaptureReferrals,ProvideAssistance process;

@@ -1,0 +1,140 @@
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1000" height="500" fill="#f8f9fa" />
+  <rect x="10" y="10" width="980" height="60" rx="5" fill="#4285F4" />
+  <text x="30" y="50" font-family="Arial" font-size="24" fill="white">Conversation Timeline Analysis</text>
+  
+  <!-- Timeline Background -->
+  <rect x="50" y="100" width="900" height="350" fill="white" stroke="#ddd" stroke-width="1" rx="5" />
+  
+  <!-- Timeline Axis -->
+  <line x1="100" y1="400" x2="900" y2="400" stroke="#555" stroke-width="2" />
+  
+  <!-- Timeline Steps -->
+  <circle cx="100" cy="400" r="5" fill="#4285F4" />
+  <circle cx="200" cy="400" r="5" fill="#4285F4" />
+  <circle cx="300" cy="400" r="5" fill="#4285F4" />
+  <circle cx="400" cy="400" r="5" fill="#4285F4" />
+  <circle cx="500" cy="400" r="5" fill="#4285F4" />
+  <circle cx="600" cy="400" r="5" fill="#4285F4" />
+  <circle cx="700" cy="400" r="5" fill="#4285F4" />
+  <circle cx="800" cy="400" r="5" fill="#4285F4" />
+  <circle cx="900" cy="400" r="5" fill="#4285F4" />
+  
+  <!-- Step Labels -->
+  <text x="100" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 1</text>
+  <text x="200" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 2</text>
+  <text x="300" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 3</text>
+  <text x="400" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 4</text>
+  <text x="500" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 5</text>
+  <text x="600" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 6</text>
+  <text x="700" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 7</text>
+  <text x="800" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 8</text>
+  <text x="900" y="420" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Turn 9</text>
+  
+  <!-- Agent Messages -->
+  <rect x="70" y="300" width="60" height="90" rx="5" fill="#4285F4" opacity="0.8" />
+  <rect x="170" y="340" width="60" height="50" rx="5" fill="#4285F4" opacity="0.8" />
+  <rect x="270" y="320" width="60" height="70" rx="5" fill="#4285F4" opacity="0.8" />
+  <rect x="370" y="300" width="60" height="90" rx="5" fill="#4285F4" opacity="0.8" />
+  <rect x="470" y="310" width="60" height="80" rx="5" fill="#4285F4" opacity="0.8" />
+  <rect x="570" y="290" width="60" height="100" rx="5" fill="#4285F4" opacity="0.8" />
+  <rect x="670" y="320" width="60" height="70" rx="5" fill="#4285F4" opacity="0.8" />
+  <rect x="770" y="330" width="60" height="60" rx="5" fill="#4285F4" opacity="0.8" />
+  <rect x="870" y="340" width="60" height="50" rx="5" fill="#4285F4" opacity="0.8" />
+  
+  <!-- Agent Message Labels -->
+  <text x="100" y="295" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Introduction</text>
+  <text x="200" y="335" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Name Verify</text>
+  <text x="300" y="315" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Details Verify</text>
+  <text x="400" y="295" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Reason Call</text>
+  <text x="500" y="305" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Negotiation</text>
+  <text x="600" y="285" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Promise to Pay</text>
+  <text x="700" y="315" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">DebiCheck</text>
+  <text x="800" y="325" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Details Update</text>
+  <text x="900" y="335" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Closing</text>
+  
+  <!-- Debtor Messages -->
+  <rect x="70" y="210" width="60" height="70" rx="5" fill="#34A853" opacity="0.8" />
+  <rect x="170" y="230" width="60" height="90" rx="5" fill="#34A853" opacity="0.8" />
+  <rect x="270" y="180" width="60" height="120" rx="5" fill="#34A853" opacity="0.8" />
+  <rect x="370" y="220" width="60" height="60" rx="5" fill="#34A853" opacity="0.8" />
+  <rect x="470" y="170" width="60" height="120" rx="5" fill="#34A853" opacity="0.8" />
+  <rect x="570" y="200" width="60" height="70" rx="5" fill="#34A853" opacity="0.8" />
+  <rect x="670" y="230" width="60" height="70" rx="5" fill="#34A853" opacity="0.8" />
+  <rect x="770" y="250" width="60" height="60" rx="5" fill="#34A853" opacity="0.8" />
+  <rect x="870" y="270" width="60" height="50" rx="5" fill="#34A853" opacity="0.8" />
+  
+  <!-- Debtor Response Types -->
+  <text x="100" y="205" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Greeting</text>
+  <text x="200" y="225" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Confirmation</text>
+  <text x="300" y="175" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Info Provided</text>
+  <text x="400" y="215" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Acknowledgment</text>
+  <text x="500" y="165" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Question</text>
+  <text x="600" y="195" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Agreement</text>
+  <text x="700" y="225" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Confirmation</text>
+  <text x="800" y="245" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Info Provided</text>
+  <text x="900" y="265" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Farewell</text>
+  
+  <!-- Call Flow Annotations -->
+  <line x1="100" y1="300" x2="100" y2="280" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <line x1="200" y1="340" x2="200" y2="320" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <line x1="300" y1="320" x2="300" y2="300" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <line x1="400" y1="300" x2="400" y2="280" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <line x1="500" y1="310" x2="500" y2="290" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <line x1="600" y1="290" x2="600" y2="270" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <line x1="700" y1="320" x2="700" y2="300" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <line x1="800" y1="330" x2="800" y2="310" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <line x1="900" y1="340" x2="900" y2="320" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  
+  <!-- Special Events Markers -->
+  <path d="M500,170 L510,160 L490,160 Z" fill="#FBBC05" />
+  <text x="510" y="155" font-family="Arial" font-size="10" fill="#555">Query Detected</text>
+  
+  <path d="M600,200 L610,190 L590,190 Z" fill="#EA4335" />
+  <text x="620" y="190" font-family="Arial" font-size="10" fill="#555">Payment Agreement</text>
+  
+  <!-- Response Time Indicators -->
+  <line x1="130" y1="220" x2="170" y2="220" stroke="#555" stroke-width="1" />
+  <text x="150" y="215" font-family="Arial" font-size="9" fill="#555" text-anchor="middle">2.1s</text>
+  
+  <line x1="230" y1="240" x2="270" y2="240" stroke="#555" stroke-width="1" />
+  <text x="250" y="235" font-family="Arial" font-size="9" fill="#555" text-anchor="middle">1.8s</text>
+  
+  <line x1="330" y1="200" x2="370" y2="200" stroke="#555" stroke-width="1" />
+  <text x="350" y="195" font-family="Arial" font-size="9" fill="#555" text-anchor="middle">2.3s</text>
+  
+  <line x1="430" y1="230" x2="470" y2="230" stroke="#555" stroke-width="1" />
+  <text x="450" y="225" font-family="Arial" font-size="9" fill="#555" text-anchor="middle">1.5s</text>
+  
+  <line x1="530" y1="190" x2="570" y2="190" stroke="#555" stroke-width="1" />
+  <text x="550" y="185" font-family="Arial" font-size="9" fill="#555" text-anchor="middle">2.8s</text>
+  
+  <line x1="630" y1="210" x2="670" y2="210" stroke="#555" stroke-width="1" />
+  <text x="650" y="205" font-family="Arial" font-size="9" fill="#555" text-anchor="middle">1.7s</text>
+  
+  <line x1="730" y1="240" x2="770" y2="240" stroke="#555" stroke-width="1" />
+  <text x="750" y="235" font-family="Arial" font-size="9" fill="#555" text-anchor="middle">1.4s</text>
+  
+  <line x1="830" y1="260" x2="870" y2="260" stroke="#555" stroke-width="1" />
+  <text x="850" y="255" font-family="Arial" font-size="9" fill="#555" text-anchor="middle">1.2s</text>
+  
+  <!-- Legend -->
+  <rect x="70" y="460" width="20" height="10" fill="#4285F4" opacity="0.8" />
+  <text x="95" y="468" font-family="Arial" font-size="10" fill="#555">Agent Messages</text>
+  
+  <rect x="220" y="460" width="20" height="10" fill="#34A853" opacity="0.8" />
+  <text x="245" y="468" font-family="Arial" font-size="10" fill="#555">Debtor Responses</text>
+  
+  <path d="M370,465 L380,455 L360,455 Z" fill="#FBBC05" />
+  <text x="395" y="468" font-family="Arial" font-size="10" fill="#555">Query Event</text>
+  
+  <path d="M500,465 L510,455 L490,455 Z" fill="#EA4335" />
+  <text x="525" y="468" font-family="Arial" font-size="10" fill="#555">Key Decision Point</text>
+  
+  <line x1="600" y1="465" x2="640" y2="465" stroke="#555" stroke-width="1" />
+  <text x="660" y="468" font-family="Arial" font-size="10" fill="#555">Response Time</text>
+  
+  <line x1="750" y1="465" x2="770" y2="465" stroke="#555" stroke-width="1" stroke-dasharray="4" />
+  <text x="795" y="468" font-family="Arial" font-size="10" fill="#555">Interaction Connection</text>
+</svg>

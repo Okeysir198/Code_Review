@@ -1,0 +1,105 @@
+# Key Performance Indicators (KPIs) for Call Center AI Agent Assessment
+
+## 1. Collection Effectiveness KPIs
+
+| KPI | Description | Calculation Method | Target Benchmark |
+|-----|-------------|-------------------|-----------------|
+| **Payment Success Rate** | Percentage of calls resulting in immediate payment or PTP | (Calls with payment secured / Total calls) × 100% | >70% |
+| **Average Collection Amount** | Average amount collected per successful call | Total amount collected / Number of successful calls | ≥90% of outstanding amount |
+| **Conversion by Debtor Type** | Success rate broken down by debtor persona | (Successful collections per persona / Total calls with that persona) × 100% | >80% for cooperative, >40% for resistant |
+| **PTP Follow-Through Rate** | Percentage of PTPs that actually result in payment | (Fulfilled PTPs / Total PTPs arranged) × 100% | >75% |
+| **Payment Method Distribution** | Breakdown of payment methods chosen by debtors | Count by method (immediate debit, DebiCheck, payment portal) | Benchmark against human agent performance |
+
+## 2. Conversation Quality KPIs
+
+| KPI | Description | Calculation Method | Target Benchmark |
+|-----|-------------|-------------------|-----------------|
+| **Average Response Time** | Time taken to generate and deliver responses | Sum of response generation times / Number of responses | <3 seconds |
+| **Call Duration** | Length of the entire conversation | Time from first to last message | 5-10 minutes |
+| **Turns to Resolution** | Number of conversation turns to secure payment | Count of turns until payment secured | <12 turns |
+| **Query Resolution Rate** | Percentage of client questions properly addressed | (Questions properly answered / Total questions asked) × 100% | >90% |
+| **Natural Language Quality** | Assessment of response naturalness and coherence | Expert evaluation on 1-5 scale | ≥4.0 |
+
+## 3. Call Flow Compliance KPIs
+
+| KPI | Description | Calculation Method | Target Benchmark |
+|-----|-------------|-------------------|-----------------|
+| **Step Completion Rate** | Percentage of required call flow steps completed | (Steps completed / Total required steps) × 100% | 100% |
+| **Script Adherence** | How closely agent follows required script elements | Expert evaluation on 1-5 scale | ≥4.5 |
+| **Step Sequence Accuracy** | Percentage of steps executed in correct order | (Steps in correct sequence / Total steps) × 100% | >95% |
+| **Contextual Transition Score** | Quality of transitions between call steps | Expert evaluation on 1-5 scale | ≥4.0 |
+| **Decision Point Accuracy** | Correct handling of decision points in call flow | (Correct decisions / Total decision points) × 100% | >95% |
+
+## 4. Verification Effectiveness KPIs
+
+| KPI | Description | Calculation Method | Target Benchmark |
+|-----|-------------|-------------------|-----------------|
+| **Verification Success Rate** | Percentage of verification attempts completed successfully | (Successful verifications / Total verification attempts) × 100% | >90% |
+| **False Verification Rate** | Incorrectly verifying non-eligible personas | (Incorrect verifications / Total verifications) × 100% | <2% |
+| **Average Verification Time** | Time taken to complete verification process | Average time from verification start to completion | <90 seconds |
+| **Identity Sensitivity** | Ability to detect third party, unavailable, wrong person | (Correctly identified special cases / Total special cases) × 100% | >95% |
+| **Verification Attempts Ratio** | Average number of attempts needed for verification | Total verification attempts / Total successful verifications | <1.5 |
+
+## 5. Customer Experience KPIs
+
+| KPI | Description | Calculation Method | Target Benchmark |
+|-----|-------------|-------------------|-----------------|
+| **Sentiment Progression** | How customer sentiment changes during call | Analysis of tone/sentiment from start to end | Neutral or positive by end |
+| **Empathy Score** | Level of appropriate empathy shown in responses | Expert evaluation on 1-5 scale | ≥4.0 |
+| **Clarity Score** | How clearly information is conveyed | Expert evaluation on 1-5 scale | ≥4.5 |
+| **Objection Handling Score** | Effectiveness in addressing customer concerns | (Successfully resolved objections / Total objections) × 100% | >85% |
+| **Persona Adaptation** | How well agent adapts to different persona types | Expert evaluation on 1-5 scale | ≥4.0 |
+
+## 6. Technical Performance KPIs
+
+| KPI | Description | Calculation Method | Target Benchmark |
+|-----|-------------|-------------------|-----------------|
+| **System Reliability** | Percentage of calls completed without technical errors | (Error-free calls / Total calls) × 100% | >99% |
+| **Hallucination Rate** | Frequency of generating incorrect or fabricated information | (Instances of hallucination / Total responses) × 100% | <1% |
+| **Context Retention Accuracy** | Ability to maintain and use conversation context | Expert evaluation on 1-5 scale | ≥4.5 |
+| **Tool Usage Accuracy** | Correct implementation of verification tools | (Correct tool implementations / Total tool uses) × 100% | >95% |
+| **Response Consistency** | Consistency of information across conversation | Expert evaluation on 1-5 scale | ≥4.5 |
+
+## 7. Compliance & Risk KPIs
+
+| KPI | Description | Calculation Method | Target Benchmark |
+|-----|-------------|-------------------|-----------------|
+| **Compliance Score** | Adherence to debt collection regulations | Expert evaluation on 1-5 scale | 5.0 (no exceptions) |
+| **Data Protection Rate** | Proper handling of sensitive information | (Compliant information handling / Total sensitive data exchanges) × 100% | 100% |
+| **Disclosure Accuracy** | Correct disclosure of required legal information | (Correct disclosures / Required disclosures) × 100% | 100% |
+| **Script Violation Rate** | Instances of deviating from approved script elements | Count of unapproved deviations / Total calls | <0.5 per call |
+| **Risk Phrase Detection** | Ability to avoid prohibited language or claims | (Calls without risk phrases / Total calls) × 100% | 100% |
+
+## 8. Comparative Performance KPIs
+
+| KPI | Description | Calculation Method | Target Benchmark |
+|-----|-------------|-------------------|-----------------|
+| **AI vs Human Success Rate** | Collection success comparison | AI success rate / Human agent success rate | ≥90% of human performance |
+| **AI Efficiency Ratio** | Time comparison for similar outcomes | Human agent avg. time / AI agent avg. time | >1.2 (20% more efficient) |
+| **Customer Preference Score** | Customer preference between AI and human agents | Survey results on 1-5 scale | ≥3.5 |
+| **Cost Per Collection** | Total operational cost per successful collection | Total costs / Number of successful collections | <70% of human agent cost |
+| **Error Rate Comparison** | Compliance/procedural errors vs human agents | AI error rate / Human agent error rate | <0.8 (20% fewer errors) |
+
+## Implementation Recommendations
+
+1. **Automated Evaluation Pipeline**:
+   - Implement real-time KPI tracking during simulations
+   - Create dashboard visualization of key metrics
+   - Set up alerts for metrics falling below thresholds
+
+2. **Ongoing Optimization Process**:
+   - Use A/B testing to compare script variations
+   - Implement weekly review cycles for lowest-performing KPIs
+   - Maintain a benchmark database for comparing performance over time
+
+3. **Balanced Scorecard Approach**:
+   - Weight KPIs based on business priorities (e.g., compliance = highest)
+   - Create combined score across categories
+   - Set improvement targets by category
+
+4. **Human-in-the-Loop Evaluation**:
+   - Supplement automated metrics with expert reviews
+   - Conduct periodic calibration sessions
+   - Document qualitative insights alongside quantitative measures
+
+This comprehensive KPI framework provides a multi-dimensional view of the Call Center AI Agent's performance, balancing business outcomes, technical performance, and customer experience measures to ensure continuous improvement of the system.

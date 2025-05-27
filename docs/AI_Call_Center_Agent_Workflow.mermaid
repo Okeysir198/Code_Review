@@ -1,0 +1,95 @@
+graph TB
+    %% Define class styles with semantic naming and optimized colors
+    classDef terminal fill:#f8f9fa,stroke:#6c757d,stroke-width:2px,color:#343a40,font-weight:bold,border-radius:10px
+    classDef message fill:#e7f5ff,stroke:#339af0,stroke-width:2px,color:#1971c2,font-weight:bold,border-radius:8px
+    classDef ai fill:#e6fcf5,stroke:#20c997,stroke-width:2px,color:#099268,font-weight:bold,border-radius:8px
+    classDef tool fill:#fff9db,stroke:#fcc419,stroke-width:2px,color:#e67700,font-weight:bold,border-radius:8px
+    classDef process fill:#e6fcf5,stroke:#20c997,stroke-width:2px,color:#099268,font-weight:bold,border-radius:8px
+    classDef decision fill:#fff5f5,stroke:#ff6b6b,stroke-width:2px,color:#c92a2a,font-weight:bold,border-radius:8px
+    classDef config fill:#f8f9fa,stroke:#adb5bd,stroke-width:2px,color:#495057,font-weight:bold,border-radius:8px
+    classDef script fill:#f3f0ff,stroke:#7950f2,stroke-width:2px,color:#5f3dc4,font-weight:bold,border-radius:8px
+    classDef verify fill:#e9ecef,stroke:#adb5bd,stroke-width:2px,color:#495057,font-weight:bold,border-radius:8px
+    classDef speech fill:#ffd8a8,stroke:#e8590c,stroke-width:2px,color:#d9480f,font-weight:bold,border-radius:8px
+    classDef voice fill:#ffd8a8,stroke:#e8590c,stroke-width:2px,color:#d9480f,font-weight:bold,border-radius:8px
+    classDef db fill:#f3f0ff,stroke:#7048e8,stroke-width:2px,color:#5f3dc4,font-weight:bold,border-radius:8px
+    classDef memory fill:#fff0f6,stroke:#f06595,stroke-width:2px,color:#d6336c,font-weight:bold,border-radius:8px
+    classDef negotiate fill:#e9ecef,stroke:#adb5bd,stroke-width:2px,color:#495057,font-weight:bold,border-radius:8px
+    classDef orchestrator fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529,font-weight:bold,border-radius:8px
+
+    %% Main flow nodes
+    Start([🚀 Start]) --> SpeechRecognition["🎤 Speech Recognition<br>(STT Models)<br>whisper_large_v3_turbo"]
+    SpeechRecognition --> ClientMessages["💬 Client Messages"]
+    ClientMessages --> AIAgent["🧠 AI Agent<br>(LLMs)<br>+ Qwen2.5:7b-it-[Ollama]"]
+    AIAgent --> ToolDecision{"🔀 Tools<br>Needed?"}
+    ToolDecision -->|No| AIMessages["💬 AI Messages"]
+    LangGraph["⚙️ LangGraph<br>Orchestration Framework"] -.-> AIAgent
+    VoiceSynthesis --> End([🏁 End])
+    ToolDecision -->|Yes| ToolExecution["🔧 Tool Execution"]
+    ToolExecution --> ResponseProcessor["⚙️ Response Processor<br>Update Verification Status"]
+    ResponseProcessor --> AIAgent
+     
+    AIMessages --> VoiceSynthesis["🔊 Voice Synthesis<br>(TTS)<br>+Kokoro model"] 
+
+    %% Helper functions
+    ContextLoader["🔄 Context Loader"]
+    StateHandler["📊 State Handler"]
+    
+    %% Database
+    CAMSPostgresSQL["🗄️ CAMS Database<br>(PostgreSQL)"]
+    
+    %% Left side components - agent configuration
+    SystemInstructions["📜 System Instructions<br>   + Security Requirements ------<br>   + Verification Protocol ----------<br>   + Conversation Guidelines ----<br>   + etc. --------------------------------"]
+    ConversationScript["📞 Conversation Script<br>   + Introduction ------------<br>   + Identity Verification --<br>   + Reason for Call --------<br>   + etc. --------------------------"]
+    SessionState["💾 State<br>   + current_call_step --------------<br>   + messages ------------------------<br>   + verification_status_name ---<br>   + verification_status_details -"]
+    
+    %% Right side components - tools and verification
+    ToolsList["🛠️ Available Tools<br>   + 🧠 retrieve_client_details() <br>   + 🧠 verify_client_name() ----<br>   + 🧠 verify_client_info() ------<br>   + update_account_status() --<br>   + to be added () ------------------"]
+    
+    %% Verification flow
+    IdentityWorkflow["📞 Debtor Call Workflow"]
+    Introduction["👋 Introduction"]
+    IdentityVerification_Name["🔍 Identity Verification - Name"]
+    IdentityVerification_Details["📝 Identity Verification - Details"]
+    ReasonForCall["🎯 Reason for Call"]
+    Negotiation["🤝 ...next steps..."]
+    
+    %% Verification flow connections
+    IdentityWorkflow -.-> Introduction
+    Introduction -.-> IdentityVerification_Name
+    IdentityVerification_Name -.-> IdentityVerification_Details
+    IdentityVerification_Details -.-> ReasonForCall
+    ReasonForCall --> Negotiation
+   
+    %% Connections
+    SystemInstructions -.-> ContextLoader
+    ConversationScript -.-> ContextLoader
+    ContextLoader -.-> AIAgent
+    SessionState <-.-> StateHandler
+    StateHandler <-.-> AIAgent
+    ToolsList <-.-> ToolExecution
+    CAMSPostgresSQL <-.-> ToolsList
+    LongTermMemory["📚 Conversation History<br>(Long-term Memory)<br>(PostgreSQL)"] <-.-> SessionState
+    
+    %% Apply classes with improved semantic naming
+    class Start,End terminal
+    class ClientMessages,AIMessages message
+    class AIAgent,ResponseProcessor ai
+    class ToolExecution,ToolsList tool
+    class Introduction,IdentityVerification_Name,IdentityVerification_Details,ReasonForCall,IdentityWorkflow verify
+    class Negotiation negotiate
+    class ToolDecision decision
+    class ConversationScript,SystemInstructions,ContextLoader config
+    class SpeechRecognition speech
+    class VoiceSynthesis voice
+    class CAMSPostgresSQL db
+    class StateHandler,SessionState,LongTermMemory memory
+    class LangGraph orchestrator
+    
+    %% Edge styling - main process flow
+    linkStyle 0,1,2,3,4,5,6,7,8,9,10 stroke:#2b8a3e,stroke-width:7px
+    
+    
+    %% Edge styling - information flow and verification flow
+    linkStyle 11,12,13,14,15,16,17,18 stroke:#888,stroke-width:3px,stroke-dasharray:5 5
+    linkStyle 19,20,23 stroke:#d6336c,stroke-width:3px,stroke-dasharray:5 5
+    linkStyle 21,22 stroke:#f76707,stroke-width:3px,stroke-dasharray:5 5

@@ -1,0 +1,98 @@
+flowchart TD
+    Start([Start Call]) --> Intro[1- Introduction]
+    Intro --> NameVerification[2- Name Verification]
+    
+    NameVerification --> NameCheck{Identity\ncheck}
+    NameCheck -->|Verified| DetailsVerification[3- Details Verification]
+    NameCheck -->|Third Party| ThirdParty[Leave message for client]
+    NameCheck -->|Unavailable| NotAvailable[Schedule callback]
+    NameCheck -->|Wrong Person| WrongPerson[Apologize and end call]
+    NameCheck -->|Insufficient Info| NameRetry{Retry\nverification?}
+    
+    NameRetry -->|Yes, attempts < max| NameVerification
+    NameRetry -->|No, max attempts reached| FailedVerification[Failed Verification]
+    
+    DetailsVerification --> DetailsCheck{Details\nverified?}
+    DetailsCheck -->|Yes, 3+ details matched| ReasonForCall[4- Reason for Call]
+    DetailsCheck -->|No, attempts < max| DetailsRetry[Ask for more details]
+    DetailsCheck -->|No, max attempts reached| FailedVerification
+    
+    DetailsRetry --> DetailsVerification
+    
+    ReasonForCall --> Negotiation[5- Negotiation]
+    Negotiation --> Consequences[Explain consequences\nof non-payment]
+    Consequences --> Benefits[Explain benefits\nof payment]
+    Benefits --> QueryCheck{Client has\nquestions?}
+    
+    QueryCheck -->|Yes| QueryHandler[Handle Query]
+    QueryCheck -->|No| PTP[6- Promise to Pay]
+    
+    QueryHandler --> ReturnToPrevious[Return to previous step]
+    ReturnToPrevious --> PTP
+    
+    PTP --> PaymentOption{Immediate\ndebit order?}
+    
+    PaymentOption -->|Yes| CheckTime{Before 2PM?}
+    CheckTime -->|Yes| ImmediateDebit[Load immediate debit order]
+    CheckTime -->|No| NextDayDebit[Schedule next day debit]
+    
+    PaymentOption -->|No| CheckBankDetails{Same details as\nfailed PTP?}
+    
+    CheckBankDetails -->|Yes| FailedPTPMessage[Explain previous failed attempts\nRequest correct details]
+    CheckBankDetails -->|No| CheckReversalHistory{Previously reversed\nsuccessful debit?}
+    
+    CheckReversalHistory -->|Yes| ReversalMessage[Explain reversal issue\nRequest correct details]
+    CheckReversalHistory -->|No| BankDetailsChanged{Bank details\nchanged?}
+    
+    BankDetailsChanged -->|Yes| UpdateCAMS[Update details on CAMS]
+    BankDetailsChanged -->|No| DebiCheckProcess[7- Setup DebiCheck]
+    
+    FailedPTPMessage --> DebiCheckProcess
+    ReversalMessage --> DebiCheckProcess
+    UpdateCAMS --> DebiCheckProcess
+    
+    DebiCheckProcess --> ExplainAuthentication[Explain authentication request]
+    ExplainAuthentication --> NotifyFee[Notify of R10 resubmission fee]
+    NotifyFee --> VerifyBankDetails[Verify bank details]
+    
+    ImmediateDebit --> Subscription[8- Subscription reminder]
+    NextDayDebit --> Subscription
+    VerifyBankDetails --> Subscription
+    
+    Subscription --> PaymentPortal[9- Cartrack Payment Portal]
+    PaymentPortal --> SendSMS[Send SMS with payment link]
+    
+    SendSMS --> ClientUpdate[10- Client Details Update]
+    ClientUpdate --> Referrals[11- Referrals]
+    
+    Referrals --> FurtherAssistance[12- Further Assistance]
+    FurtherAssistance --> DetailedNote[13- Add Detailed Note]
+    DetailedNote --> Disposition[14- Disposition Correctly]
+    
+    Disposition --> CancellationQuery{Client wants\nto cancel?}
+    CancellationQuery -->|Yes| Cancellation[15- Cancellation Declaration]
+    CancellationQuery -->|No| EndCall1([End Call])
+    
+    Cancellation --> LogTicket[Log cancellation ticket]
+    LogTicket --> EndCall2([End Call])
+    
+    ThirdParty --> EndCall3([End Call])
+    NotAvailable --> EndCall4([End Call])
+    WrongPerson --> EndCall5([End Call])
+    FailedVerification --> EndCall6([End Call])
+    
+    classDef process fill:#c4e3f3,stroke:#5bc0de,stroke-width:1px,color:#000000;
+    classDef decision fill:#fcf8e3,stroke:#faebcc,stroke-width:1px,color:#000000;
+    classDef terminal fill:#d9edf7,stroke:#31708f,stroke-width:2px,color:#000000;
+    classDef alert fill:#f2dede,stroke:#ebccd1,stroke-width:1px,color:#000000;
+    classDef highlight fill:#dff0d8,stroke:#d6e9c6,stroke-width:2px,color:#000000;
+    classDef verification fill:#e8daef,stroke:#8e44ad,stroke-width:2px,color:#000000;
+    classDef wrongPerson fill:#f9e7d2,stroke:#d35400,stroke-width:2px,color:#000000;
+    
+    class Start,EndCall1,EndCall2,EndCall3,EndCall4,EndCall5,EndCall6 terminal;
+    class NameCheck,DetailsCheck,NameRetry,PaymentOption,CheckTime,CheckBankDetails,CheckReversalHistory,BankDetailsChanged,CancellationQuery,QueryCheck decision;
+    class FailedPTPMessage,ReversalMessage,FailedVerification alert;
+    class DebiCheckProcess,ExplainAuthentication,NotifyFee,VerifyBankDetails,PaymentPortal,SendSMS highlight;
+    class NameVerification,DetailsVerification,DetailsRetry verification;
+    class WrongPerson wrongPerson;
+    class Intro,ReasonForCall,Negotiation,Consequences,Benefits,PTP,ImmediateDebit,NextDayDebit,Subscription,ClientUpdate,Referrals,FurtherAssistance,DetailedNote,Disposition,Cancellation,LogTicket,ThirdParty,NotAvailable,QueryHandler,ReturnToPrevious process;

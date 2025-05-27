@@ -1,0 +1,58 @@
+Comprehensive Call Center AI Agent Design Specification
+1. Overview & Core Requirements
+The AI Agent handles outbound debt collection calls for Cartrack, following a structured call flow while maintaining natural conversation.
+Key tasks include verifying client identity, explaining outstanding payments, negotiating payment or Promise-to-Pay (PTP), handling queries, and closing the call professionally.
+2. Architecture
+LangGraph Implementation: Uses a state graph (StateGraph) with nodes representing call steps and a router for flow control. State is managed using CallCenterAgentState and persisted with MemorySaver.
+Conversation State: Tracks current_call_step, name_verification_status, details_verification_status, verification_attempts, verified_client_name, is_call_ended, and call_info.
+Component Integration: Integrates LLM, TTS/STT, and specialized tools (e.g., for verification).
+3. Conversation Flow (Based on call_flow_v2.txt)
+Introduction: Agent introduces themselves, the department (Cartrack Accounts), and asks to speak with the client.
+Name Verification: Confirm if speaking to the correct person.
+Decision (Identity Check):
+Verified: Proceed to Details Verification.
+Third Party: Ask them to relay a message to the client to call 011 250 3000. End call.
+Unavailable: Schedule a callback. End call.
+Wrong Person: Apologize and end call politely.
+Insufficient Info: Retry verification or proceed to Failed Verification.
+Failed Verification (Max Retries/No): End call politely.
+Details Verification: Notify call is recorded. Verify identity by confirming ANY 3 details (e.g., vehicle info, email, username) OR the full ID/Passport number.
+Decision (Details Verified?):
+Yes: Proceed to Reason for Call.
+No, try again: Request alternative/additional details. Retry Details Verification.
+No, max attempts: Proceed to Failed Verification.
+Reason for Call: Inform the client about the missed payment, overdue status, and required payment amount.
+Negotiation: Explain consequences (service suspension: App access, positioning, notifications) and benefits (reinstatement) of payment.
+Handle client queries if any, then proceed.
+Promise to Pay (PTP): Request permission for immediate debit.
+Decision (Immediate Debit?):
+Yes: Check time. If before 2 PM, process same-day; otherwise, schedule next-day. Proceed to Subscription Reminder.
+No: Check for history of failed PTPs with same details. If yes, explain and request correct details. Check for previous reversals. If yes, address history and request details. Check if details changed. If yes, update CAMS. Proceed to DebiCheck Setup.
+Setup DebiCheck: Explain the bank authentication request (DebiCheck) and the R10 resubmission fee. Verify details before capturing.
+Subscription Reminder: Clarify the current payment is for arrears and the normal monthly subscription will still be debited separately.
+Payment Portal: Explain the SMS payment link and guide the client through the portal (PAY HERE -> Edit Amount -> CONFIRM & NEXT -> Select Method: Card/Ozow/CapitecPay/Pay@). Explain post-payment steps.
+Client Details Update: Verify and update contact information (phone, email, banking details, salary date, next of kin).
+Referrals: Offer the referral program (2 months free subscription) and capture details if interested.
+Further Assistance: Ask if the client needs any other help. Provide support if needed.
+Document Interaction: Add detailed notes about the call.
+Disposition Call: Select the appropriate outcome code.
+Cancellation Handling (If requested): Identify contract/reason, advise cancellation value/total balance, explain escalation to Client Services, log a Helpdesk ticket.
+End Call: Conclude the call professionally.
+4. Verification Process
+Name Verification: Uses verify_client_name tool. Classifies responses into VERIFIED, THIRD_PARTY, WRONG_PERSON, INSUFFICIENT_INFO, UNAVAILABLE, VERIFICATION_FAILED. Handles maximum attempts.
+Details Verification: Uses verify_client_details tool. Requires 3 matching items or ID/Passport number. Handles maximum attempts.
+5. Response Generation
+Uses dynamic system prompts based on the current call state, script type, and verification status.
+Relies on script templates (e.g., from call_scripts.py) for guidance but generates natural, conversational responses.
+Handles off-topic questions by briefly answering and redirecting back to the flow.
+6. Implementation Details
+Key methods include _router, _router_condition, _create_dynamic_system_prompt, _generate_llm_response, and step-specific _process_ methods.
+Configurable parameters for max verification attempts and script type.
+Script templates are located in the CallScripts module.
+7. Technical Components
+Tools: verify_client_name, verify_client_details.
+Prompt Templates: SYSTEM_PROMPT_TEMPLATE, DYNAMIC_SYSTEM_PROMPT_TEMPLATE, CONTEXT_PROMPT_TEMPLATE, etc., located in prompts.py.
+Agent Configuration: Includes LLM settings, TTS/STT config, verification parameters.
+8. Development Roadmap
+Covers phases for core flow implementation, enhancing intelligence (intent recognition, memory), and refinement/optimization.
+This updated summary integrates the detailed steps from the call_flow_v2.txt flowchart into the existing structure of agent_summary.txt.

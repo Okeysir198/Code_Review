@@ -1,0 +1,125 @@
+flowchart TD
+    Start([Start Call]) --> NewTurn[New Turn]
+    NewTurn --> Router[Router]
+    
+    %% Initial Call Flow
+    Router -.->|Initial Call| Intro[0•Introduction]
+    Intro --> EndTurn
+
+    %% Name Verification Flow
+    Router -.->|After Introduction| NameVerificationTool[Name Verification Tool]
+    
+    %% Third Party path
+    NameVerificationTool -.->|Third Party| ThirdParty[Third Party Message]
+    ThirdParty --> EndCall[End Call]
+    
+    %% Unavailable path
+    NameVerificationTool -.->|Unavailable| NotAvailable[Not Available Message]
+    NotAvailable --> EndCall
+
+    %% Wrong Person path
+    NameVerificationTool -.->|Wrong Person| WrongPerson[Wrong Person Message]
+    WrongPerson --> EndCall
+    
+    %% Name Verification retry path
+    NameVerificationTool -.->|Insufficient Info, < Max Attempts| NameVerificationResponse[1• Name Verification Response]
+    NameVerificationResponse --> EndTurn
+
+    %% Verification failed
+    NameVerificationTool -.->|Insufficient Info, >= Max Attempt| FailedVerification[Failed Verification]
+    DetailsVerificationTool -.->|Insufficient Info, >= Max Attempt| FailedVerification
+
+
+    %% Details Verification path
+    DetailsVerificationTool -.->|Insufficient Info, < Max Attempts| DetailsVerificationResponse[2•Details Verification Response]
+    DetailsVerificationResponse --> EndTurn
+    FailedVerification --> EndCall
+    
+    
+    %% Main verification success path
+    NameVerificationTool -.->|Verified| DetailsVerificationTool[Details Verification Tool]
+    DetailsVerificationTool -.->|Verified| ReasonForCall[3•Reason For Call]
+    ReasonForCall --> EndTurn
+    
+
+    %% Negotiation Flow
+    Router -.->|After Reason For Call| Negotiation[4• Negotiation<br>• Consequences<br>• Benefits]
+    Negotiation --> EndTurn
+
+    %% Query Handler
+    Router -.->|Query Detected| QueryHandler[Query Handler]
+    QueryHandler --> EndTurn 
+
+    %% Promise to Pay Process
+    Router -.->|Need PTP| PromiseToPayProcess[6• Promise To Pay Process]
+    PromiseToPayProcess  -.->   PromiseToPayProcessTools[Promise To Pay Tools<br>• Yes <2PM: load immediate debit order <br>•Yes >2PM: schedule next-day debit order<br>• check failed PTP with current bank details<br>• check previously reversed a successful debit order<br>• verify new provied bank details<br>• update new bank info to CAMS<br>• update salary date to CAMS<br>• Load debicheck PTP ]
+    PromiseToPayProcessTools --> PromiseToPayProcess
+    PromiseToPayProcess -.-> EndTurn 
+
+    %% DebiCheck Process
+    Router -.->|Debit Order Chosen| DebiCheckProcess[7• DebiCheck Process]
+    DebiCheckProcess -.-> EndTurn
+    DebiCheckProcess -.-> SubscriptionReminder[8• Subscription Reminder]
+    SubscriptionReminder --> EndTurn 
+    
+
+    %% Online Payment Process
+    Router -.->|Online Chosen| PaymentPortalProcess[9• Payment Portal Process]
+    PaymentPortalProcess -.-> PaymentPortalProcessTools[Payment Portal Process Tools<br>•Send SMS with payment link]
+    PaymentPortalProcessTools --> PaymentPortalProcess
+    PaymentPortalProcess -.-> SubscriptionReminder
+    PaymentPortalProcess -.-> EndTurn 
+
+    %% Client Details Process
+    Router -.->|Need Client Details| ClientDetailsProcess[10• Client Details Process]
+    ClientDetailsProcess -.-> ClientDetailsProcessTool[Client Details update Tools]
+    ClientDetailsProcessTool --> ClientDetailsProcess
+    ClientDetailsProcess -.-> EndTurn 
+
+    %% Referrals Process
+    Router -.->|Need Referrals| ReferralsProcess[11• Referrals Process]
+    ReferralsProcess --> EndTurn 
+
+    %% Further Assistance Flow
+    Router -.->|Need Further Assistance| FurtherAssistance[12• Further Assistance?]
+    FurtherAssistance --> EndTurn 
+
+    %% Cancellation Process
+    Router -.->|Cancellation Request| CancellationProcess[15• Cancellation Process]
+    CancellationProcess -.-> CancellationProcessTool[log cancel ticket]
+    CancellationProcessTool --> CancellationProcess
+    CancellationProcess --> EndTurn 
+
+    %% Escalation Process
+    Router -.->|Complex Issue| Escalation[17• Escalation Process]
+    Escalation -.-> EscalationTools[log escalation ticket]
+    EscalationTools-->Escalation
+    Escalation --> EndTurn 
+
+    
+
+    %% Closing Path
+    Router -.->|Need Closing| Closing[16• Closing] 
+    Closing --> EndCall
+
+    %% Post-Call Documentation
+    EndCall --> PostCallDocumentation[13-14• Post-Call Documentation]
+    PostCallDocumentation --> EndTurn 
+
+    %% Node styling
+    classDef router fill:#ffad99, stroke:#990000, stroke-width:2px, color:#000000, font-weight:bold;
+    classDef process fill:#90EE90, stroke:#006400, stroke-width:1px, color:#000000;
+    classDef special fill:#ffcccc, stroke:#cc0000, stroke-width:1px, color:#000000;
+    classDef terminal fill:#e6e6e6, stroke:#404040, stroke-width:2px, color:#000000, font-weight:bold;
+    classDef EndCall fill:#ff6b6b, stroke:#c0392b, stroke-width:2px, color:#000000, font-weight:bold;
+    classDef decision fill:#fcf8e3, stroke:#faebcc, stroke-width:1px, color:#000000;
+    classDef tools fill:#ffd8a8,stroke:#e8590c,stroke-width:2px,color:#000000,font-weight:bold;
+
+    %% Apply styling to nodes
+    class Router router;
+    class DetailsRetryCheck,NameRetryCheck,UnavailableCheck,ThirdPartyCheck,WrongPersonCheck decision
+    class Intro,NameVerificationResponse,DetailsVerificationResponse,ReasonForCall,Negotiation,PromiseToPayProcess,DebiCheckProcess,SubscriptionReminder,PaymentPortalProcess,ClientDetailsProcess,ReferralsProcess,FurtherAssistance,CancellationProcess,Escalation,Closing,PostCallDocumentation process;
+    class ThirdParty,NotAvailable,WrongPerson,FailedVerification,QueryHandler special;
+    class NameVerificationTool,DetailsVerificationTool,PromiseToPayProcessTools,EscalationTools,DebiCheckProcessTools,PaymentPortalProcessTools,ClientDetailsProcessTool,CancellationProcessTool tools
+    class Start,NewTurn,EndTurn terminal;
+    class EndCall EndCall;

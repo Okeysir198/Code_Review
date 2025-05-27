@@ -1,0 +1,416 @@
+Complete Call Center AI Agent Implementation Components
+Core Classes
+
+CallCenterAgent
+
+Main agent class orchestrating the entire conversation flow and tool interactions
+Handles LLM routing decisions, script management, and tool integration
+Maintains conversation context and drives seamless transitions between states
+
+
+CallCenterAgentState
+
+Comprehensive state tracking for conversation context and progress
+Stores verification status, current step, client sentiment, and payment information
+Tracks flags for special cases and conversation history
+
+
+Enumerations
+
+CallStep: Maps the structured debt collection flow (introduction through disposition)
+VerificationStatus: Classification results for identity verification
+PaymentMethod: Available payment options for debt resolution
+
+
+
+Setup Functions
+
+__init__(app_config)
+
+Initializes agent with configuration settings for LLM, tools, and scripts
+Sets verification parameters and script type
+Creates memory and state management components
+
+
+define_tool_configs()
+
+Configures tool groups for different call steps (DB, payment, DebiCheck, etc.)
+Creates tool-bound LLMs for specialized call segments
+Organizes tools into logical functional groups
+
+
+_build_workflow()
+
+Constructs complete LangGraph state machine with all nodes and transitions
+Defines conditional routing logic between states
+Creates an executable graph that handles conversation flow
+
+
+
+Router Functions (LLM-driven Decision Making)
+
+_router(state)
+
+Central intelligence that performs all client message analysis using the LLM
+Directly detects topics, intents, sentiment, and payment agreements from natural language
+Performs all classification tasks including payment commitment detection and topic detection
+Analyzes client sentiment to guide negotiation strategies
+Updates state with all detected context without separate classification functions
+
+
+_router_condition(state)
+
+Determines optimal next node based on current conversation state
+Handles transitions between call steps based on LLM understanding
+Manages special cases and topic shifts with contextual awareness
+
+
+_name_verification_router(state)
+
+Routes based on name verification results including special cases
+Handles confirmation thresholds for special classifications
+Enforces security protocols for identity verification
+
+
+_details_verification_router(state)
+
+Decides next step based on verification progress and attempt count
+Transitions to reason for call when verification is complete
+Manages failed verification scenarios
+
+
+
+Tool Execution Nodes
+
+_run_name_verification_tool(state)
+
+Executes identity verification tool to analyze client responses
+Processes verification results into state updates
+Tracks verification attempts and confirmation counters
+
+
+_run_details_verification_tool(state)
+
+Executes secondary verification for account-specific details
+Processes verification results and tracks matched/unmatched items
+Updates state with verification progress for step-by-step verification
+
+
+_execute_payment_arrangement_tools(state)
+
+Processes payment arrangements through appropriate tools
+Updates banking information and schedules payments
+Captures payment dates and confirmation details
+
+
+_execute_debicheck_tools(state)
+
+Sets up DebiCheck authentication system
+Processes banking details through secure channels
+Captures authentication status for client approval
+
+
+_execute_payment_portal_tools(state)
+
+Sends payment links and processes portal payments
+Tracks SMS delivery and payment confirmations
+Updates payment status in the client record
+
+
+_execute_client_details_tools(state)
+
+Updates client contact and banking information
+Captures new client details for database updates
+Validates information format and completeness
+
+
+_execute_referral_tools(state)
+
+Processes referral information for reward program
+Creates referral records in the system
+Tracks referral status and confirms submission
+
+
+_execute_cancellation_tools(state)
+
+Creates cancellation tickets and log requests
+Calculates cancellation fees and outstanding balances
+Routes cancellation to appropriate departments
+
+
+_execute_escalation_tools(state)
+
+Creates escalation tickets for specialized handling
+Routes issues to appropriate departments
+Captures escalation details and priority levels
+
+
+_execute_disposition_tools(state)
+
+Documents call outcomes and creates call notes
+Assigns disposition codes based on call results
+Finalizes record-keeping for call completion
+
+
+
+LLM-Tool Connection Logic
+
+_generate_llm_response(state, additional_context, with_tools, tool_bound_llm)
+
+Core function connecting LLM to appropriate tools
+Selects specialized tool-bound LLM based on current step
+Handles context assembly and response generation with tools
+Processes tool outputs back into conversation flow
+
+
+Tool-Bound LLM Creation (in define_tool_configs)
+
+Creates specialized LLMs with relevant tool access
+llm_with_ptp_tools - Payment arrangement tools
+llm_with_debicheck_tools - DebiCheck processing
+llm_with_payment_portal_tools - Portal payment
+llm_with_client_details_tools - Client information updates
+llm_with_referrals_tools - Referral processing
+llm_with_cancellation_tools - Cancellation handling
+llm_with_escalation_tools - Escalation management
+llm_with_disposition_tools - Call documentation
+
+
+
+Process Nodes (Call Flow Steps)
+
+_process_introduction(state)
+
+Initiates call with appropriate greeting based on script type
+Introduces agent and requests to speak with client
+Sets conversation tone for debt collection purpose
+
+
+_process_name_verification_response(state)
+
+Generates identity verification requests based on attempt number
+Provides appropriate follow-up based on partial verification
+Maintains security by withholding account details until verified
+
+
+_process_details_verification_response(state)
+
+Manages progressive verification with one-item-at-a-time approach
+Focuses verification requests on unverified items
+Provides feedback on matched and unmatched items
+
+
+_process_reason_for_call(state)
+
+Explains outstanding payment situation with appropriate urgency
+Communicates amount due and account status
+Adapts explanation based on script type (inflow, failed PTP, etc.)
+
+
+_process_negotiation(state)
+
+Implements adaptive negotiation strategies based on client response
+Explains consequences of non-payment and benefits of resolution
+Adjusts approach based on client sentiment and previous attempts
+
+
+_process_promise_to_pay(state)
+
+Secures payment arrangement with appropriate payment method
+Detects client agreement from natural language
+Connects to payment processing tools when agreement reached
+
+
+_process_debicheck_setup(state)
+
+Explains DebiCheck authentication process step-by-step
+Guides client through bank approval process
+Clarifies fee structure and total payment amount
+
+
+_process_subscription_reminder(state)
+
+Clarifies distinction between arrears payment and subscription
+Explains ongoing payment obligations
+Ensures client understands total financial commitment
+
+
+_process_payment_portal(state)
+
+Guides client through payment portal access and usage
+Explains payment options and process
+Sends SMS link and provides step-by-step instructions
+
+
+_process_client_details_update(state)
+
+Verifies and updates contact information and banking details
+Captures next-of-kin information for account security
+Updates client record with new information
+
+
+_process_referrals(state)
+
+Presents referral program benefits to client
+Captures referral information when offered
+Explains reward process for successful referrals
+
+
+_process_further_assistance(state)
+
+Addresses any remaining questions or concerns
+Ensures all client needs are addressed before closing
+Transitions toward call closing
+
+
+_process_disposition_call(state)
+
+Documents call outcome with appropriate disposition code
+Creates detailed call notes for account history
+Processes call completion in system records
+
+
+_process_cancellation(state)
+
+Handles cancellation requests professionally
+Explains cancellation fees and total settlement amount
+Creates cancellation ticket for specialized follow-up
+
+
+_process_escalation(state)
+
+Processes escalation requests to appropriate departments
+Creates escalation tickets with priority levels
+Explains escalation process and next steps to client
+
+
+_process_closing(state)
+
+Provides appropriate closing based on call outcome
+Summarizes actions taken and next steps
+Concludes conversation professionally
+
+
+_process_query_handler(state)
+
+Handles off-topic questions with context maintenance
+Provides accurate information while keeping conversation on track
+Returns to main flow after addressing client questions
+
+
+_process_end_call(state)
+
+Finalizes call state and prepares for disposition
+Ensures all tracking flags are properly set
+Transitions to call documentation
+
+
+
+Special Case Handlers
+
+_process_third_party(state)
+
+Handles situations when speaking to someone other than the client
+Provides appropriate message for the client about the account
+Maintains privacy and security while leaving contact information
+
+
+_process_not_available(state)
+
+Handles scenarios where client is identified but unavailable
+Arranges callback time or provides contact information
+Closes call professionally with appropriate documentation
+
+
+_process_wrong_person(state)
+
+Addresses cases of reaching incorrect individual
+Apologizes for inconvenience and ends call appropriately
+Updates disposition to reflect wrong contact
+
+
+_process_failed_verification(state)
+
+Manages situations where verification repeatedly fails
+Explains security requirements professionally
+Provides alternative contact methods for verification
+
+
+
+Support Functions
+
+_create_dynamic_system_prompt(state, current_step)
+
+Builds rich contextual prompts for LLM based on current state
+Incorporates script sections, client information, and verification status
+Provides step-specific guidance for LLM response generation
+
+
+_format_script(template, **kwargs)
+
+Formats script templates with client-specific information
+Handles partial formatting when information is incomplete
+Creates natural-sounding script text from templates
+
+
+_generate_call_summary(state)
+
+Creates comprehensive summary of call for documentation
+Captures key actions, agreements, and next steps
+Formats information for disposition and note creation
+
+
+
+Public Interface
+
+run(user_input)
+
+Primary function for processing user messages
+Invokes workflow with current state and new input
+Returns appropriate response from conversation flow
+
+
+reset()
+
+Resets conversation state to begin new interaction
+Clears memory and workflow state
+Prepares agent for fresh conversation
+
+
+
+Prompt Templates
+The system uses specialized prompt templates for different conversation phases, each designed to provide rich context and guidance to the LLM:
+
+System and Context Prompts
+
+SYSTEM_PROMPT_TEMPLATE: Foundational prompt defining agent role and behavior
+DYNAMIC_SYSTEM_PROMPT_TEMPLATE: Rich contextual prompt incorporating state and script
+CONTEXT_PROMPT_TEMPLATE: Specialized handling for off-topic discussions
+
+
+Verification Prompts
+
+NAME_VERIFICATION_PROMPT_TEMPLATE: Attempt-specific identity verification guidance
+DETAILS_VERIFICATION_PROMPT_TEMPLATE: Progressive verification with specific feedback
+SPECIAL_CASE_CONFIRMATION_TEMPLATE: Confirmation for third-party/unavailable scenarios
+
+
+Call Flow Prompts
+
+REASON_FOR_CALL_PROMPT_TEMPLATE: Script-specific explanation guidance
+NEGOTIATION_PROMPT_TEMPLATE: Multi-strategy approach based on client response
+PAYMENT_ARRANGEMENT_PROMPT_TEMPLATE: Payment setup with method-specific guidance
+DEBICHECK_SETUP_PROMPT_TEMPLATE: Step-by-step DebiCheck explanation
+SUBSCRIPTION_REMINDER_PROMPT_TEMPLATE: Clear distinction between payments
+PAYMENT_PORTAL_PROMPT_TEMPLATE: Portal guidance with troubleshooting
+CLIENT_DETAILS_UPDATE_PROMPT_TEMPLATE: Specific field collection guidance
+REFERRALS_PROMPT_TEMPLATE: Value proposition for referral program
+FURTHER_ASSISTANCE_PROMPT_TEMPLATE: Final questions with focused responses
+CANCELLATION_PROMPT_TEMPLATE: Professional cancellation process explanation
+CLOSING_PROMPT_TEMPLATE: Outcome-specific closing statements
+
+
+Special Handling Prompts
+
+QUERY_HANDLING_PROMPT_TEMPLATE: Structured response format with topic relevance
+DOCUMENTATION_PROMPT_TEMPLATE: Call documentation with complete data points

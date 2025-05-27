@@ -1,0 +1,64 @@
+flowchart TB
+    %% Main flow and key nodes
+    Start([Start Simulation]) --> TestController
+    TestController["Test Controller"] --> CCA_Init & DS_Init
+    
+    %% Call Center Agent core flow (left side)
+    CCA_Init["Initialize Call Center Agent"] --> CCA_Router
+    CCA_Router["Router Node"] --> NameVerification
+    NameVerification["Name Verification"] --> DetailsVerification
+    DetailsVerification["Details Verification"] --> ReasonForCall
+    ReasonForCall["Explain Reason for Call"] --> Negotiation
+    Negotiation["Negotiation Phase"] --> PTP["Promise to Pay"]
+    
+    %% Payment paths
+    PTP --> PaymentPath{"Payment Path"}
+    PaymentPath -->|"Immediate"| ImmediateDebit["Process Immediate Debit"]
+    PaymentPath -->|"Future"| DebiCheckSetup["DebiCheck Setup"]
+    PaymentPath -->|"Online"| PaymentPortal["Payment Portal"]
+    
+    %% Closing flow
+    ImmediateDebit & DebiCheckSetup & PaymentPortal --> ClientDetails["Update Client Details"]
+    ClientDetails --> Referrals["Request Referrals"]
+    Referrals --> FurtherAssistance["Further Assistance"]
+    FurtherAssistance --> Closing["Close Call"]
+    Closing --> ConversationEnd
+    
+    %% Special cases branch
+    CCA_Router -->|"Special Case"| SpecialCases["Special Cases:<br>- Third party<br>- Unavailable<br>- Wrong person"]
+    SpecialCases --> ConversationEnd["Conversation End"]
+    
+    %% Debtor Simulator core flow (right side)
+    DS_Init["Initialize Debtor Simulator"] --> DS_StepDetect
+    DS_StepDetect["Detect Call Step"] --> DS_Persona
+    
+    %% Persona selection
+    DS_Persona{"Select Persona"} -->|"Cooperative"| Cooperative["Cooperative Response"]
+    DS_Persona -->|"Resistant"| Resistant["Resistant Response"]
+    DS_Persona -->|"Special"| SpecialPersona["Special Response:<br>- Third party<br>- Unavailable<br>- Wrong number"]
+    
+    %% Response generation
+    Cooperative & Resistant & SpecialPersona --> DS_PaymentPref
+    DS_PaymentPref["Apply Payment Preference"] --> DS_LLMPrompt
+    DS_LLMPrompt["Create LLM Prompt"] --> DS_Response["Generate Debtor Response"]
+    
+    %% Interaction between agents (center)
+    DS_Response --> |"Debtor Message"| CCA_Router
+    CCA_Router --> |"Agent Message"| DS_StepDetect
+    
+    ConversationEnd --> Analysis["Performance Analysis"]
+    Analysis --> End([End Simulation])
+    
+    %% Clear styling with higher contrast
+    classDef callCenter fill:#4285F4,color:white,stroke:#2A56C6,stroke-width:2px;
+    classDef debtorSim fill:#34A853,color:white,stroke:#1F8B3B,stroke-width:2px;
+    classDef decision fill:#FBBC05,color:black,stroke:#F29900,stroke-width:2px;
+    classDef terminal fill:#EA4335,color:white,stroke:#C5221F,stroke-width:2px;
+    classDef controller fill:#9C27B0,color:white,stroke:#6A1B9A,stroke-width:2px;
+    
+    %% Apply styles
+    class CCA_Init,CCA_Router,NameVerification,DetailsVerification,ReasonForCall,Negotiation,PTP,ImmediateDebit,DebiCheckSetup,PaymentPortal,ClientDetails,Referrals,FurtherAssistance,Closing,SpecialCases callCenter;
+    class DS_Init,DS_StepDetect,Cooperative,Resistant,SpecialPersona,DS_PaymentPref,DS_LLMPrompt,DS_Response debtorSim;
+    class PaymentPath,DS_Persona decision;
+    class Start,End,ConversationEnd terminal;
+    class TestController,Analysis controller;
