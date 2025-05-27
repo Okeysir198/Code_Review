@@ -122,6 +122,7 @@ class ClientData:
     last_successful_payment: Optional[Dict[str, Any]] = None
     contracts: List[Dict[str, Any]] = field(default_factory=list)
     billing_analysis: Dict[str, Any] = field(default_factory=dict)
+    existing_mandates: Dict[str, Any] = field(default_factory=dict)
     loaded_at: Optional[datetime] = None
 
 @dataclass
@@ -192,7 +193,6 @@ class CallCenterAgentState(MessagesState):
     current_step: str = CallStep.INTRODUCTION.value
     previous_step: Optional[str] = None
     next_step: Optional[str] = None
-    script_type: str = ScriptType.RATIO_1_INFLOW.value
     is_call_active: bool = True
     is_call_ended: bool = False
     call_outcome: Optional[str] = None
@@ -204,17 +204,10 @@ class CallCenterAgentState(MessagesState):
     details_verification_attempts: int = 0
     matched_fields: List[str] = field(default_factory=list)
     field_to_verify: str = "id_number"
-    max_name_verification_attempts: int = 3
-    max_details_verification_attempts: int = 5
     
     # ===== CLIENT DATA =====
     client_data: ClientData = field(default_factory=ClientData)
-    client_full_name: str = "Client"
-    client_name: str = "Client"
-    client_title: str = "Mr/Ms"
-    outstanding_amount: str = "R 0.00"
-    subscription_amount: str = "R 199.00"
-    subscription_date: str = "5th of each month"
+
     
     # ===== BEHAVIORAL INTELLIGENCE =====
     behavioral_analysis: BehavioralAnalysis = field(default_factory=BehavioralAnalysis)

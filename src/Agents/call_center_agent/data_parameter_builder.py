@@ -133,12 +133,13 @@ class ClientDataBuilder:
             },
             "account_overview": {"account_status": "Overdue"},
             "account_aging": {"xbalance": "0.00"},
-            "subscription": {"subscription_amount": "199.00"},
+            "subscription": {"subscription_amount": "0.00"},
             "payment_history": [],
             "failed_payments": [],
             "last_successful_payment": None,
             "contracts": [],
             "billing_analysis": {},
+            "existing_mandates": {},
             "loaded_at": datetime.now()
         }
     

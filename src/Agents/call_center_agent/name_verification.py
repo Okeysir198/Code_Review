@@ -1,13 +1,14 @@
 # ./src/Agents/call_center_agent/name_verification.py
 """
-Optimized Name Verification Agent for Call Center.
+Name Verification Agent for Call Center.
 """
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
+from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.prompts import get_step_prompt
@@ -23,80 +24,86 @@ def create_name_verification_agent(
     script_type: str = ScriptType.RATIO_1_INFLOW.value,
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
-    verbose: bool = False
+    verbose: bool = False,
+    config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """
-    Create a name verification agent for debt collection calls.
+    """Create a name verification agent for debt collection calls."""
     
-    Args:
-        model: Language model to use
-        script_type: Script type (e.g., "ratio_1_inflow")
-        agent_name: Name of the agent
-        tools: Optional tools for the agent
-        verbose: Enable verbose logging
+    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["__end__", "agent"]]:
+        """Verify client name and update state."""
         
-    Returns:
-        Compiled name verification agent workflow
-    """
-    
-    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
-        """Pre-process state to verify client name."""
-        # Increment attempt counter
-        attempts = state.get("name_verification_attempts", -1) + 1
-        
-
-        
-        # Extract client name safely
+        # Extract client info
         profile = client_data.get("profile", {})
-        client_info = profile.get("client_info", {}) if profile else {}
+        client_info = profile.get("client_info", {})
         client_full_name = client_info.get("client_full_name", "Client")
         
-        # Perform name verification
+        # Increment attempts
+        attempts = state.get("name_verification_attempts", 0) + 1
+        max_attempts = config.get("verification", {}).get("max_name_verification_attempts", 3)
+        
+        # Perform verification
+        verification_status = VerificationStatus.INSUFFICIENT_INFO.value
+        current_step =  CallStep.NAME_VERIFICATION.value
+        goto = "agent"
         try:
-            verification_result = verify_client_name.invoke({
+            result = verify_client_name.invoke({
                 "client_full_name": client_full_name,
-                "messages": state.get("messages",[]),
-                "max_failed_attempts": state.get("max_name_verification_attempts",5)
+                "messages": state.get("messages", []),
+                "max_failed_attempts": max_attempts
             })
-            
-            return {
-                "client_full_name": client_full_name,
-                "name_verification_status": verification_result.get("classification", VerificationStatus.INSUFFICIENT_INFO.value),
-                "name_verification_attempts": attempts,
-            }
-            
+            verification_status = result.get("classification", VerificationStatus.INSUFFICIENT_INFO.value)
         except Exception as e:
             if verbose:
-                print(f"Name verification error: {e}")
-            
-            return {
-                "client_full_name": client_full_name,
-                "name_verification_status": VerificationStatus.INSUFFICIENT_INFO.value,
-                "name_verification_attempts": attempts,
-            }
+                print(f"Verification error: {e}")
+        
+        # Handle max attempts
+        if attempts > max_attempts and verification_status == VerificationStatus.INSUFFICIENT_INFO.value:
+            verification_status = VerificationStatus.VERIFICATION_FAILED.value
+        
+        # Determine next step - only VERIFIED proceeds to details verification
+        if verification_status == VerificationStatus.VERIFIED.value:
+            next_step = CallStep.DETAILS_VERIFICATION.value
+            goto = "__end__"
+        else:
+            next_step = CallStep.CLOSING.value
+        
+        return Command(
+            update={
+            "name_verification_status": verification_status,
+            "name_verification_attempts": attempts,
+            "current_step": current_step,
+            "next_step": next_step
+            },
+            goto=goto
+        )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for name verification step."""
-        # Build parameters using real client data
         parameters = prepare_parameters(
             client_data=client_data,
             current_step=CallStep.NAME_VERIFICATION.value,
-            state=state.to_dict(),
+            state=state.to_dict() if hasattr(state, 'to_dict') else state,
             script_type=script_type,
             agent_name=agent_name
         )
         
-        # Generate step-specific prompt
         prompt_content = get_step_prompt(CallStep.NAME_VERIFICATION.value, parameters)
-        
-        return SystemMessage(content=prompt_content)
+        return [SystemMessage(content=prompt_content)] + state['messages']
     
-    return create_basic_agent(
-        model=model,
-        prompt=dynamic_prompt,
-        tools=tools or [],
-        pre_processing_node=pre_processing_node,
-        state_schema=CallCenterAgentState,
-        verbose=verbose,
-        name="NameVerificationAgent"
-    )
+    # Configure basic agent
+    kwargs = {
+        "model": model,
+        "prompt": dynamic_prompt,
+        "tools": tools or [],
+        "pre_processing_node": pre_processing_node,
+        "state_schema": CallCenterAgentState,
+        "verbose": verbose,
+        "name": "NameVerificationAgent"
+    }
+    
+    # Add memory if configured
+    if config and config.get('configurable', {}).get('use_memory'):
+        from langgraph.checkpoint.memory import MemorySaver
+        kwargs["checkpointer"] = MemorySaver()
+    
+    return create_basic_agent(**kwargs)

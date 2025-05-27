@@ -28,17 +28,18 @@ def create_introduction_agent(
 ) -> CompiledGraph:
     """Create an introduction agent for debt collection calls."""
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__", "agent"]]:
         client_full_name = client_data["profile"]["client_info"]['client_full_name']
         client_title = client_data["profile"]["client_info"]['title']
 
-        messages = HumanMessage(content=f"Good day!, you are speaking to {agent_name} from Cartrack Accounts Department. May I speak to {client_title} {client_full_name}, please?")
+        messages = HumanMessage(content=f"Good day, you are speaking to {agent_name} from Cartrack Accounts Department. May I speak to {client_title} {client_full_name}, please?")
         
         return Command(
             # state update
             update={
                 "messages": [messages],
-                "current_step": CallStep.NAME_VERIFICATION.value
+                "current_step": CallStep.INTRODUCTION.value,
+                "next_step": CallStep.NAME_VERIFICATION.value,
                 },
             goto="__end__"
         )

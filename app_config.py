@@ -91,7 +91,7 @@ CONFIG = {
 
     # Name verification config
     "verification": {
-        "max_name_verification_attempts": 3,
+        "max_name_verification_attempts": 4,
         "max_details_verification_attempts": 5,
         },
 
