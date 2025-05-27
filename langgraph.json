@@ -4,15 +4,10 @@
     "."
   ],
   "graphs": {
-    "basic_agent"                       : "./test_graph/test_langgraph_flow.py:graph_basic_agent",
-    "graph_react_agent"                 :  "./src/Agents/graph_react_agent.py:react_agent_graph",
     "graph_introduction_agent"          : "./src/Agents/graph_call_center.py:graph_introduction_agent",
     "graph_name_verification_agent"     : "./src/Agents/graph_call_center.py:graph_name_verification_agent",
     "graph_details_verification_agent"  : "./src/Agents/graph_call_center.py:graph_details_verification_agent",
     "graph_reason_for_call"             : "./src/Agents/graph_call_center.py:graph_reason_for_call"
-
-
-
   },
   "env": ".env"
 }
