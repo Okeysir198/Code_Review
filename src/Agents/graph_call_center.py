@@ -70,7 +70,8 @@ graph_details_verification_agent = create_details_verification_agent(
     model=llm,
     client_data=client_data,
     script_type=ScriptType.RATIO_1_INFLOW.value,
-    verbose=True
+    verbose=True,
+    config=config
 )
 logger.info("✅ Details verification agent created successfully")
 
