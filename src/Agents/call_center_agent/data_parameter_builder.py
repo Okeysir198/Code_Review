@@ -76,39 +76,39 @@ class ClientDataBuilder:
             if not profile:
                 raise ValueError(f"Client profile not found for user_id: {user_id}")
             
-            # Load account overview and financial data
-            account_overview = get_client_account_overview.invoke(user_id)
-            account_aging = get_client_account_aging.invoke(user_id)
-            banking_details = get_client_banking_details.invoke(user_id)
+            # # Load account overview and financial data
+            # account_overview = get_client_account_overview.invoke(user_id)
+            # account_aging = get_client_account_aging.invoke(user_id)
+            # banking_details = get_client_banking_details.invoke(user_id)
             
-            # Load subscription and payment data
-            subscription_data = get_client_subscription_amount.invoke(user_id)
-            payment_history = get_client_payment_history.invoke(user_id)
-            failed_payments = get_client_failed_payments.invoke(user_id)
-            last_payment = get_client_last_successful_payment.invoke(user_id)
+            # # Load subscription and payment data
+            # subscription_data = get_client_subscription_amount.invoke(user_id)
+            # payment_history = get_client_payment_history.invoke(user_id)
+            # failed_payments = get_client_failed_payments.invoke(user_id)
+            # last_payment = get_client_last_successful_payment.invoke(user_id)
             
-            # Load contracts and billing analysis
-            contracts = get_client_contracts.invoke(user_id)
-            billing_analysis = get_client_billing_analysis.invoke(user_id)
+            # # Load contracts and billing analysis
+            # contracts = get_client_contracts.invoke(user_id)
+            # billing_analysis = get_client_billing_analysis.invoke(user_id)
             
-            # load existing_mandates
+            # # load existing_mandates
 
-            existing_mandates = get_client_debit_mandates.invoke(user_id)
+            # existing_mandates = get_client_debit_mandates.invoke(user_id)
 
             # Consolidate all data
             client_data = {
                 "user_id": user_id,
                 "profile": profile,
-                "account_overview": account_overview,
-                "account_aging": account_aging[0] if account_aging else {},
-                "banking_details": banking_details[0] if banking_details else {},
-                "subscription": subscription_data,
-                "payment_history": payment_history[:5] if payment_history else [],
-                "failed_payments": failed_payments[:3] if failed_payments else [],
-                "last_successful_payment": last_payment,
-                "contracts": contracts,
-                "billing_analysis": billing_analysis[0] if billing_analysis else {},
-                "existing_mandates": existing_mandates,
+                # "account_overview": account_overview,
+                # "account_aging": account_aging[0] if account_aging else {},
+                # "banking_details": banking_details[0] if banking_details else {},
+                # "subscription": subscription_data,
+                # "payment_history": payment_history[:5] if payment_history else [],
+                # "failed_payments": failed_payments[:3] if failed_payments else [],
+                # "last_successful_payment": last_payment,
+                # "contracts": contracts,
+                # "billing_analysis": billing_analysis[0] if billing_analysis else {},
+                # "existing_mandates": existing_mandates,
                 "loaded_at": datetime.now()
             }
             

@@ -1,5 +1,6 @@
 import time
 from typing import Dict, Any, Optional
+from src.Agents.call_center_agent.data_parameter_builder import get_client_data
 
 # Simple global cache
 _cache = {}
@@ -18,7 +19,6 @@ def get_cached_client_data(user_id: str) -> Dict[str, Any]:
     
     # Cache miss or expired - fetch fresh data
     print(f"🔄 Fetching fresh data for user {user_id}")
-    from src.Agents.call_center_agent.data_parameter_builder import get_client_data
     
     fresh_data = get_client_data(user_id)
     
