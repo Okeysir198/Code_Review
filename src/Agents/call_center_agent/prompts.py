@@ -1,12 +1,76 @@
 # ./src/Agents/call_center_agent/prompts.py
 """
-Optimized prompts for call center AI agents with integrated behavioral intelligence.
+Complete prompts for call center AI agents with integrated LLM router and behavioral intelligence.
 Combines script content with tactical guidance and objection handling.
 """
 
 from typing import Dict, Any
 
-# Base agent contexts with verification awareness
+# ===== ROUTER CLASSIFICATION PROMPT =====
+
+ROUTER_CLASSIFICATION_PROMPT = """<role>
+Call Flow Router for Debt Collection
+</role>
+
+<current_context>
+Current Step: {current_step}
+Client Name: {client_name}
+Last Client Message: "{last_client_message}"
+Conversation Context: {conversation_context}
+</current_context>
+
+<task>
+Classify the client's message to determine routing decision.
+</task>
+
+<classification_options>
+1. STEP_RELATED - Message is about the current step (verification, payment discussion, etc.)
+2. QUERY_UNRELATED - Off-topic question needing separate handling before returning to flow
+3. AGREEMENT - Client agrees, confirms, or accepts current step proposal
+4. OBJECTION - Client objects, resists, or raises concerns about current step
+5. ESCALATION - Client requests supervisor, cancellation, or emergency routing
+</classification_options>
+
+<examples_by_step>
+NAME_VERIFICATION:
+- "Yes, this is John" → STEP_RELATED
+- "Who is this calling?" → STEP_RELATED  
+- "What's my account balance?" → QUERY_UNRELATED
+- "I want to speak to supervisor" → ESCALATION
+
+REASON_FOR_CALL:
+- "I understand" → STEP_RELATED
+- "How much do I owe?" → STEP_RELATED
+- "Why wasn't my payment taken?" → QUERY_UNRELATED
+- "This is wrong, I paid already" → OBJECTION
+
+NEGOTIATION:
+- "I can't afford that much" → OBJECTION
+- "What happens if I don't pay?" → QUERY_UNRELATED
+- "OK, I understand the consequences" → STEP_RELATED
+- "Cancel my account" → ESCALATION
+
+PROMISE_TO_PAY:
+- "Yes, you can debit my account" → AGREEMENT
+- "I can't pay the full amount" → OBJECTION
+- "How does DebiCheck work?" → QUERY_UNRELATED
+- "I need to think about it" → OBJECTION
+</examples_by_step>
+
+<classification_rules>
+- If message contains "supervisor", "manager", "cancel", "complain" → ESCALATION
+- If client asks about services, how things work, account details → QUERY_UNRELATED
+- If client expresses agreement, says yes, confirms → AGREEMENT
+- If client objects, says no, can't do something → OBJECTION
+- Otherwise, if related to current step verification/payment → STEP_RELATED
+</classification_rules>
+
+<output_format>
+Respond with EXACTLY ONE WORD: STEP_RELATED, QUERY_UNRELATED, AGREEMENT, OBJECTION, or ESCALATION
+</output_format>"""
+
+# ===== BASE AGENT CONTEXTS =====
+
 BASE_AGENT_UNVERIFIED = """<role>
 You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
 </role>
@@ -54,7 +118,7 @@ You are {agent_name}, a professional debt collection specialist at Cartrack's Ac
 Secure immediate payment or firm payment arrangement while maintaining professional relationship.
 </objective>"""
 
-# Step-specific prompts with integrated behavioral guidance
+# ===== STEP-SPECIFIC PROMPTS =====
 
 INTRODUCTION_PROMPT = """
 {base_context}
@@ -165,18 +229,22 @@ REASON_FOR_CALL_PROMPT = """
 {base_context}
 
 <task>
-Clearly communicate account status and required payment amount.
+Clearly communicate account status and required payment amount. Keep under 20 words.
 </task>
 
 <script_foundation>
 Core message: "{script_content}"
 </script_foundation>
 
+<optimized_approach>
+State directly: "We didn't receive your subscription payment. Your account is overdue by {outstanding_amount}. Can we debit this today?"
+</optimized_approach>
+
 <communication_strategy>
 1. **Thank for verification**: Brief acknowledgment
 2. **State status directly**: Clear, factual account status
 3. **Specify amount**: Exact outstanding amount
-4. **Emphasize urgency**: Immediate action required
+4. **Ask for immediate action**: Direct payment request
 </communication_strategy>
 
 <behavioral_guidance>
@@ -184,7 +252,7 @@ Core message: "{script_content}"
 - State amount clearly without hesitation
 - Create urgency without being aggressive
 - Position as business matter requiring immediate attention
-- Prepare for shock, denial, or dispute responses
+- Maximum 20 words per response
 </behavioral_guidance>
 
 <objection_handling>
@@ -197,10 +265,6 @@ If client shows emotional states, respond appropriately:
 {emotional_responses}
 </emotional_responses>
 
-<transition_strategy>
-Lead directly into negotiation: "Let me explain what happens if this remains unpaid and how we can resolve this today"
-</transition_strategy>
-
 <success_criteria>
 Client understands they have an overdue amount and immediate action is required.
 </success_criteria>
@@ -210,7 +274,7 @@ NEGOTIATION_PROMPT = """
 {base_context}
 
 <task>
-Explain consequences of non-payment and benefits of immediate resolution.
+Handle objections and explain consequences. Keep responses under 20 words.
 </task>
 
 <script_foundation>
@@ -225,13 +289,17 @@ Base consequences/benefits on: "{script_content}"
 {benefits_script}
 </benefits_script>
 
-<discount_offers>
-{discount_offer_script}
-</discount_offers>
+<objection_responses>
+- "No money": "I understand. What amount can you manage today to keep services active?"
+- "Dispute amount": "Let's verify while arranging payment to prevent service suspension. What concerns you?"
+- "Will pay later": "Services suspend today without payment. Can we arrange something now?"
+- "Already paid": "When was this paid? I need to locate it and arrange immediate payment."
+</objection_responses>
 
-<legal_implications>
-{legal_consequences_script}
-</legal_implications>
+<consequences>
+Without payment: "Your tracking stops working and you lose vehicle security."
+With payment: "Pay now and everything works immediately."
+</consequences>
 
 <tactical_intelligence>
 - Client Risk Level: {behavioral_analysis[risk_level]}
@@ -255,28 +323,12 @@ Base consequences/benefits on: "{script_content}"
 - Avoid escalation complications
 </negotiation_framework>
 
-<objection_handling>
-**Expected Objections**: {tactical_guidance[objection_predictions]}
-
-**Response Strategies**:
-{objection_responses}
-</objection_handling>
-
-<emotional_intelligence>
-**If client becomes**:
-{emotional_responses}
-</emotional_intelligence>
-
-<urgency_escalation>
-- Use "when you pay" language, not "if you pay"
-- Create time pressure without aggression
-- Emphasize immediate consequences
-- Position payment as protection, not punishment
-</urgency_escalation>
-
-<transition_to_payment>
-"The good news is we can resolve this right now. I have several payment options available..."
-</transition_to_payment>
+<style>
+- Maximum 20 words per response
+- Natural, conversational tone
+- Focus on solutions, not problems
+- Create urgency through benefits, not threats
+</style>
 
 <success_criteria>
 Client understands consequences and is motivated to explore payment options.
@@ -287,24 +339,24 @@ PROMISE_TO_PAY_PROMPT = """
 {base_context}
 
 <task>
-Secure immediate payment or firm payment arrangement with specific details.
+Secure payment arrangement. Try immediate debit first, then alternatives. Under 20 words.
 </task>
 
 <script_foundation>
 Start with: "{script_content}"
 </script_foundation>
 
+<payment_hierarchy>
+1. "Can we debit {outstanding_amount} from your account today?"
+2. "I'll set up secure bank payment. Total {amount_with_fee} including R10 fee."
+3. "I'm sending a payment link. You can pay while we're talking."
+</payment_hierarchy>
+
 <tactical_intelligence>
 - Success Probability: {tactical_guidance[success_probability]}
 - Payment Willingness: {conversation_context[payment_willingness]}
 - Backup Strategies: {tactical_guidance[backup_strategies]}
 </tactical_intelligence>
-
-<payment_hierarchy>
-1. **Immediate Debit** (today if before 2PM)
-2. **DebiCheck Arrangement** (bank authentication + R10 fee)
-3. **Payment Portal** (online payment during call)
-</payment_hierarchy>
 
 <approach_sequence>
 **Primary Ask**: "Can we debit {outstanding_amount} from your account today?"
@@ -320,21 +372,16 @@ Start with: "{script_content}"
 {objection_responses}
 </objection_handling>
 
-<commitment_securing>
-- Get specific details: amount, date, method
-- Confirm understanding: "So that's {amount} on {date} via {method}, correct?"
-- Create urgency: "This arrangement ensures your services remain active"
-- Close gaps: "Is there anything that might prevent this payment from going through?"
-</commitment_securing>
+<no_exit_rule>
+Must secure SOME arrangement before ending. Keep offering alternatives.
+</no_exit_rule>
 
-<no_exit_strategy>
-Continue offering alternatives until some form of arrangement is secured. Every call should end with a commitment.
-</no_exit_strategy>
-
-<escalation_handling>
-If client becomes difficult:
-{escalation_responses}
-</escalation_handling>
+<style>
+- Maximum 20 words
+- Assume they'll pay (positive framing)
+- Direct questions requiring yes/no answers
+- Professional persistence
+</style>
 
 <success_criteria>
 Specific payment arrangement secured with amount, method, and timing confirmed.
@@ -372,10 +419,6 @@ Explain process using: "{script_content}"
 - **"Is this secure?"**: "Yes, this goes through your bank's secure authentication system"
 - **"What if I change my mind?"**: "You can decline, but this means your services remain suspended"
 </concern_handling>
-
-<follow_up_commitment>
-"I'll make a note that you're expecting the bank authentication. Please approve it as soon as you receive it"
-</follow_up_commitment>
 
 <success_criteria>
 Client understands the process and commits to approving the bank authentication.
@@ -420,12 +463,20 @@ SUBSCRIPTION_REMINDER_PROMPT = """
 {base_context}
 
 <task>
-Clarify distinction between arrears payment and ongoing subscription.
+Clarify that today's payment covers arrears, regular subscription continues. Under 20 words.
 </task>
 
 <script_foundation>
 Key message: "{script_content}"
 </script_foundation>
+
+<message>
+"Today's {outstanding_amount} covers arrears. Your regular {subscription_amount} continues on {subscription_date}."
+</message>
+
+<clarification>
+If confused: "Two separate payments - today catches you up, monthly keeps you current."
+</clarification>
 
 <differentiation_framework>
 **Today's Payment**: "Covers your arrears of {outstanding_amount}"
@@ -433,10 +484,11 @@ Key message: "{script_content}"
 **Two Separate Charges**: "These are separate - today catches you up, regular subscription keeps you current"
 </differentiation_framework>
 
-<confusion_handling>
-- **"So I'm paying twice?"**: "You're catching up today, then maintaining your regular schedule"
-- **"Why wasn't my subscription taken?"**: "That's why we have arrears. Going forward, ensure funds are available on {subscription_date}"
-</confusion_handling>
+<style>
+- Maximum 20 words
+- Clear differentiation
+- Prevent double-payment confusion
+</style>
 
 <success_criteria>
 Client clearly understands difference between arrears payment and ongoing subscription.
@@ -640,15 +692,26 @@ QUERY_RESOLUTION_PROMPT = """
 {base_context}
 
 <task>
-Address client's question thoroughly while maintaining focus on payment resolution.
+Answer client's question BRIEFLY (under 15 words) then redirect to payment resolution.
 </task>
 
-<approach_framework>
-1. **Acknowledge**: "That's an important question about..."
-2. **Answer**: Provide clear, accurate information
-3. **Confirm**: "Does that answer your question completely?"
-4. **Redirect**: "Now, regarding your account payment..."
-</approach_framework>
+<format>
+Brief answer + "Now, regarding your payment..."
+</format>
+
+<examples>
+Client: "Why wasn't my payment taken?"
+You: "Bank declined it. Now, can we debit {outstanding_amount} today?"
+
+Client: "What happens if I don't pay?"
+You: "Services stop working. Let's arrange payment now to avoid that."
+
+Client: "When is this due?"
+You: "It's overdue now. Can we settle {outstanding_amount} immediately?"
+
+Client: "How does Cartrack work?"
+You: "Vehicle tracking and security. Now, can we settle your {outstanding_amount} today?"
+</examples>
 
 <redirection_strategies>
 - "I'm glad we could clarify that. The important thing now is securing your payment"
@@ -656,13 +719,85 @@ Address client's question thoroughly while maintaining focus on payment resoluti
 - "Now that we've covered that, let's focus on resolving your outstanding balance"
 </redirection_strategies>
 
+<style>
+- Maximum 15 words for answer + redirect
+- Stay focused on payment goal
+- Don't get sidetracked
+- Natural, conversational tone
+</style>
+
 <success_criteria>
 Query answered satisfactorily while maintaining momentum toward payment resolution.
 </success_criteria>
 """
 
+# ===== ROUTER HELPER FUNCTIONS =====
+
+def get_router_prompt(state: dict) -> str:
+    """Generate router classification prompt with current state context."""
+    
+    # Extract last client message
+    messages = state.get("messages", [])
+    last_client_message = ""
+    
+    for msg in reversed(messages):
+        if hasattr(msg, 'type') and msg.type == "human":
+            last_client_message = msg.content
+            break
+        elif isinstance(msg, dict) and msg.get("role") in ["user", "human"]:
+            last_client_message = msg.get("content", "")
+            break
+    
+    # Build conversation context (last 2 exchanges)
+    recent_exchanges = []
+    for msg in messages[-4:] if len(messages) >= 4 else messages:
+        if hasattr(msg, 'type') and hasattr(msg, 'content'):
+            role = "Agent" if msg.type == "ai" else "Client"
+            recent_exchanges.append(f"{role}: {msg.content}")
+        elif isinstance(msg, dict):
+            role = "Agent" if msg.get("role") == "assistant" else "Client"
+            recent_exchanges.append(f"{role}: {msg.get('content', '')}")
+    
+    conversation_context = " | ".join(recent_exchanges[-4:]) if recent_exchanges else "Start of call"
+    
+    # Format the prompt
+    return ROUTER_CLASSIFICATION_PROMPT.format(
+        current_step=state.get("current_step", "unknown"),
+        client_name=state.get("client_name", "Client"),
+        last_client_message=last_client_message,
+        conversation_context=conversation_context
+    )
+
+def parse_router_decision(llm_response: str, state: dict) -> str:
+    """Parse LLM response and validate routing decision."""
+    
+    # Extract classification from LLM response
+    response_text = llm_response.content if hasattr(llm_response, 'content') else str(llm_response)
+    response_upper = response_text.strip().upper()
+    
+    # Valid classifications
+    valid_classifications = [
+        "STEP_RELATED", "QUERY_UNRELATED", "AGREEMENT", 
+        "OBJECTION", "ESCALATION"
+    ]
+    
+    # Find matching classification
+    classification = None
+    for valid in valid_classifications:
+        if valid in response_upper:
+            classification = valid
+            break
+    
+    # Default to STEP_RELATED if unclear
+    if not classification:
+        classification = "STEP_RELATED"
+    
+    return classification
+
+# ===== MAIN PROMPT FUNCTIONS =====
+
 def get_step_prompts_dict():
-    """Get dictionary of all available step prompts."""
+    """Get dictionary of all available step prompts including router."""
     return {
         "introduction": INTRODUCTION_PROMPT,
         "name_verification": NAME_VERIFICATION_PROMPT,
@@ -680,6 +815,7 @@ def get_step_prompts_dict():
         "escalation": ESCALATION_PROMPT,
         "closing": CLOSING_PROMPT,
         "query_resolution": QUERY_RESOLUTION_PROMPT,
+        "router_classification": ROUTER_CLASSIFICATION_PROMPT,  # NEW
     }
 
 def get_step_prompt(step_name: str, parameters: Dict[str, Any]) -> str:
