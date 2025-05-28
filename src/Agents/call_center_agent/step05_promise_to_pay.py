@@ -120,7 +120,19 @@ def create_promise_to_pay_agent(
                 recommended_approach = "partial_payment"
             else:
                 recommended_approach = "ask_immediate_debit"
+            # Add payment flexibility assessment
+            from src.Agents.call_center_agent.data_parameter_builder import PaymentFlexibilityAnalyzer
             
+            flexibility_analysis = PaymentFlexibilityAnalyzer.assess_payment_capacity(client_data)
+            
+            # Determine current negotiation stage
+            offers_made = state.get("payment_offers_made", [])
+            current_offer_level = len(offers_made) + 1
+            
+            # Select appropriate payment option based on stage
+            available_options = flexibility_analysis["payment_options"]
+            current_option = available_options[min(current_offer_level - 1, len(available_options) - 1)]
+
             return Command(
                 update={
                     "has_banking_details": has_banking_details,
@@ -129,7 +141,11 @@ def create_promise_to_pay_agent(
                     "payment_date": payment_date,
                     "payment_method_preference": payment_method_preference,
                     "recommended_approach": recommended_approach,
-                    "available_payment_types": payment_types or []
+                    "available_payment_types": payment_types or [],
+                    "payment_capacity_assessment": flexibility_analysis["capacity_level"],
+                    "current_payment_option": current_option,
+                    "negotiation_stage": current_offer_level,
+                    "payment_plan_eligible": flexibility_analysis["payment_plan_eligible"]
                 },
                 goto="agent"
             )

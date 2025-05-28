@@ -28,7 +28,7 @@ from src.Database.CartrackSQLDatabase import (
     get_client_debit_mandates
 )
 from src.Agents.call_center_agent.call_scripts import ScriptManager, ScriptType, CallStep
-from .call_scripts import ScriptManager, ScriptType, CallStep
+from src.Agents.call_center_agent.prompts import *
 
 logger = logging.getLogger(__name__)
 
@@ -324,6 +324,113 @@ async def get_client_data_async(user_id: str, force_reload: bool = False) -> Dic
     """Get client data asynchronously with caching."""
     return await AsyncClientDataBuilder.get_client_data(user_id, force_reload)
 
+########################################################################################
+class PaymentFlexibilityAnalyzer:
+    """Analyzes client payment capacity and determines flexibility options."""
+    
+    @staticmethod
+    def assess_payment_capacity(client_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Assess client's payment capacity and flexibility options."""
+        
+        # Extract financial indicators
+        account_aging = client_data.get("account_aging", {})
+        payment_history = client_data.get("payment_history", [])
+        failed_payments = client_data.get("failed_payments", [])
+        
+        outstanding_amount = 0.0
+        try:
+            outstanding_amount = float(account_aging.get("xbalance", 0))
+        except (ValueError, TypeError):
+            outstanding_amount = 0.0
+        
+        # Calculate payment reliability
+        total_attempts = len(payment_history)
+        failed_attempts = len(failed_payments)
+        success_rate = (total_attempts - failed_attempts) / total_attempts if total_attempts > 0 else 0
+        
+        # Assess capacity level
+        capacity_level = "unknown"
+        if outstanding_amount <= 200:
+            capacity_level = "high"
+        elif outstanding_amount <= 500:
+            capacity_level = "medium" if success_rate >= 0.7 else "low"
+        elif outstanding_amount <= 1000:
+            capacity_level = "low" if success_rate >= 0.5 else "hardship"
+        else:
+            capacity_level = "hardship"
+        
+        # Calculate payment options
+        payment_options = PaymentFlexibilityAnalyzer._calculate_payment_options(
+            outstanding_amount, capacity_level, success_rate
+        )
+        
+        return {
+            "capacity_level": capacity_level,
+            "payment_options": payment_options,
+            "minimum_payment": payment_options[0]["amount"] if payment_options else outstanding_amount * 0.3,
+            "payment_plan_eligible": outstanding_amount > 300 and success_rate >= 0.3,
+            "hardship_indicators": PaymentFlexibilityAnalyzer._detect_hardship_indicators(
+                failed_payments, payment_history
+            )
+        }
+    
+    @staticmethod
+    def _calculate_payment_options(amount: float, capacity: str, success_rate: float) -> List[Dict[str, Any]]:
+        """Calculate available payment options based on capacity."""
+        options = []
+        
+        # Full payment (always offered first)
+        options.append({
+            "type": "full_payment",
+            "amount": amount,
+            "description": f"Full payment of R {amount:.2f}",
+            "priority": 1
+        })
+        
+        # Partial payments based on capacity
+        if capacity in ["medium", "low", "hardship"]:
+            # 80% option
+            options.append({
+                "type": "partial_80",
+                "amount": amount * 0.8,
+                "description": f"80% payment of R {amount * 0.8:.2f}",
+                "priority": 2
+            })
+            
+            # 50% option for low capacity
+            if capacity in ["low", "hardship"]:
+                options.append({
+                    "type": "partial_50",
+                    "amount": amount * 0.5,
+                    "description": f"50% payment of R {amount * 0.5:.2f}",
+                    "priority": 3
+                })
+                
+                # Payment plan for hardship
+                if capacity == "hardship" and amount > 300:
+                    monthly_amount = amount / 3
+                    options.append({
+                        "type": "payment_plan",
+                        "amount": monthly_amount,
+                        "description": f"3-month plan: R {monthly_amount:.2f} monthly",
+                        "priority": 4
+                    })
+        
+        return options
+    
+    @staticmethod
+    def _detect_hardship_indicators(failed_payments: List, payment_history: List) -> List[str]:
+        """Detect indicators of financial hardship."""
+        indicators = []
+        
+        if len(failed_payments) >= 3:
+            indicators.append("multiple_failures")
+        
+        if len(payment_history) == 0:
+            indicators.append("no_payment_history")
+        
+        # Add more sophisticated hardship detection here
+        return indicators
 
 #####################################################################################
 class BehavioralAnalyzer:
@@ -921,6 +1028,18 @@ class ParameterBuilder:
     @staticmethod
     def _build_state_info(state: Dict[str, Any], current_step: str) -> Dict[str, Any]:
         """Build state information for prompts."""
+        # Add bridge selection
+        previous_step = state.get("previous_step", "")
+        bridge_phrase = ""
+        
+        if previous_step and current_step:
+            bridge_key = f"{previous_step}_to_{current_step}"
+            if bridge_key in CONVERSATION_BRIDGES.get("step_transitions", {}):
+                bridge_phrase = CONVERSATION_BRIDGES["step_transitions"][bridge_key]
+            elif current_step == "reason_for_call" and previous_step == "details_verification":
+                bridge_phrase = get_conversation_bridge("verification_to_account")
+            elif current_step == "negotiation":
+                bridge_phrase = get_conversation_bridge("account_to_consequences")
         return {
             "current_step": current_step,
             "name_verification_status": state.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value),
@@ -943,7 +1062,9 @@ class ParameterBuilder:
             "outcome_summary": state.get("outcome_summary", "We have discussed your account"),
             "payment_method": state.get("payment_method", "agreed payment method"),
             "campaign_end_date": state.get("campaign_end_date", "month-end"),
-            "campaign_first_date": state.get("campaign_first_date", "15th of the month")
+            "campaign_first_date": state.get("campaign_first_date", "15th of the month"),
+            "previous_step": previous_step,
+            "bridge_phrase": bridge_phrase,
         }
     
     @staticmethod

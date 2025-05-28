@@ -4,7 +4,7 @@ Lean LangGraph state management for call center AI agent.
 Minimal state with only essential fields for call flow.
 """
 
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from enum import Enum
 from langgraph.graph.message import MessagesState
 
@@ -78,6 +78,13 @@ class CallCenterAgentState(MessagesState):
     return_to_step: Optional[str] = None      # For query resolution return
     route_override: Optional[str] = None      # For emergency routing (escalation/cancellation)
     
+    # ===== PAYMENT FLEXIBILITY STATE =====
+    payment_capacity_assessment: str = "unknown"  # high/medium/low/hardship
+    payment_offers_made: List[Dict[str, Any]] = []
+    client_counter_offers: List[Dict[str, Any]] = []
+    minimum_acceptable_payment: float = 0.0
+    payment_plan_eligible: bool = False
+    hardship_indicators: List[str] = []
     # ===== HELPER METHODS =====
     
     def is_verified(self) -> bool:
