@@ -194,17 +194,3 @@ def create_call_center_agent(
 
 
 ####################################################################################
-from langchain_ollama import ChatOllama
-from src.Agents.call_center_agent.call_scripts import ScriptType
-
-from app_config import CONFIG
-
-llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0, num_ctx=32000)
-def create_call_center_agent_with_client_data(user_id:str) -> CompiledGraph:
-    client_data = get_client_data(user_id=user_id)
-    return create_call_center_agent(
-        model=llm,
-        client_data=client_data,    
-        script_type=ScriptType.RATIO_1_INFLOW.value,
-        config=CONFIG
-    )
