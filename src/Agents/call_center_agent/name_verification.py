@@ -3,6 +3,8 @@
 Name Verification Agent for Call Center.
 """
 from typing import Dict, Any, Optional, List, Literal
+import logging
+
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
@@ -17,6 +19,9 @@ from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, V
 from src.Agents.call_center_agent.call_scripts import ScriptType
 from src.Agents.call_center_agent.tools.verify_client_name import verify_client_name
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def create_name_verification_agent(
     model: BaseChatModel,
@@ -29,7 +34,8 @@ def create_name_verification_agent(
 ) -> CompiledGraph:
     """Create a name verification agent for debt collection calls."""
     
-    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["__end__", "agent"]]:
+
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__", "agent"]]:
         """Verify client name and update state."""
         
         # Extract client info
@@ -38,6 +44,7 @@ def create_name_verification_agent(
         client_full_name = client_info.get("client_full_name", "Client")
         
         # Increment attempts
+        
         attempts = state.get("name_verification_attempts", 0) + 1
         max_attempts = config.get("verification", {}).get("max_name_verification_attempts", 3)
         

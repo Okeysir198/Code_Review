@@ -11,6 +11,7 @@ import logging
 from typing import Dict, Any, Optional, List, Callable, Coroutine
 from datetime import datetime, timedelta
 from enum import Enum
+from app_config import CONFIG
 
 # Import real database tools
 from src.Database.CartrackSQLDatabase import (
@@ -927,8 +928,8 @@ class ParameterBuilder:
             "details_verification_status": state.get("details_verification_status", VerificationStatus.INSUFFICIENT_INFO.value),
             "details_verification_attempts": state.get("details_verification_attempts", 1),
             "matched_fields": state.get("matched_fields", []),
-            "max_name_verification_attempts": 3,
-            "max_details_verification_attempts": 5,
+            "max_name_verification_attempts": CONFIG.get('verification',{}).get('max_name_verification_attempts',4),
+            "max_details_verification_attempts": CONFIG.get('verification',{}).get('max_details_verification_attempts',5),
             "conversation_context": {
                 "emotional_state": state.get("emotional_state", "neutral"),
                 "objections_raised": state.get("objections_raised", []),

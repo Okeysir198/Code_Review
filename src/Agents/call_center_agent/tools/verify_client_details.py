@@ -44,7 +44,7 @@ _LLM_CACHE_FLUSH_THRESHOLD = 100
 def get_llm_instance():
     """Returns a cached LLM instance to avoid recreation on each call."""
     return ChatOllama(
-        model="qwen2.5:7b-instruct", 
+        model="qwen2.5:3b-instruct", 
         temperature=0,
     )
 

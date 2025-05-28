@@ -192,9 +192,9 @@ class CallCenterAgentState(MessagesState):
     # ===== CALL FLOW MANAGEMENT =====
     current_step: str = CallStep.INTRODUCTION.value
     previous_step: Optional[str] = None
-    next_step: Optional[str] = None
+    # next_step: Optional[str] = None
     # is_call_active: bool = True
-    # is_call_ended: bool = False
+    is_call_ended: bool = False
     # call_outcome: Optional[str] = None
     
     # ===== VERIFICATION STATE =====
@@ -269,108 +269,108 @@ class CallCenterAgentState(MessagesState):
 
     # ===== HELPER METHODS =====
     
-    def is_verified(self) -> bool:
-        """Check if client is fully verified"""
-        return (self.name_verification_status == VerificationStatus.VERIFIED.value and 
-                self.details_verification_status == VerificationStatus.VERIFIED.value)
+    # def is_verified(self) -> bool:
+    #     """Check if client is fully verified"""
+    #     return (self.name_verification_status == VerificationStatus.VERIFIED.value and 
+    #             self.details_verification_status == VerificationStatus.VERIFIED.value)
     
-    def can_discuss_account(self) -> bool:
-        """Check if can discuss account details"""
-        return self.is_verified()
+    # def can_discuss_account(self) -> bool:
+    #     """Check if can discuss account details"""
+    #     return self.is_verified()
     
-    def add_objection(self, objection: str):
-        """Add objection to tracking"""
-        if objection not in self.objections_raised:
-            self.objections_raised.append(objection)
+    # def add_objection(self, objection: str):
+    #     """Add objection to tracking"""
+    #     if objection not in self.objections_raised:
+    #         self.objections_raised.append(objection)
     
-    def add_matched_field(self, field: str):
-        """Add verified field"""
-        if field not in self.matched_fields:
-            self.matched_fields.append(field)
+    # def add_matched_field(self, field: str):
+    #     """Add verified field"""
+    #     if field not in self.matched_fields:
+    #         self.matched_fields.append(field)
     
-    def increment_verification_attempt(self, verification_type: str):
-        """Increment verification attempt counter"""
-        if verification_type == "name":
-            self.name_verification_attempts += 1
-        elif verification_type == "details":
-            self.details_verification_attempts += 1
+    # def increment_verification_attempt(self, verification_type: str):
+    #     """Increment verification attempt counter"""
+    #     if verification_type == "name":
+    #         self.name_verification_attempts += 1
+    #     elif verification_type == "details":
+    #         self.details_verification_attempts += 1
     
-    def update_emotional_state(self, new_state: str):
-        """Update client emotional state"""
-        if new_state in [e.value for e in EmotionalState]:
-            self.emotional_state = new_state
+    # def update_emotional_state(self, new_state: str):
+    #     """Update client emotional state"""
+    #     if new_state in [e.value for e in EmotionalState]:
+    #         self.emotional_state = new_state
     
-    def update_payment_willingness(self, willingness: str):
-        """Update payment willingness"""
-        if willingness in [w.value for w in PaymentWillingness]:
-            self.payment_willingness = willingness
+    # def update_payment_willingness(self, willingness: str):
+    #     """Update payment willingness"""
+    #     if willingness in [w.value for w in PaymentWillingness]:
+    #         self.payment_willingness = willingness
     
-    def set_call_outcome(self, outcome: str):
-        """Set call outcome"""
-        if outcome in [o.value for o in CallOutcome]:
-            self.call_outcome = outcome
+    # def set_call_outcome(self, outcome: str):
+    #     """Set call outcome"""
+    #     if outcome in [o.value for o in CallOutcome]:
+    #         self.call_outcome = outcome
     
-    def add_note(self, note: str):
-        """Add note to tracking"""
-        self.notes_added.append(note)
+    # def add_note(self, note: str):
+    #     """Add note to tracking"""
+    #     self.notes_added.append(note)
     
-    def add_topic(self, topic: str):
-        """Add discussed topic"""
-        if topic not in self.topics_discussed:
-            self.topics_discussed.append(topic)
+    # def add_topic(self, topic: str):
+    #     """Add discussed topic"""
+    #     if topic not in self.topics_discussed:
+    #         self.topics_discussed.append(topic)
     
-    def get_verification_progress(self) -> Dict[str, Any]:
-        """Get verification progress summary"""
-        return {
-            "name_status": self.name_verification_status,
-            "name_attempts": self.name_verification_attempts,
-            "details_status": self.details_verification_status,
-            "details_attempts": self.details_verification_attempts,
-            "matched_fields": self.matched_fields,
-            "is_verified": self.is_verified()
-        }
+    # def get_verification_progress(self) -> Dict[str, Any]:
+    #     """Get verification progress summary"""
+    #     return {
+    #         "name_status": self.name_verification_status,
+    #         "name_attempts": self.name_verification_attempts,
+    #         "details_status": self.details_verification_status,
+    #         "details_attempts": self.details_verification_attempts,
+    #         "matched_fields": self.matched_fields,
+    #         "is_verified": self.is_verified()
+    #     }
     
-    def get_payment_summary(self) -> Dict[str, Any]:
-        """Get payment arrangement summary"""
-        return {
-            "secured": self.payment_secured,
-            "method": self.payment_arrangement.payment_method,
-            "amount": self.payment_arrangement.amount,
-            "arrangement_id": self.payment_arrangement.arrangement_id,
-            "mandate_id": self.payment_arrangement.mandate_id
-        }
+    # def get_payment_summary(self) -> Dict[str, Any]:
+    #     """Get payment arrangement summary"""
+    #     return {
+    #         "secured": self.payment_secured,
+    #         "method": self.payment_arrangement.payment_method,
+    #         "amount": self.payment_arrangement.amount,
+    #         "arrangement_id": self.payment_arrangement.arrangement_id,
+    #         "mandate_id": self.payment_arrangement.mandate_id
+    #     }
     
-    def get_conversation_summary(self) -> Dict[str, Any]:
-        """Get conversation summary"""
-        return {
-            "step": self.current_step,
-            "emotional_state": self.emotional_state,
-            "payment_willingness": self.payment_willingness,
-            "objections": len(self.objections_raised),
-            "verified": self.is_verified(),
-            "payment_secured": self.payment_secured,
-            "outcome": self.call_outcome
-        }
+    # def get_conversation_summary(self) -> Dict[str, Any]:
+    #     """Get conversation summary"""
+    #     return {
+    #         "step": self.current_step,
+    #         "emotional_state": self.emotional_state,
+    #         "payment_willingness": self.payment_willingness,
+    #         "objections": len(self.objections_raised),
+    #         "verified": self.is_verified(),
+    #         "payment_secured": self.payment_secured,
+    #         "outcome": self.call_outcome
+    #     }
     
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert state to dictionary for external use"""
-        return {
-            "user_id": self.user_id,
-            "agent_name": self.agent_name,
-            "current_step": self.current_step,
-            "script_type": self.script_type,
-            "verification": self.get_verification_progress(),
-            "payment": self.get_payment_summary(),
-            "conversation": self.get_conversation_summary(),
-            "behavioral_analysis": self.behavioral_analysis.__dict__,
-            "tactical_guidance": self.tactical_guidance.__dict__,
-            "flags": {
-                "query_detected": self.query_detected,
-                "cancellation_requested": self.cancellation_requested,
-                "escalation_requested": self.escalation_requested,
-                "complaint_raised": self.complaint_raised
-            }
-        }
+    # def to_dict(self) -> Dict[str, Any]:
+    #     """Convert state to dictionary for external use"""
+    #     return {
+    #         "user_id": self.user_id,
+    #         "agent_name": self.agent_name,
+    #         "current_step": self.current_step,
+    #         "script_type": self.script_type,
+    #         "verification": self.get_verification_progress(),
+    #         "payment": self.get_payment_summary(),
+    #         "conversation": self.get_conversation_summary(),
+    #         "behavioral_analysis": self.behavioral_analysis.__dict__,
+    #         "tactical_guidance": self.tactical_guidance.__dict__,
+    #         "flags": {
+    #             "query_detected": self.query_detected,
+    #             "cancellation_requested": self.cancellation_requested,
+    #             "escalation_requested": self.escalation_requested,
+    #             "complaint_raised": self.complaint_raised
+    #         }
+    #     }
 
 #########################################################################################
 # State Update Helpers

@@ -17,10 +17,8 @@ from src.Agents.call_center_agent.name_verification import create_name_verificat
 from src.Agents.call_center_agent.details_verification import create_details_verification_agent
 from src.Agents.call_center_agent.reason_for_call import create_reason_for_call_agent
 from src.Agents.call_center_agent.negotiation import create_negotiation_agent
-from src.Agents.call_center_agent.data_parameter_builder import get_client_data, get_client_data_async
 
 logger = logging.getLogger(__name__)
-
 
 
 def create_call_center_agent(
@@ -45,7 +43,7 @@ def create_call_center_agent(
     """
     config = config or {}
     
-    # Create specialized sub-agents
+    # ✅ Create specialized sub-agents directly using individual variables
     introduction_agent = create_introduction_agent(model, client_data, script_type, agent_name, config=config)
     name_verification_agent = create_name_verification_agent(model, client_data, script_type, agent_name, config=config)
     details_verification_agent = create_details_verification_agent(model, client_data, script_type, agent_name, config=config)
@@ -67,95 +65,126 @@ def create_call_center_agent(
         
         return step_mapping.get(next_step, CallStep.INTRODUCTION.value)
 
-    # Node functions
+    # Node functions following the two-step pattern
     def router_node(state: CallCenterAgentState) -> Dict[str, Any]:
         """Router determines next step."""
         return {"current_step": state.get("current_step", CallStep.INTRODUCTION.value)}
 
     def introduction_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
         """Introduction step - always ends to wait for response."""
+        # Step 1: Get result from sub-agent
         result = introduction_agent.invoke(state)
         
+        # Step 2: Extract values and update state
+        messages = result.get("messages", state.get("messages", []))
+        current_step = result.get("current_step", CallStep.INTRODUCTION.value)
+
         return Command(
             update={
-                "messages": result.get("messages", state.get("messages", [])),
-                "current_step": result.get("current_step", CallStep.INTRODUCTION.value),
-                "next_step": result.get("next_step")
+                "messages": messages,
+                "current_step": current_step,
             },
             goto="__end__"
         )
 
     def name_verification_node(state: CallCenterAgentState) -> Command[Literal["details_verification", "__end__"]]:
         """Name verification step."""
+        # Step 1: Get result from sub-agent
         result = name_verification_agent.invoke(state)
         
-        status = result.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
-        
+        # Step 2: Extract values and update state
+        messages = result.get("messages", state.get("messages", []))
+        name_verification_status = result.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
+        name_verification_attempts = result.get("name_verification_attempts", 0)
+        current_step = result.get("current_step", CallStep.NAME_VERIFICATION.value)
+
         update = {
-            "messages": result.get("messages", state.get("messages", [])),
-            "name_verification_status": status,
-            "name_verification_attempts": result.get("name_verification_attempts", 0),
-            "current_step": CallStep.NAME_VERIFICATION.value
+            "messages": messages,
+            "name_verification_status": name_verification_status,
+            "name_verification_attempts": name_verification_attempts,
+            "current_step": current_step
         }
         
-        # Route based on verification status
-        if status == VerificationStatus.VERIFIED.value:
+        # Determine routing
+        goto = "__end__"
+        if name_verification_status == VerificationStatus.VERIFIED.value:
             update["current_step"] = CallStep.DETAILS_VERIFICATION.value
-            return Command(update=update, goto=CallStep.DETAILS_VERIFICATION.value)
-        elif status in [VerificationStatus.THIRD_PARTY.value, VerificationStatus.WRONG_PERSON.value, VerificationStatus.VERIFICATION_FAILED.value]:
-            return Command(update=update, goto="__end__")
-        else:
-            return Command(update=update, goto="__end__")
+            goto = CallStep.DETAILS_VERIFICATION.value
+         
+        return Command(update=update, goto=goto)
 
     def details_verification_node(state: CallCenterAgentState) -> Command[Literal["reason_for_call", "__end__"]]:
         """Details verification step."""
+        # Step 1: Get result from sub-agent
         result = details_verification_agent.invoke(state)
         
-        status = result.get("details_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
+        # Step 2: Extract values and update state
+        messages = result.get("messages", state.get("messages", []))
+        details_verification_status = result.get("details_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
+        details_verification_attempts = result.get("details_verification_attempts", 0)
+        matched_fields = result.get("matched_fields", [])
+        field_to_verify = result.get("field_to_verify", "id_number")
+        current_step = result.get("current_step", CallStep.DETAILS_VERIFICATION.value)
         
         update = {
-            "messages": result.get("messages", state.get("messages", [])),
-            "details_verification_status": status,
-            "details_verification_attempts": result.get("details_verification_attempts", 0),
-            "matched_fields": result.get("matched_fields", []),
-            "field_to_verify": result.get("field_to_verify", "id_number"),
-            "current_step": CallStep.DETAILS_VERIFICATION.value
+            "messages": messages,
+            "details_verification_status": details_verification_status,
+            "details_verification_attempts": details_verification_attempts,
+            "matched_fields": matched_fields,
+            "field_to_verify": field_to_verify,
+            "current_step": current_step
         }
         
-        # Route based on verification status
-        if status == VerificationStatus.VERIFIED.value:
+        # Determine routing
+        goto = "__end__"
+        if details_verification_status == VerificationStatus.VERIFIED.value:
             update["current_step"] = CallStep.REASON_FOR_CALL.value
-            return Command(update=update, goto=CallStep.REASON_FOR_CALL.value)
-        elif status == VerificationStatus.VERIFICATION_FAILED.value:
-            return Command(update=update, goto="__end__")
-        else:
-            return Command(update=update, goto="__end__")
+            goto = CallStep.REASON_FOR_CALL.value
+        elif details_verification_status == VerificationStatus.VERIFICATION_FAILED.value:
+            goto = "__end__"
+        
+        return Command(update=update, goto=goto)
 
     def reason_for_call_node(state: CallCenterAgentState) -> Command[Literal["negotiation"]]:
         """Reason for call step - explains debt and proceeds to negotiation."""
+        # Step 1: Get result from sub-agent
         result = reason_for_call_agent.invoke(state)
+        
+        # Step 2: Extract values and update state
+        messages = result.get("messages", state.get("messages", []))
+        current_step = result.get("current_step", CallStep.REASON_FOR_CALL.value)
+        outstanding_amount = result.get("outstanding_amount")
+        account_status = result.get("account_status")
         
         return Command(
             update={
-                "messages": result.get("messages", state.get("messages", [])),
+                "messages": messages,
                 "current_step": CallStep.NEGOTIATION.value,
-                "outstanding_amount": result.get("outstanding_amount"),
-                "account_status": result.get("account_status")
+                "outstanding_amount": outstanding_amount,
+                "account_status": account_status
             },
             goto=CallStep.NEGOTIATION.value
         )
 
     def negotiation_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
         """Negotiation step - handles objections and seeks payment commitment."""
+        # Step 1: Get result from sub-agent
         result = negotiation_agent.invoke(state)
+        
+        # Step 2: Extract values and update state
+        messages = result.get("messages", state.get("messages", []))
+        current_step = result.get("current_step", CallStep.NEGOTIATION.value)
+        emotional_state = result.get("emotional_state")
+        objections_raised = result.get("objections_raised", [])
+        payment_willingness = result.get("payment_willingness")
         
         return Command(
             update={
-                "messages": result.get("messages", state.get("messages", [])),
-                "current_step": CallStep.NEGOTIATION.value,
-                "emotional_state": result.get("emotional_state"),
-                "objections_raised": result.get("objections_raised", []),
-                "payment_willingness": result.get("payment_willingness")
+                "messages": messages,
+                "current_step": current_step,
+                "emotional_state": emotional_state,
+                "objections_raised": objections_raised,
+                "payment_willingness": payment_willingness
             },
             goto="__end__"
         )
@@ -191,6 +220,3 @@ def create_call_center_agent(
         compile_kwargs["checkpointer"] = MemorySaver()
     
     return workflow.compile(**compile_kwargs)
-
-
-####################################################################################

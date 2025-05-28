@@ -331,7 +331,8 @@ def create_basic_agent(
                 logger.info(f"Final prompt to LLM: {system_prompt}")
                 logger.info(f"Messages content as below:")
                 for msg in messages:
-                    logger.info(f"{msg.type.upper()}: {msg.content}")
+                    if not isinstance(msg, SystemMessage):
+                        logger.info(f"{msg.type.upper()}: {msg.content}")
                 
                 logger.info(f"Len of Messages: {len(messages)}")
             
