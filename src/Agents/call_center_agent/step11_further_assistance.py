@@ -1,6 +1,7 @@
-# ./src/Agents/call_center_agent/further_assistance_agent.py
+# ./src/Agents/call_center_agent/step11_further_assistance.py
 """
 Further Assistance Agent - Final check for additional concerns.
+SIMPLIFIED: No query detection - router handles all routing decisions.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -31,7 +32,7 @@ def create_further_assistance_agent(
     
     agent_tools = [add_client_note] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__", "agent"]]:
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to check for additional client concerns."""
         
         # Check if client has additional questions or concerns
@@ -47,19 +48,11 @@ def create_further_assistance_agent(
                     has_concerns = True
                     break
         
-        # If they have concerns, route to query resolution
-        if has_concerns:
-            return Command(
-                update={
-                    "query_detected": True,
-                    "current_step": CallStep.QUERY_RESOLUTION.value,
-                    "return_to_step": CallStep.CLOSING.value
-                },
-                goto="__end__"
-            )
-        
         return Command(
-            update={"current_step": CallStep.FURTHER_ASSISTANCE.value},
+            update={
+                "has_concerns": has_concerns,
+                "current_step": CallStep.FURTHER_ASSISTANCE.value
+            },
             goto="agent"
         )
 

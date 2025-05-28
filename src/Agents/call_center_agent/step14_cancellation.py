@@ -1,6 +1,7 @@
-# ./src/Agents/call_center_agent/cancellation_agent.py
+# ./src/Agents/call_center_agent/step14_cancellation.py
 """
 Cancellation Agent - Handles cancellation requests professionally.
+SIMPLIFIED: Keep fee logic, no query detection.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -39,7 +40,7 @@ def create_cancellation_agent(
         get_client_account_aging
     ] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__", "agent"]]:
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to calculate cancellation fees and create ticket."""
         
         # Calculate cancellation fee and total balance

@@ -1,6 +1,7 @@
-# ./src/Agents/call_center_agent/referrals_agent.py
+# ./src/Agents/call_center_agent/step10_referrals.py
 """
 Referrals Agent - Briefly mentions referral program.
+SIMPLIFIED: No query detection - router handles all routing decisions.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -31,30 +32,8 @@ def create_referrals_agent(
     
     agent_tools = [add_client_note] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__", "agent"]]:
-        """Pre-process to check for queries and prepare referral info."""
-        
-        # Check for queries first
-        recent_messages = state.get("messages", [])[-2:] if state.get("messages") else []
-        query_detected = False
-        
-        for msg in recent_messages:
-            if hasattr(msg, 'content') and hasattr(msg, 'type') and msg.type == "human":
-                content = msg.content.lower()
-                query_indicators = ["why", "what", "how", "when", "who", "where", "?"]
-                if any(indicator in content for indicator in query_indicators):
-                    query_detected = True
-                    break
-        
-        if query_detected:
-            return Command(
-                update={
-                    "query_detected": True,
-                    "current_step": CallStep.QUERY_RESOLUTION.value,
-                    "return_to_step": CallStep.REFERRALS.value
-                },
-                goto="__end__"
-            )
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
+        """Pre-process to prepare referral information only."""
         
         return Command(
             update={"current_step": CallStep.REFERRALS.value},

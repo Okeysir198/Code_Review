@@ -1,13 +1,15 @@
-# ./src/Agents/call_center_agent/client_details_update.py
+# ./src/Agents/call_center_agent/step09_client_details_update.py
 """
 Client Details Update Agent - Updates client contact and personal information.
+SIMPLIFIED: No query detection - router handles all routing decisions.
 """
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
+from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.prompts import get_step_prompt
@@ -30,22 +32,10 @@ def create_client_details_update_agent(
     script_type: str = "ratio_1_inflow",
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
-    verbose: bool = False
+    verbose: bool = False,
+    config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """
-    Create a client details update agent for debt collection calls.
-    
-    Args:
-        model: Language model to use
-        client_data: client information
-        script_type: Script type (e.g., "ratio_1_inflow")
-        agent_name: Name of the agent
-        tools: Optional tools for the agent
-        verbose: Enable verbose logging
-        
-    Returns:
-        Compiled client details update agent workflow
-    """
+    """Create a client details update agent for debt collection calls."""
     
     # Add relevant database tools
     agent_tools = [
@@ -54,16 +44,12 @@ def create_client_details_update_agent(
         update_client_next_of_kin,
         update_client_banking_details,
         add_client_note
-    ]
-    if tools:
-        agent_tools.extend(tools)
+    ] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
+    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["agent"]]:
         """Pre-process to identify what details need updating."""
         
         try:
-            # Get current client data to compare
-            
             # Extract current contact information
             profile = client_data.get("profile", {})
             client_info = profile.get("client_info", {}) if profile else {}
@@ -72,7 +58,7 @@ def create_client_details_update_agent(
             current_email = client_info.get("email_address", "")
             
             # Check what updates might be needed based on recent conversation
-            recent_messages = state['messages'][-5:] if len(state['messages']) >= 5 else state['messages']
+            recent_messages = state.get("messages", [])[-5:] if state.get("messages") else []
             
             updates_needed = {
                 "mobile": False,
@@ -123,31 +109,31 @@ def create_client_details_update_agent(
                     if any(phrase in content for phrase in ["next of kin", "emergency contact", "nok"]):
                         updates_needed["next_of_kin"] = True
             
-            return {
-                "current_mobile": current_mobile,
-                "current_email": current_email,
-                "updates_needed": updates_needed,
-                "new_details": new_details,
-                "contact_details_updated": False,
-                "call_info": {
-                    "has_current_mobile": bool(current_mobile),
-                    "has_current_email": bool(current_email),
-                    "updates_required": any(updates_needed.values())
-                }
-            }
+            return Command(
+                update={
+                    "current_mobile": current_mobile,
+                    "current_email": current_email,
+                    "updates_needed": updates_needed,
+                    "new_details": new_details,
+                    "contact_details_updated": False
+                },
+                goto="agent"
+            )
             
         except Exception as e:
             if verbose:
                 print(f"Error in client details pre-processing: {e}")
             
-            return {
-                "current_mobile": "",
-                "current_email": "",
-                "updates_needed": {"mobile": False, "email": False, "next_of_kin": False, "banking": False},
-                "new_details": {},
-                "contact_details_updated": False,
-                "call_info": {}
-            }
+            return Command(
+                update={
+                    "current_mobile": "",
+                    "current_email": "",
+                    "updates_needed": {"mobile": False, "email": False, "next_of_kin": False, "banking": False},
+                    "new_details": {},
+                    "contact_details_updated": False
+                },
+                goto="agent"
+            )
 
     def post_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
         """Post-process to actually update client details if provided."""
@@ -155,10 +141,10 @@ def create_client_details_update_agent(
         try:
             updates_made = []
             update_success = True
-            user_id=client_data['user_id']
+            user_id = client_data.get("user_id")
 
             # Check if client provided new details in recent conversation
-            recent_messages = state['messages'][-3:] if len(state['messages']) >= 3 else state['messages']
+            recent_messages = state.get("messages", [])[-3:] if state.get("messages") else []
             
             new_mobile = None
             new_email = None
@@ -226,11 +212,7 @@ def create_client_details_update_agent(
             return {
                 "contact_details_updated": len(updates_made) > 0,
                 "updates_made": updates_made,
-                "update_success": update_success,
-                "call_info": {
-                    "update_status": "completed" if updates_made else "no_updates",
-                    "updates_count": len(updates_made)
-                }
+                "update_success": update_success
             }
             
         except Exception as e:
@@ -240,25 +222,21 @@ def create_client_details_update_agent(
             return {
                 "contact_details_updated": False,
                 "updates_made": [],
-                "update_success": False,
-                "call_info": {"update_status": "error"}
+                "update_success": False
             }
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for client details update step."""
-        # Build parameters using real client data
         parameters = prepare_parameters(
             client_data=client_data,
             current_step=CallStep.CLIENT_DETAILS_UPDATE.value,
-            state=state.to_dict(),
+            state=state.to_dict() if hasattr(state, 'to_dict') else state,
             script_type=script_type,
             agent_name=agent_name
         )
         
-        # Generate step-specific prompt
         prompt_content = get_step_prompt(CallStep.CLIENT_DETAILS_UPDATE.value, parameters)
-        
-        return SystemMessage(content=prompt_content)
+        return [SystemMessage(content=prompt_content)] + state['messages']
     
     return create_basic_agent(
         model=model,

@@ -96,7 +96,7 @@ Answer briefly, then secure payment arrangement immediately.
         model=model,
         prompt=dynamic_prompt,
         tools=agent_tools,
-        pre_processing_node=pre_processing_node,
+        # pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,
         name="QueryResolutionAgent"

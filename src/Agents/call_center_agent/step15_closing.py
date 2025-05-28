@@ -8,11 +8,27 @@ from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
+from enum import Enum
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.prompts import get_step_prompt
 from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
-from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, CallOutcome
+from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
+
+class CallOutcome(Enum):
+    """Possible call outcomes"""
+    PAYMENT_SECURED = "payment_secured"
+    PTP_ARRANGED = "ptp_arranged"
+    PARTIAL_PAYMENT = "partial_payment"
+    CALLBACK_SCHEDULED = "callback_scheduled"
+    ESCALATED = "escalated"
+    CANCELLED = "cancelled"
+    UNCONTACTABLE = "uncontactable"
+    REFUSAL = "refusal"
+    DISPUTE = "dispute"
+    WRONG_PERSON = "wrong_person"
+    INCOMPLETE = "incomplete"
+
 
 # Import relevant database tools
 from src.Database.CartrackSQLDatabase import (

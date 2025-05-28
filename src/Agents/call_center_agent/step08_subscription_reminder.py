@@ -1,6 +1,7 @@
-# ./src/Agents/call_center_agent/subscription_reminder_agent.py
+# ./src/Agents/call_center_agent/step08_subscription_reminder.py
 """
 Subscription Reminder Agent - Clarifies arrears vs ongoing subscription.
+SIMPLIFIED: No query detection - router handles all routing decisions.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -37,30 +38,8 @@ def create_subscription_reminder_agent(
         add_client_note
     ] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__", "agent"]]:
-        """Pre-process to check for queries and prepare subscription info."""
-        
-        # Check for queries first
-        recent_messages = state.get("messages", [])[-2:] if state.get("messages") else []
-        query_detected = False
-        
-        for msg in recent_messages:
-            if hasattr(msg, 'content') and hasattr(msg, 'type') and msg.type == "human":
-                content = msg.content.lower()
-                query_indicators = ["why", "what", "how", "when", "who", "where", "?"]
-                if any(indicator in content for indicator in query_indicators):
-                    query_detected = True
-                    break
-        
-        if query_detected:
-            return Command(
-                update={
-                    "query_detected": True,
-                    "current_step": CallStep.QUERY_RESOLUTION.value,
-                    "return_to_step": CallStep.SUBSCRIPTION_REMINDER.value
-                },
-                goto="__end__"
-            )
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
+        """Pre-process to prepare subscription information only."""
         
         # Get subscription information
         subscription = client_data.get("subscription", {})
@@ -74,8 +53,7 @@ def create_subscription_reminder_agent(
         return Command(
             update={
                 "subscription_amount": subscription_str,
-                "subscription_date": "5th of each month",
-                "current_step": CallStep.SUBSCRIPTION_REMINDER.value
+                "subscription_date": "5th of each month"
             },
             goto="agent"
         )

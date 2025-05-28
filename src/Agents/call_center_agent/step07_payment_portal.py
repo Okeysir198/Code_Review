@@ -1,13 +1,15 @@
-# ./src/Agents/call_center_agent/payment_portal.py
+# ./src/Agents/call_center_agent/step07_payment_portal.py
 """
 Payment Portal Agent - Guides clients through online payment process.
+SIMPLIFIED: No query detection - router handles all routing decisions.
 """
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
+from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.prompts import get_step_prompt
@@ -28,40 +30,27 @@ def create_payment_portal_agent(
     script_type: str = "ratio_1_inflow",
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
-    verbose: bool = False
+    verbose: bool = False,
+    config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """
-    Create a payment portal agent for debt collection calls.
-    
-    Args:
-        model: Language model to use
-        client_data: client information
-        script_type: Script type (e.g., "ratio_1_inflow")
-        agent_name: Name of the agent
-        tools: Optional tools for the agent
-        verbose: Enable verbose logging
-        
-    Returns:
-        Compiled payment portal agent workflow
-    """
+    """Create a payment portal agent for debt collection calls."""
     
     # Add relevant database tools
     agent_tools = [
         generate_sms_payment_url,
         create_payment_arrangement_payment_portal,
         add_client_note
-    ]
-    if tools:
-        agent_tools.extend(tools)
+    ] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
+    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["agent"]]:
         """Pre-process to generate payment URL and prepare portal guidance."""
         
         try:
             # Get payment amount from state
             payment_arrangement = getattr(state, 'payment_arrangement', {})
             amount = payment_arrangement.get('amount', 0)
-            user_id = client_data['user_id']
+            user_id = client_data.get('user_id')
+            
             # Generate payment URL if amount is available
             payment_url = None
             reference_id = None
@@ -84,38 +73,37 @@ def create_payment_portal_agent(
                     if verbose:
                         print(f"Error generating payment URL: {url_error}")
             
-            return {
-                "payment_url": payment_url,
-                "reference_id": reference_id,
-                "url_generated": url_generated,
-                "payment_amount": amount,
-                "portal_payment_complete": False,
-                "call_info": {
-                    "payment_url_status": "generated" if url_generated else "failed",
-                    "amount": amount
-                }
-            }
+            return Command(
+                update={
+                    "payment_url": payment_url,
+                    "reference_id": reference_id,
+                    "url_generated": url_generated,
+                    "payment_amount": amount,
+                    "portal_payment_complete": False
+                },
+                goto="agent"
+            )
             
         except Exception as e:
             if verbose:
                 print(f"Error in payment portal pre-processing: {e}")
             
-            return {
-                "payment_url": None,
-                "reference_id": None,
-                "url_generated": False,
-                "payment_amount": 0,
-                "portal_payment_complete": False,
-                "call_info": {"payment_url_status": "error"}
-            }
+            return Command(
+                update={
+                    "payment_url": None,
+                    "url_generated": False,
+                    "portal_payment_complete": False
+                },
+                goto="agent"
+            )
 
     def post_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
         """Post-process to track payment completion and create arrangement record."""
         
         try:
             # Check if client confirmed payment completion
-            recent_messages = state['messages'][-3:] if len(state['messages']) >= 3 else state['messages']
-            user_id = client_data['user_id']
+            recent_messages = state.get("messages", [])[-3:] if state.get("messages") else []
+            user_id = client_data.get("user_id")
             payment_completed = False
             payment_confirmed = False
             
@@ -172,10 +160,7 @@ def create_payment_portal_agent(
             return {
                 "payment_confirmed": payment_confirmed,
                 "portal_payment_complete": payment_completed or payment_confirmed,
-                "arrangement_id": arrangement_id,
-                "call_info": {
-                    "portal_payment_status": "completed" if (payment_completed or payment_confirmed) else "pending"
-                }
+                "arrangement_id": arrangement_id
             }
             
         except Exception as e:
@@ -185,25 +170,21 @@ def create_payment_portal_agent(
             return {
                 "payment_confirmed": False,
                 "portal_payment_complete": False,
-                "arrangement_id": None,
-                "call_info": {"portal_payment_status": "error"}
+                "arrangement_id": None
             }
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for payment portal step."""
-        # Build parameters using real client data
         parameters = prepare_parameters(
             client_data=client_data,
             current_step=CallStep.PAYMENT_PORTAL.value,
-            state=state.to_dict(),
+            state=state.to_dict() if hasattr(state, 'to_dict') else state,
             script_type=script_type,
             agent_name=agent_name
         )
         
-        # Generate step-specific prompt
         prompt_content = get_step_prompt(CallStep.PAYMENT_PORTAL.value, parameters)
-        
-        return SystemMessage(content=prompt_content)
+        return [SystemMessage(content=prompt_content)] + state['messages']
     
     return create_basic_agent(
         model=model,

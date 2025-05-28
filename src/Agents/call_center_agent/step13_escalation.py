@@ -1,6 +1,7 @@
-# ./src/Agents/call_center_agent/escalation_agent.py
+# ./src/Agents/call_center_agent/step13_escalation.py
 """
 Escalation Agent - Handles escalation requests professionally.
+SIMPLIFIED: Keep ticket logic, no query detection.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -39,7 +40,7 @@ def create_escalation_agent(
         save_call_disposition
     ] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__", "agent"]]:
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to create escalation ticket and prepare response."""
         
         # Generate ticket details
