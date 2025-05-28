@@ -5,10 +5,10 @@ This module provides a comprehensive debtor simulator for testing call center ag
 Includes wrong person and third party scenarios for realistic testing.
 """
 import random
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from enum import Enum
 
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, BaseMessage
 from langchain_core.language_models import BaseChatModel
 from langgraph.prebuilt import create_react_agent
 from langgraph.graph.graph import CompiledGraph
@@ -489,7 +489,33 @@ def get_test_scenarios() -> Dict[str, str]:
         "scenario_9_confused": "Debtor is confused about the situation and needs clarification"
     }
 
-
+def swap_roles(messages: List[BaseMessage]) -> List[BaseMessage]:
+    """
+    Swap roles of messages between agent and user.
+    
+    This is necessary because what appears as an AI response to the agent
+    needs to be a human message to the debtor, and vice versa.
+    
+    Args:
+        messages: List of messages to swap roles for
+        
+    Returns:
+        List of messages with swapped roles
+    """
+    new_messages = []
+    
+    # Only keep System messages and the relevant conversation messages
+    for m in messages:
+        if isinstance(m, SystemMessage):
+            new_messages.append(m)
+        elif isinstance(m, AIMessage):
+            # Agent messages become Human messages for the debtor
+            new_messages.append(HumanMessage(content=m.content))
+        elif isinstance(m, HumanMessage):
+            # Human messages become AI messages for the debtor
+            new_messages.append(AIMessage(content=m.content))
+    
+    return new_messages
 # Usage examples and testing
 """
 from langchain_ollama import ChatOllama
