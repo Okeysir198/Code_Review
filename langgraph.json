@@ -4,10 +4,11 @@
     "."
   ],
   "graphs": {
-    "graph_introduction_agent"          : "./src/Agents/graph_call_center.py:graph_introduction_agent",
-    "graph_name_verification_agent"     : "./src/Agents/graph_call_center.py:graph_name_verification_agent",
-    "graph_details_verification_agent"  : "./src/Agents/graph_call_center.py:graph_details_verification_agent",
-    "graph_reason_for_call"             : "./src/Agents/graph_call_center.py:graph_reason_for_call"
+    "graph_debtor_simulator"            : "./src/Agents/graph_test_call_center.py:graph_debtor_simulator",
+    "graph_introduction_agent"          : "./src/Agents/graph_test_call_center.py:graph_introduction_agent",
+    "graph_name_verification_agent"     : "./src/Agents/graph_test_call_center.py:graph_name_verification_agent",
+    "graph_details_verification_agent"  : "./src/Agents/graph_test_call_center.py:graph_details_verification_agent",
+    "graph_reason_for_call"             : "./src/Agents/graph_test_call_center.py:graph_reason_for_call"
   },
   "env": ".env"
 }

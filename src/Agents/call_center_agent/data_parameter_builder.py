@@ -3,9 +3,12 @@
 Optimized data parameter builder for call center AI agents.
 Integrates real client data with behavioral intelligence and tactical guidance.
 """
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+import functools
 
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Callable, Coroutine
 from datetime import datetime, timedelta
 from enum import Enum
 
@@ -77,38 +80,37 @@ class ClientDataBuilder:
                 raise ValueError(f"Client profile not found for user_id: {user_id}")
             
             # # Load account overview and financial data
-            # account_overview = get_client_account_overview.invoke(user_id)
-            # account_aging = get_client_account_aging.invoke(user_id)
-            # banking_details = get_client_banking_details.invoke(user_id)
+            account_overview = get_client_account_overview.invoke(user_id)
+            account_aging = get_client_account_aging.invoke(user_id)
+            banking_details = get_client_banking_details.invoke(user_id)
             
             # # Load subscription and payment data
-            # subscription_data = get_client_subscription_amount.invoke(user_id)
-            # payment_history = get_client_payment_history.invoke(user_id)
-            # failed_payments = get_client_failed_payments.invoke(user_id)
-            # last_payment = get_client_last_successful_payment.invoke(user_id)
+            subscription_data = get_client_subscription_amount.invoke(user_id)
+            payment_history = get_client_payment_history.invoke(user_id)
+            failed_payments = get_client_failed_payments.invoke(user_id)
+            last_payment = get_client_last_successful_payment.invoke(user_id)
             
             # # Load contracts and billing analysis
-            # contracts = get_client_contracts.invoke(user_id)
-            # billing_analysis = get_client_billing_analysis.invoke(user_id)
+            contracts = get_client_contracts.invoke(user_id)
+            billing_analysis = get_client_billing_analysis.invoke(user_id)
             
             # # load existing_mandates
-
-            # existing_mandates = get_client_debit_mandates.invoke(user_id)
+            existing_mandates = get_client_debit_mandates.invoke(user_id)
 
             # Consolidate all data
             client_data = {
                 "user_id": user_id,
                 "profile": profile,
-                # "account_overview": account_overview,
-                # "account_aging": account_aging[0] if account_aging else {},
-                # "banking_details": banking_details[0] if banking_details else {},
-                # "subscription": subscription_data,
-                # "payment_history": payment_history[:5] if payment_history else [],
-                # "failed_payments": failed_payments[:3] if failed_payments else [],
-                # "last_successful_payment": last_payment,
-                # "contracts": contracts,
-                # "billing_analysis": billing_analysis[0] if billing_analysis else {},
-                # "existing_mandates": existing_mandates,
+                "account_overview": account_overview,
+                "account_aging": account_aging[0] if account_aging else {},
+                "banking_details": banking_details[0] if banking_details else {},
+                "subscription": subscription_data,
+                "payment_history": payment_history[:5] if payment_history else [],
+                "failed_payments": failed_payments[:3] if failed_payments else [],
+                "last_successful_payment": last_payment,
+                "contracts": contracts,
+                "billing_analysis": billing_analysis[0] if billing_analysis else {},
+                "existing_mandates": existing_mandates,
                 "loaded_at": datetime.now()
             }
             
@@ -152,6 +154,177 @@ class ClientDataBuilder:
             cls._cache.clear()
 
 ########################################################################################
+class AsyncClientDataBuilder:
+    """Async version of ClientDataBuilder for faster data fetching."""
+    
+    _cache = {}
+    _cache_duration = timedelta(hours=1)
+    _executor = ThreadPoolExecutor(max_workers=10)  # Adjust based on your DB capacity
+    
+    @classmethod
+    async def get_client_data(cls, user_id: str, force_reload: bool = False) -> Dict[str, Any]:
+        """Get client data with caching - async version."""
+        cache_key = user_id
+        now = datetime.now()
+        
+        # Check cache
+        if not force_reload and cache_key in cls._cache:
+            cached_entry = cls._cache[cache_key]
+            if now - cached_entry["timestamp"] < cls._cache_duration:
+                logger.info(f"Using cached data for user_id: {user_id}")
+                return cached_entry["data"]
+        
+        # Fetch fresh data asynchronously
+        logger.info(f"Fetching fresh data asynchronously for user_id: {user_id}")
+        try:
+            data = await cls._fetch_client_data_async(user_id)
+            cls._cache[cache_key] = {"data": data, "timestamp": now}
+            return data
+        except Exception as e:
+            logger.error(f"Error fetching client data for {user_id}: {e}")
+            return cls._get_fallback_data(user_id)
+    
+    @classmethod
+    async def _fetch_client_data_async(cls, user_id: str) -> Dict[str, Any]:
+        """Fetch data from database using async calls for speed."""
+        try:
+            # Convert sync tool calls to async using thread pool
+            async def call_tool_async(tool_func: Callable, *args, **kwargs):
+                """Convert synchronous tool call to async."""
+                loop = asyncio.get_event_loop()
+                return await loop.run_in_executor(
+                    cls._executor, 
+                    functools.partial(tool_func.invoke, *args, **kwargs)
+                )
+            
+            # Create all async tasks
+            tasks = {
+                "profile": call_tool_async(get_client_profile, user_id),
+                "account_overview": call_tool_async(get_client_account_overview, user_id),
+                "account_aging": call_tool_async(get_client_account_aging, user_id),
+                "banking_details": call_tool_async(get_client_banking_details, user_id),
+                "subscription_data": call_tool_async(get_client_subscription_amount, user_id),
+                "payment_history": call_tool_async(get_client_payment_history, user_id),
+                "failed_payments": call_tool_async(get_client_failed_payments, user_id),
+                "last_payment": call_tool_async(get_client_last_successful_payment, user_id),
+                "contracts": call_tool_async(get_client_contracts, user_id),
+                "billing_analysis": call_tool_async(get_client_billing_analysis, user_id),
+                "existing_mandates": call_tool_async(get_client_debit_mandates, user_id),
+            }
+            
+            # Execute all tasks concurrently
+            logger.info(f"Executing {len(tasks)} concurrent database calls for user_id: {user_id}")
+            start_time = datetime.now()
+            
+            results = await asyncio.gather(*tasks.values(), return_exceptions=True)
+            
+            end_time = datetime.now()
+            duration = (end_time - start_time).total_seconds()
+            logger.info(f"Completed concurrent database calls in {duration:.2f} seconds")
+            
+            # Map results back to names
+            task_names = list(tasks.keys())
+            data_results = {}
+            
+            for i, result in enumerate(results):
+                task_name = task_names[i]
+                if isinstance(result, Exception):
+                    logger.warning(f"Error fetching {task_name} for {user_id}: {result}")
+                    data_results[task_name] = None
+                else:
+                    data_results[task_name] = result
+            
+            # Check if profile loaded successfully (critical requirement)
+            profile = data_results.get("profile")
+            if not profile:
+                raise ValueError(f"Client profile not found for user_id: {user_id}")
+            
+            # Consolidate all data with safe handling
+            client_data = {
+                "user_id": user_id,
+                "profile": profile,
+                "account_overview": data_results.get("account_overview"),
+                "account_aging": cls._safe_get_first(data_results.get("account_aging")),
+                "banking_details": cls._safe_get_first(data_results.get("banking_details")),
+                "subscription": data_results.get("subscription_data"),
+                "payment_history": cls._safe_slice(data_results.get("payment_history"), 5),
+                "failed_payments": cls._safe_slice(data_results.get("failed_payments"), 3),
+                "last_successful_payment": data_results.get("last_payment"),
+                "contracts": data_results.get("contracts"),
+                "billing_analysis": cls._safe_get_first(data_results.get("billing_analysis")),
+                "existing_mandates": data_results.get("existing_mandates"),
+                "loaded_at": datetime.now(),
+                "load_duration_seconds": duration
+            }
+            
+            logger.info(f"Successfully loaded async data for user_id: {user_id} in {duration:.2f}s")
+            return client_data
+            
+        except Exception as e:
+            logger.error(f"Error loading async client data for {user_id}: {str(e)}")
+            raise
+    
+    @classmethod
+    def _safe_get_first(cls, data_list: Optional[List]) -> Dict[str, Any]:
+        """Safely get first item from list or return empty dict."""
+        if data_list and isinstance(data_list, list) and len(data_list) > 0:
+            return data_list[0]
+        return {}
+    
+    @classmethod
+    def _safe_slice(cls, data_list: Optional[List], limit: int) -> List:
+        """Safely slice list or return empty list."""
+        if data_list and isinstance(data_list, list):
+            return data_list[:limit]
+        return []
+    
+    @classmethod
+    def _get_fallback_data(cls, user_id: str) -> Dict[str, Any]:
+        """Fallback data when database fails."""
+        return {
+            "user_id": user_id,
+            "profile": {
+                "client_info": {
+                    "client_full_name": "Client",
+                    "first_name": "Client",
+                    "title": "Mr/Ms"
+                }
+            },
+            "account_overview": {"account_status": "Overdue"},
+            "account_aging": {"xbalance": "0.00"},
+            "subscription": {"subscription_amount": "0.00"},
+            "payment_history": [],
+            "failed_payments": [],
+            "last_successful_payment": None,
+            "contracts": [],
+            "billing_analysis": {},
+            "existing_mandates": {},
+            "loaded_at": datetime.now(),
+            "load_duration_seconds": 0.0,
+            "fallback_used": True
+        }
+    
+    @classmethod
+    def clear_cache(cls, user_id: Optional[str] = None):
+        """Clear cached data."""
+        if user_id:
+            cls._cache.pop(user_id, None)
+        else:
+            cls._cache.clear()
+    
+    @classmethod
+    def shutdown_executor(cls):
+        """Shutdown the thread pool executor."""
+        cls._executor.shutdown(wait=True)
+
+
+# Async convenience functions
+async def get_client_data_async(user_id: str, force_reload: bool = False) -> Dict[str, Any]:
+    """Get client data asynchronously with caching."""
+    return await AsyncClientDataBuilder.get_client_data(user_id, force_reload)
+
+
+#####################################################################################
 class BehavioralAnalyzer:
     """Analyzes client behavior and provides tactical guidance."""
     

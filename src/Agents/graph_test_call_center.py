@@ -17,9 +17,11 @@ from app_config import CONFIG
 from src.Agents.call_center_agent.call_scripts import ScriptType
 from test_graph.client_data import client_data
 
+from src.Agents.graph_debtor_simulator import create_debtor_simulator, create_random_debtor
 from src.Agents.call_center_agent.introduction import create_introduction_agent
 from src.Agents.call_center_agent.name_verification import create_name_verification_agent
 from src.Agents.call_center_agent.details_verification import create_details_verification_agent
+
 
 logger.info("✅ All imports successful")
     
@@ -36,8 +38,17 @@ config['configurable']['enable_tts_model'] = False
 llm = ChatOllama(model="qwen2.5:7b-instruct", temperature=0, num_ctx=32000)
 logger.info("✅ LLM initialized successfully")
     
-
-
+################################################################################
+graph_debtor_simulator = create_debtor_simulator(
+    llm=llm,
+    client_data=client_data,
+    personality="cooperative",
+    cooperativeness=0.8,
+)
+graph_debtor_simulator = create_random_debtor(
+    llm=llm,
+    client_data=client_data,
+)
 ################################################################################
 # Create agents with proper error handling
 
