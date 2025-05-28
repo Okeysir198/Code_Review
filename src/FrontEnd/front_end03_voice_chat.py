@@ -358,7 +358,7 @@ def create_voice_chat_block(voice_handler=None, workflow=None, theme=None) -> gr
                         # Additional phone-optimized settings
                         max_speech_duration_s=30.0,  # Prevent extremely long segments
                     ),
-                    can_interrupt=True,
+                    # can_interrupt=True,
                 ),
                 inputs=[audio, chatbot, voice_thread_id],
                 outputs=[audio],

@@ -12,6 +12,7 @@ from src.Database import CartrackSQLDatabase
 from app_config import CONFIG
 from src.VoiceHandler import VoiceInteractionHandler
 from src.Agents import react_agent_graph
+from src.Agents.graph_call_center_agent import create_call_center_agent_with_client_data
 
 from .front_end03_voice_chat import create_voice_chat_block
 from .front_end04_profile_display import display_client_profile
@@ -468,7 +469,8 @@ class ClientDashboard:
             # Voice Chat Block
             with gr.Column(elem_classes=["voice-chat-floating"]):
                 voice_handler = VoiceInteractionHandler(CONFIG)
-                create_voice_chat_block(voice_handler, react_agent_graph)
+                create_voice_chat_block(voice_handler, create_call_center_agent_with_client_data(user_id_input))
+                
             
             # Define all outputs
             outputs = [
