@@ -199,5 +199,6 @@ def create_debicheck_setup_agent(
         post_processing_node=post_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,
+        config=config,
         name="DebiCheckSetupAgent"
     )

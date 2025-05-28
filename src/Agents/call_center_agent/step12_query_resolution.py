@@ -99,5 +99,6 @@ Answer briefly, then secure payment arrangement immediately.
         # pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,
+        config=config,
         name="QueryResolutionAgent"
     )

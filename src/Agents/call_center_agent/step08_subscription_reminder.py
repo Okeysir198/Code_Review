@@ -78,5 +78,6 @@ def create_subscription_reminder_agent(
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,
+        config=config,
         name="SubscriptionReminderAgent"
     )

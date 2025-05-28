@@ -169,6 +169,7 @@ def create_details_verification_agent(
         "pre_processing_node": pre_processing_node,
         "state_schema": CallCenterAgentState,
         "verbose": verbose,
+        'config':config,
         "name": "DetailsVerificationAgent"
     }
     
