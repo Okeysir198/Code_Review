@@ -4,6 +4,7 @@
     "."
   ],
   "graphs": {
+    "graph_call_center_agent"           : "./src/Agents/graph_test_call_center.py:graph_call_center_agent",
     "graph_debtor_simulator"            : "./src/Agents/graph_test_call_center.py:graph_debtor_simulator",
     "graph_introduction_agent"          : "./src/Agents/graph_test_call_center.py:graph_introduction_agent",
     "graph_name_verification_agent"     : "./src/Agents/graph_test_call_center.py:graph_name_verification_agent",

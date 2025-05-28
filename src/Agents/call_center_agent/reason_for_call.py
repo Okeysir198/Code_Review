@@ -29,7 +29,9 @@ def create_reason_for_call_agent(
     script_type: str = "ratio_1_inflow",
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
-    verbose: bool = False
+    verbose: bool = False,
+    config: Optional[Dict[str, Any]] = None
+
 ) -> CompiledGraph:
     """
     Create a reason for call agent for debt collection calls.

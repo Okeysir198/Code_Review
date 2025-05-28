@@ -18,6 +18,10 @@ from src.Agents.call_center_agent.call_scripts import ScriptType
 from test_graph.client_data import client_data
 
 from src.Agents.graph_debtor_simulator import create_debtor_simulator, create_random_debtor
+from src.Agents.graph_call_center_agent import create_call_center_agent
+
+from src.Agents.call_center_agent.state import CallCenterAgentState
+
 from src.Agents.call_center_agent.introduction import create_introduction_agent
 from src.Agents.call_center_agent.name_verification import create_name_verification_agent
 from src.Agents.call_center_agent.details_verification import create_details_verification_agent
@@ -45,13 +49,23 @@ graph_debtor_simulator = create_debtor_simulator(
     personality="cooperative",
     cooperativeness=0.8,
 )
-graph_debtor_simulator = create_random_debtor(
-    llm=llm,
-    client_data=client_data,
-)
-################################################################################
-# Create agents with proper error handling
+# graph_debtor_simulator = create_random_debtor(
+#     llm=llm,
+#     client_data=client_data,
+# )
+logger.info("✅ Debtor simulator agent created successfully")
 
+################################################################################
+# Call Center Agent
+graph_call_center_agent = create_call_center_agent(
+    model=llm,
+    client_data=client_data,
+    script_type=ScriptType.RATIO_1_INFLOW.value,
+    config=config
+)
+logger.info("✅ Call center agent created successfully")
+
+################################################################################
 # Introduction Agent
 graph_introduction_agent = create_introduction_agent(
     model=llm,
@@ -63,8 +77,7 @@ graph_introduction_agent = create_introduction_agent(
 logger.info("✅ Introduction agent created successfully")
     
 
-
-################################################################################
+###############################################################################
 # Name Verification Agent  
 graph_name_verification_agent = create_name_verification_agent(
     model=llm,
@@ -91,3 +104,7 @@ logger.info("✅ Details verification agent created successfully")
 graph_reason_for_call = graph_introduction_agent
 
 logger.info("🎉 All graph agents initialized successfully")
+
+
+#################################################################################
+

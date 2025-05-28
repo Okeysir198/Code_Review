@@ -184,18 +184,18 @@ class CallCenterAgentState(MessagesState):
     verification, behavioral analysis, payment arrangements, and call flow.
     """
     
-    # ===== CORE IDENTIFICATION =====
-    user_id: str = ""
-    agent_name: str = "AI Agent"
-    session_id: str = ""
+    # # ===== CORE IDENTIFICATION =====
+    # user_id: str = ""
+    # agent_name: str = "AI Agent"
+    # session_id: str = ""
     
     # ===== CALL FLOW MANAGEMENT =====
     current_step: str = CallStep.INTRODUCTION.value
     previous_step: Optional[str] = None
     next_step: Optional[str] = None
-    is_call_active: bool = True
-    is_call_ended: bool = False
-    call_outcome: Optional[str] = None
+    # is_call_active: bool = True
+    # is_call_ended: bool = False
+    # call_outcome: Optional[str] = None
     
     # ===== VERIFICATION STATE =====
     name_verification_status: str = VerificationStatus.INSUFFICIENT_INFO.value
@@ -205,67 +205,67 @@ class CallCenterAgentState(MessagesState):
     matched_fields: List[str] = field(default_factory=list)
     field_to_verify: str = "id_number"
     
-    # ===== CLIENT DATA =====
-    client_data: ClientData = field(default_factory=ClientData)
+    # # ===== CLIENT DATA =====
+    # client_data: ClientData = field(default_factory=ClientData)
 
     
-    # ===== BEHAVIORAL INTELLIGENCE =====
-    behavioral_analysis: BehavioralAnalysis = field(default_factory=BehavioralAnalysis)
-    tactical_guidance: TacticalGuidance = field(default_factory=TacticalGuidance)
+    # # ===== BEHAVIORAL INTELLIGENCE =====
+    # behavioral_analysis: BehavioralAnalysis = field(default_factory=BehavioralAnalysis)
+    # tactical_guidance: TacticalGuidance = field(default_factory=TacticalGuidance)
     
-    # ===== CONVERSATION CONTEXT =====
-    emotional_state: str = EmotionalState.NEUTRAL.value
-    payment_willingness: str = PaymentWillingness.UNKNOWN.value
-    rapport_level: str = "establishing"
-    objections_raised: List[str] = field(default_factory=list)
-    topics_discussed: List[str] = field(default_factory=list)
+    # # ===== CONVERSATION CONTEXT =====
+    # emotional_state: str = EmotionalState.NEUTRAL.value
+    # payment_willingness: str = PaymentWillingness.UNKNOWN.value
+    # rapport_level: str = "establishing"
+    # objections_raised: List[str] = field(default_factory=list)
+    # topics_discussed: List[str] = field(default_factory=list)
     
-    # ===== CONVERSATION FLAGS =====
-    query_detected: bool = False
-    cancellation_requested: bool = False
-    escalation_requested: bool = False
-    supervisor_requested: bool = False
-    complaint_raised: bool = False
-    dispute_raised: bool = False
+    # # ===== CONVERSATION FLAGS =====
+    # query_detected: bool = False
+    # cancellation_requested: bool = False
+    # escalation_requested: bool = False
+    # supervisor_requested: bool = False
+    # complaint_raised: bool = False
+    # dispute_raised: bool = False
     
-    # ===== PAYMENT MANAGEMENT =====
-    payment_arrangement: PaymentArrangement = field(default_factory=PaymentArrangement)
-    payment_secured: bool = False
-    debicheck_setup_complete: bool = False
-    portal_payment_complete: bool = False
+    # # ===== PAYMENT MANAGEMENT =====
+    # payment_arrangement: PaymentArrangement = field(default_factory=PaymentArrangement)
+    # payment_secured: bool = False
+    # debicheck_setup_complete: bool = False
+    # portal_payment_complete: bool = False
     
-    # ===== CALL MANAGEMENT =====
-    notes_added: List[str] = field(default_factory=list)
-    disposition_saved: bool = False
-    disposition_type_id: Optional[str] = None
-    callback_scheduled: bool = False
-    callback_date: Optional[str] = None
+    # # ===== CALL MANAGEMENT =====
+    # notes_added: List[str] = field(default_factory=list)
+    # disposition_saved: bool = False
+    # disposition_type_id: Optional[str] = None
+    # callback_scheduled: bool = False
+    # callback_date: Optional[str] = None
     
-    # ===== UPDATES TRACKING =====
-    contact_details_updated: bool = False
-    banking_details_updated: bool = False
-    next_of_kin_updated: bool = False
-    referral_captured: bool = False
+    # # ===== UPDATES TRACKING =====
+    # contact_details_updated: bool = False
+    # banking_details_updated: bool = False
+    # next_of_kin_updated: bool = False
+    # referral_captured: bool = False
     
-    # ===== CONVERSATION METRICS =====
-    metrics: ConversationMetrics = field(default_factory=ConversationMetrics)
+    # # ===== CONVERSATION METRICS =====
+    # metrics: ConversationMetrics = field(default_factory=ConversationMetrics)
     
-    # ===== SYSTEM CONTEXT =====
-    system_prompt: Optional[str] = None
-    last_response: Optional[str] = None
-    error_count: int = 0
-    retry_count: int = 0
+    # # ===== SYSTEM CONTEXT =====
+    # system_prompt: Optional[str] = None
+    # last_response: Optional[str] = None
+    # error_count: int = 0
+    # retry_count: int = 0
     
-    # ===== ROUTING AND FLOW CONTROL =====
-    recommended_next_node: Optional[str] = None
-    route_reason: Optional[str] = None
-    should_continue: bool = True
+    # # ===== ROUTING AND FLOW CONTROL =====
+    # recommended_next_node: Optional[str] = None
+    # route_reason: Optional[str] = None
+    # should_continue: bool = True
     
-    # ===== COMPLIANCE AND AUDIT =====
-    popi_acknowledged: bool = False
-    call_recorded_notice_given: bool = False
-    security_verification_complete: bool = False
-    compliance_notes: List[str] = field(default_factory=list)
+    # # ===== COMPLIANCE AND AUDIT =====
+    # popi_acknowledged: bool = False
+    # call_recorded_notice_given: bool = False
+    # security_verification_complete: bool = False
+    # compliance_notes: List[str] = field(default_factory=list)
 
     # ===== HELPER METHODS =====
     

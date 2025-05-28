@@ -200,16 +200,16 @@ class AsyncClientDataBuilder:
             # Create all async tasks
             tasks = {
                 "profile": call_tool_async(get_client_profile, user_id),
-                "account_overview": call_tool_async(get_client_account_overview, user_id),
-                "account_aging": call_tool_async(get_client_account_aging, user_id),
-                "banking_details": call_tool_async(get_client_banking_details, user_id),
-                "subscription_data": call_tool_async(get_client_subscription_amount, user_id),
-                "payment_history": call_tool_async(get_client_payment_history, user_id),
-                "failed_payments": call_tool_async(get_client_failed_payments, user_id),
-                "last_payment": call_tool_async(get_client_last_successful_payment, user_id),
-                "contracts": call_tool_async(get_client_contracts, user_id),
-                "billing_analysis": call_tool_async(get_client_billing_analysis, user_id),
-                "existing_mandates": call_tool_async(get_client_debit_mandates, user_id),
+                # "account_overview": call_tool_async(get_client_account_overview, user_id),
+                # "account_aging": call_tool_async(get_client_account_aging, user_id),
+                # "banking_details": call_tool_async(get_client_banking_details, user_id),
+                # "subscription_data": call_tool_async(get_client_subscription_amount, user_id),
+                # "payment_history": call_tool_async(get_client_payment_history, user_id),
+                # "failed_payments": call_tool_async(get_client_failed_payments, user_id),
+                # "last_payment": call_tool_async(get_client_last_successful_payment, user_id),
+                # "contracts": call_tool_async(get_client_contracts, user_id),
+                # "billing_analysis": call_tool_async(get_client_billing_analysis, user_id),
+                # "existing_mandates": call_tool_async(get_client_debit_mandates, user_id),
             }
             
             # Execute all tasks concurrently
@@ -243,16 +243,16 @@ class AsyncClientDataBuilder:
             client_data = {
                 "user_id": user_id,
                 "profile": profile,
-                "account_overview": data_results.get("account_overview"),
-                "account_aging": cls._safe_get_first(data_results.get("account_aging")),
-                "banking_details": cls._safe_get_first(data_results.get("banking_details")),
-                "subscription": data_results.get("subscription_data"),
-                "payment_history": cls._safe_slice(data_results.get("payment_history"), 5),
-                "failed_payments": cls._safe_slice(data_results.get("failed_payments"), 3),
-                "last_successful_payment": data_results.get("last_payment"),
-                "contracts": data_results.get("contracts"),
-                "billing_analysis": cls._safe_get_first(data_results.get("billing_analysis")),
-                "existing_mandates": data_results.get("existing_mandates"),
+                # "account_overview": data_results.get("account_overview"),
+                # "account_aging": cls._safe_get_first(data_results.get("account_aging")),
+                # "banking_details": cls._safe_get_first(data_results.get("banking_details")),
+                # "subscription": data_results.get("subscription_data"),
+                # "payment_history": cls._safe_slice(data_results.get("payment_history"), 5),
+                # "failed_payments": cls._safe_slice(data_results.get("failed_payments"), 3),
+                # "last_successful_payment": data_results.get("last_payment"),
+                # "contracts": data_results.get("contracts"),
+                # "billing_analysis": cls._safe_get_first(data_results.get("billing_analysis")),
+                # "existing_mandates": data_results.get("existing_mandates"),
                 "loaded_at": datetime.now(),
                 "load_duration_seconds": duration
             }
