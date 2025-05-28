@@ -13,9 +13,8 @@ sys.path.append("../..")
 load_dotenv(find_dotenv())
 
 # Configuration
-PROMPT = "You are a helpful AI assistant. Answer in 20 words or less. YOur name is Trung" \
-"If the input is unclear or incomplete, say shortly 'Pardon?'" \
-"If the input is not in English, say shortly 'Pardon? I can only respond in English.'"
+PROMPT = "You are a helpful AI assistant. Answer in 20 words or less. YOur name is Trung" 
+
 MAX_SEARCH_RESULTS = 2
 MODEL_NAME = "ollama:qwen2.5:14b-instruct"
 TEMPERATURE = 0

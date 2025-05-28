@@ -2,6 +2,7 @@ import logging
 from langchain_ollama import ChatOllama
 from langgraph.checkpoint.memory import MemorySaver
 
+from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 from langgraph.graph import StateGraph, START,END
 from langgraph.graph.message import MessagesState
@@ -35,11 +36,11 @@ logger.info("✅ All imports successful")
 config = CONFIG.copy()
 config['configurable'] = config.get("configurable", {})
 config['configurable']['use_memory'] = False
-config['configurable']['enable_stt_model'] = False
-config['configurable']['enable_tts_model'] = False
+# config['configurable']['enable_stt_model'] = False
+# config['configurable']['enable_tts_model'] = False
 
 # Initialize LLM
-llm = ChatOllama(model="qwen2.5:7b-instruct", temperature=0, num_ctx=32000)
+llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0, num_ctx=32000)
 logger.info("✅ LLM initialized successfully")
     
 ################################################################################
@@ -57,6 +58,14 @@ logger.info("✅ Debtor simulator agent created successfully")
 
 ################################################################################
 # Call Center Agent
+def create_call_center_agent_with_client_data(client_data) -> CompiledGraph:
+    return create_call_center_agent(
+        model=llm,
+        client_data=client_data,
+        script_type=ScriptType.RATIO_1_INFLOW.value,
+        config=config
+    )
+
 graph_call_center_agent = create_call_center_agent(
     model=llm,
     client_data=client_data,

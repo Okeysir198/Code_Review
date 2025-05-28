@@ -97,7 +97,7 @@ CONFIG = {
 
     # Gradio UI config
     "server": {
-        "port": 7899,
+        "port": 7898,
         "host": "0.0.0.0",
         "share": False,
         "enable_queue": True,

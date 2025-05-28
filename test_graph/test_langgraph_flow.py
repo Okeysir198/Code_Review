@@ -20,8 +20,8 @@ from langchain_core.tools import tool
 config = CONFIG.copy()
 config['configurable'] = config.get("configurable",{})
 config['configurable']['use_memory'] = False
-config['configurable']['enable_stt_model'] = False
-config['configurable']['enable_tts_model'] = False
+# config['configurable']['enable_stt_model'] = False
+# config['configurable']['enable_tts_model'] = False    
 
 llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0, num_ctx=40000)
 

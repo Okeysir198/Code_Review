@@ -277,7 +277,7 @@ def main():
         create_demo_app().launch(
             server_name=args.host, 
             server_port=args.port, 
-            share=args.share
+            share=args.share,
         )
 
 if __name__ == "__main__":
