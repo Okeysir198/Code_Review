@@ -1,23 +1,25 @@
 """
-Optimized Voice Chat Component - Enhanced UI with better layout and styling.
+Optimized Voice Chat Component - Enhanced UI with client data caching.
 """
 
 import gradio as gr
 import uuid
 import logging
 import os
-from typing import Dict, List, Tuple, Generator, Any, Optional
+from typing import Dict, List, Tuple, Generator, Any, Optional, Callable
 from fastrtc import WebRTC, ReplyOnPause, AlgoOptions, SileroVadOptions, AdditionalOutputs
 
 logger = logging.getLogger(__name__)
 
 
 class VoiceChatInterface:
-    """Gradio interface wrapper for VoiceInteractionHandler."""
+    """Gradio interface wrapper for VoiceInteractionHandler with client data caching."""
     
-    def __init__(self, voice_handler=None, workflow=None):
+    def __init__(self, voice_handler=None, workflow=None, workflow_factory: Optional[Callable] = None, client_data_loader: Optional[Callable] = None):
         self.voice_handler = voice_handler
         self.workflow = workflow
+        self.workflow_factory = workflow_factory
+        self.client_data_loader = client_data_loader  # Function to load client data by user_id
     
     def _validate_history(self, history: List[Dict]) -> List[Dict]:
         """Validate chatbot history."""
@@ -29,6 +31,33 @@ class VoiceChatInterface:
             if isinstance(msg, dict) and 'role' in msg and 'content' in msg
         ]
     
+    def update_client_data(self, user_id: str) -> str:
+        """Update client data in voice handler and return status."""
+        chatbot, thread_id = self.start_new_conversation()
+
+        if not user_id or not user_id.strip():
+            return chatbot, thread_id, "❌ No client ID provided"
+        
+        try:
+            if self.client_data_loader and self.voice_handler:
+                # Load client data
+                logger.info(f"Loading client data for user_id: {user_id}")
+                client_data = self.client_data_loader(user_id)
+                
+                if client_data:
+                    # Update voice handler with new client data
+                    self.voice_handler.update_client_data(user_id, client_data)
+                    
+                    return chatbot, thread_id, f"✅ Client data loaded for ID: {user_id}"
+                else:
+                    return chatbot, thread_id, f"❌ No data found for client ID: {user_id}"
+            else:
+                return chatbot, thread_id, "❌ Voice handler or data loader not available"
+                
+        except Exception as e:
+            logger.error(f"Error updating client data for {user_id}: {e}")
+            return chatbot, thread_id, f"❌ Error loading client data: {str(e)}"
+    
     def process_text_input(self, text_input: str, chatbot_history: List[Dict], thread_id: str) -> Generator:
         """Process text input with streaming."""
         if not text_input.strip():
@@ -38,9 +67,10 @@ class VoiceChatInterface:
         try:
             history = self._validate_history(chatbot_history)
             
-            if self.voice_handler and self.workflow:
+            if self.voice_handler:
+                # Use cached workflow from voice handler
                 for result in self.voice_handler.process_text_input(
-                    text_input.strip(), self.workflow, history, thread_id
+                    text_input.strip(), None, history, thread_id
                 ):
                     audio, chatbot, _ = result if len(result) >= 3 else (*result, "")
                     yield audio, self._validate_history(chatbot) if chatbot else history, ""
@@ -65,9 +95,10 @@ class VoiceChatInterface:
         try:
             history = self._validate_history(chatbot_history)
             
-            if self.voice_handler and self.workflow:
+            if self.voice_handler:
+                # Use cached workflow from voice handler
                 for result in self.voice_handler.process_audio_input(
-                    audio_input, self.workflow, history, thread_id
+                    audio_input, None, history, thread_id
                 ):
                     yield result
             else:
@@ -89,10 +120,10 @@ class VoiceChatInterface:
         return [], new_id
 
 
-def create_voice_chat_block(voice_handler=None, workflow=None, theme=None) -> gr.Blocks:
-    """Create an optimized voice chat interface with enhanced UI."""
+def create_voice_chat_block(voice_handler=None, workflow=None, workflow_factory: Optional[Callable] = None, client_data_loader: Optional[Callable] = None, theme=None) -> gr.Blocks:
+    """Create an optimized voice chat interface with client data caching."""
     
-    interface = VoiceChatInterface(voice_handler, workflow)
+    interface = VoiceChatInterface(voice_handler, workflow, workflow_factory, client_data_loader)
     
     # Enhanced CSS for better styling
     voice_chat_css = """
@@ -182,18 +213,32 @@ def create_voice_chat_block(voice_handler=None, workflow=None, theme=None) -> gr
         margin-bottom: 8px;
         display: block;
     }
+    
+    .client-status {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
     """
     
     with gr.Blocks(css=voice_chat_css) as block:
         voice_thread_id = gr.State(value=str(uuid.uuid4()))
+        current_user_id = gr.State(value="")
+        client_status = gr.State(value="❌ No client selected")
 
         with gr.Column(elem_classes="voice-chat-container"):
-            # Header
+            # Header with client status
             gr.HTML("""
                 <div class="voice-header">
                     <h3 style="margin: 0; font-size: 18px;">🎙️ Voice Agent</h3>
                 </div>
             """)
+            
+            # Client status indicator
+            client_status_display = gr.Markdown(value="❌ No client selected", elem_classes="client-status")
             
             # Voice Controls Section
             with gr.Column(elem_classes="voice-controls"):
@@ -231,11 +276,17 @@ def create_voice_chat_block(voice_handler=None, workflow=None, theme=None) -> gr
                         size="sm",
                         scale=1
                     )
+                    refresh_client_btn = gr.Button(
+                        "🔄 Refresh Client", 
+                        variant="secondary", 
+                        size="sm",
+                        scale=1
+                    )
             
             # Conversation Area
             with gr.Column(elem_classes="conversation-area"):
             
-                if voice_handler and workflow:
+                if voice_handler:
                     text_chat_audio = gr.Audio(
                         label="", 
                         autoplay=True,
@@ -285,7 +336,7 @@ def create_voice_chat_block(voice_handler=None, workflow=None, theme=None) -> gr
                             min_width=80
                         )
         
-        # Handlers (keeping all original functionality)
+        # Handlers
         def handle_additional_outputs(output):
             """Handle chatbot updates from audio."""
             try:
@@ -315,23 +366,23 @@ def create_voice_chat_block(voice_handler=None, workflow=None, theme=None) -> gr
                 logger.error(f"Output handling error: {e}")
                 return gr.update()
         
-        # Connect events (keeping all original functionality)
+        # Connect events
         send_btn.click(
             fn=interface.process_text_input,
             inputs=[text_input, chatbot, voice_thread_id],
-            outputs=[text_chat_audio, chatbot, text_input] if voice_handler and workflow else [chatbot, text_input],
+            outputs=[text_chat_audio, chatbot, text_input] if voice_handler else [chatbot, text_input],
             queue=True
         )
         
         text_input.submit(
             fn=interface.process_text_input,
             inputs=[text_input, chatbot, voice_thread_id],
-            outputs=[text_chat_audio, chatbot, text_input] if voice_handler and workflow else [chatbot, text_input],
+            outputs=[text_chat_audio, chatbot, text_input] if voice_handler else [chatbot, text_input],
             queue=True
         )
         
         # Audio streaming (only if voice handler available)
-        if voice_handler and workflow:
+        if voice_handler:
             audio.stream(
                 ReplyOnPause(
                     interface.process_audio_input,
@@ -383,13 +434,29 @@ def create_voice_chat_block(voice_handler=None, workflow=None, theme=None) -> gr
             queue=False
         )
         
+        # Refresh client data button
+        refresh_client_btn.click(
+            fn=interface.update_client_data,
+            inputs=[current_user_id],
+            outputs=[chatbot, voice_thread_id, client_status_display],
+            queue=False
+        )
+        
+        # Store references for external access
+        block.current_user_id = current_user_id
+        block.client_status = client_status
+        block.client_status_display = client_status_display
+        block.interface = interface
+        
     return block
 
 
-def create_voice_chat_tab(voice_handler=None, workflow=None, tab_name: str = "🎙️ Voice Assistant") -> gr.Tab:
-    """Create voice chat tab with enhanced styling."""
+def create_voice_chat_tab(voice_handler=None, workflow=None, workflow_factory: Optional[Callable] = None, client_data_loader: Optional[Callable] = None, tab_name: str = "🎙️ Voice Assistant") -> gr.Tab:
+    """Create voice chat tab with enhanced styling and client data caching."""
     with gr.Tab(tab_name) as tab:
-        create_voice_chat_block(voice_handler, workflow)
+        voice_block = create_voice_chat_block(voice_handler, workflow, workflow_factory, client_data_loader)
+        # Return both tab and block for state access
+        tab.voice_block = voice_block
     return tab
 
 

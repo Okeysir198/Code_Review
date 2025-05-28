@@ -3,7 +3,7 @@
 import logging
 import uuid
 import json
-from typing import Dict, Any, Optional, Tuple, List, Generator, Union, Set
+from typing import Dict, Any, Optional, Tuple, List, Generator, Union, Set, Callable
 import numpy as np
 from fastrtc import AdditionalOutputs
 from langgraph.graph.graph import CompiledGraph
@@ -29,13 +29,44 @@ class Colors:
 class VoiceInteractionHandler:
     """Voice interaction handler for AI conversational agents."""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], workflow_factory: Optional[Callable] = None):
         self.config = self._setup_config(config or {})
+        self.workflow_factory = workflow_factory
         self._setup_logging()
+        
+        # Client data caching
+        self.cached_client_data = None
+        self.cached_user_id = None
+        self.cached_workflow = None
         
         # Initialize models
         self.stt_model = self._init_stt() if self.config['configurable'].get('enable_stt_model') else None
         self.tts_model = self._init_tts() if self.config['configurable'].get('enable_tts_model') else None
+
+    def update_client_data(self, user_id: str, client_data: Dict[str, Any]):
+        """Update cached client data and workflow."""
+        try:
+            if user_id != self.cached_user_id or not self.cached_workflow:
+                logger.info(f"Updating client data cache for user_id: {user_id}")
+                
+                self.cached_user_id = user_id
+                self.cached_client_data = client_data
+                
+                # Create new workflow with cached data
+                if self.workflow_factory and client_data:
+                    self.cached_workflow = self.workflow_factory(client_data)
+                    logger.info(f"Created new workflow for user_id: {user_id}")
+                else:
+                    self.cached_workflow = None
+                    logger.warning(f"No workflow factory or client data for user_id: {user_id}")
+                    
+        except Exception as e:
+            logger.error(f"Error updating client data for user_id {user_id}: {e}")
+            self.cached_workflow = None
+
+    def get_current_workflow(self) -> Optional[CompiledGraph]:
+        """Get the current cached workflow."""
+        return self.cached_workflow
 
     def _setup_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
         """Setup configuration with defaults."""
@@ -150,10 +181,14 @@ class VoiceInteractionHandler:
                 return (sample_rate, audio_array)
         return audio_chunk
 
-    def process_message(self, user_message: str, workflow: CompiledGraph) -> Dict[str, Any]:
+    def process_message(self, user_message: str, workflow: CompiledGraph = None) -> Dict[str, Any]:
         """Process message through workflow."""
+        # Use cached workflow if no workflow provided
+        if workflow is None:
+            workflow = self.get_current_workflow()
+        
         if not workflow:
-            return {"messages": [], "error": "No workflow provided"}
+            return {"messages": [], "error": "No workflow available. Please select a client first."}
         
         try:
             workflow_input = {"messages": [HumanMessage(content=user_message)]}
@@ -173,7 +208,7 @@ class VoiceInteractionHandler:
             logger.error(f"Workflow error: {e}")
             return {"messages": [], "error": f"Workflow execution error: {str(e)}"}
 
-    def process_text_input(self, text_input: str, workflow: CompiledGraph,
+    def process_text_input(self, text_input: str, workflow: CompiledGraph = None,
                           gradio_chatbot: Optional[List[Dict[str, str]]] = None,
                           thread_id: Optional[Union[str, int]] = None) -> Generator:
         """Process text input with streaming response."""
@@ -188,7 +223,7 @@ class VoiceInteractionHandler:
             chatbot.append({"role": "user", "content": text_input})
             yield None, chatbot, ""
 
-            # Process and get response
+            # Process and get response with cached workflow
             workflow_result = self.process_message(text_input, workflow)
             response = self._extract_ai_response(workflow_result)
             
@@ -207,7 +242,7 @@ class VoiceInteractionHandler:
             chatbot.append({"role": "assistant", "content": "Sorry, an error occurred."})
             yield None, chatbot, ""
 
-    def process_audio_input(self, audio_input: Tuple[int, np.ndarray], workflow: CompiledGraph,
+    def process_audio_input(self, audio_input: Tuple[int, np.ndarray], workflow: CompiledGraph = None,
                            gradio_chatbot: Optional[List[Dict[str, str]]] = None,
                            thread_id: Optional[Union[str, int]] = None) -> Generator:
         """Process audio input with streaming response."""
@@ -236,7 +271,7 @@ class VoiceInteractionHandler:
             self._print("Voice Input", stt_text, Colors.YELLOW)
             chatbot.append({"role": "user", "content": stt_text})
             
-            # Set thread ID and get response
+            # Set thread ID and get response with cached workflow
             self.config['configurable']["thread_id"] = str(thread_id or uuid.uuid4())
             workflow_result = self.process_message(stt_text, workflow)
             response = self._extract_ai_response(workflow_result)
@@ -254,8 +289,6 @@ class VoiceInteractionHandler:
             else:
                 yield (sample_rate, np.array([0], dtype=np.int16))
             
-            
-            
         except Exception as e:
             logger.error(f"Audio processing error: {e}")
             chatbot.append({"role": "assistant", "content": "Sorry, an error occurred."})
@@ -266,4 +299,3 @@ class VoiceInteractionHandler:
         """Set logging level at runtime."""
         self.config['logging']['level'] = level
         self._setup_logging()
- 

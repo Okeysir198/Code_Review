@@ -13,6 +13,7 @@ from app_config import CONFIG
 from src.VoiceHandler import VoiceInteractionHandler
 from src.Agents import react_agent_graph
 from src.Agents.graph_call_center_agent import create_call_center_agent_with_client_data
+from src.Agents.call_center_agent.data_parameter_builder import get_client_data
 
 from .front_end03_voice_chat import create_voice_chat_block
 from .front_end04_profile_display import display_client_profile
@@ -25,9 +26,9 @@ from .front_end10_debit_mandates import display_client_debit_mandates
 from .front_end11_notes_letters import display_client_notes_and_letters
 
 # Configuration
-CACHE_SIZE = 10
+CACHE_SIZE = 20
 CACHE_DURATION = 300  # 5 minutes
-ASYNC_TIMEOUT = 15.0
+ASYNC_TIMEOUT = 50.0
 
 @dataclass
 class FunctionConfig:
@@ -410,6 +411,7 @@ class ClientDashboard:
         self.cache = ClientDataCache()
         self.data_loader = DataLoader(self.cache)
         self.ui_builder = UIBuilder(self.data_loader, initial_client_id)
+        self.initial_client_id = initial_client_id
     
     def update_all_data(self, user_id: str) -> Tuple:
         """Sync wrapper for async data loading"""
@@ -427,6 +429,39 @@ class ClientDashboard:
             error_msg = f"❌ Error: {str(e)}"
             error_response = self.data_loader._create_error_response(str(e))
             return error_response + (error_msg,)
+    
+    def load_client_data_for_voice(self, user_id: str) -> Optional[dict]:
+        """Load client data specifically for voice chat workflow creation."""
+        try:
+            if not user_id or not user_id.strip():
+                return None
+            
+            # Use the existing data builder to get comprehensive client data
+            client_data = get_client_data(user_id)
+            return client_data
+            
+        except Exception as e:
+            print(f"Error loading client data for voice chat: {e}")
+            return None
+    
+    def update_voice_client_data(self, user_id: str, voice_chat_block) -> str:
+        """Update voice chat with new client data."""
+        try:
+            if not user_id or not user_id.strip():
+                return "❌ No client ID provided"
+            
+            # Load client data
+            client_data = self.load_client_data_for_voice(user_id)
+            
+            if client_data and hasattr(voice_chat_block, 'interface'):
+                # Update voice chat interface with new client data
+                status = voice_chat_block.interface.update_client_data(user_id)
+                return status
+            else:
+                return f"❌ Failed to load data for client ID: {user_id}"
+                
+        except Exception as e:
+            return f"❌ Error updating voice client data: {str(e)}"
     
     def create_interface(self) -> Tuple[gr.Blocks, gr.Textbox]:
         """Create the complete client dashboard interface"""
@@ -466,12 +501,41 @@ class ClientDashboard:
                         with gr.TabItem("📋 Notes & Letters"):
                             notes_outputs = self.ui_builder.create_notes_tab()
             
-            # Voice Chat Block
+            # Voice Chat Block - UPDATED IMPLEMENTATION WITH CLIENT DATA CACHING
             with gr.Column(elem_classes=["voice-chat-floating"]):
-                voice_handler = VoiceInteractionHandler(CONFIG)
-                create_voice_chat_block(voice_handler, create_call_center_agent_with_client_data(user_id_input))
+                # Create workflow factory that takes client_data (not user_id)
+                def workflow_factory(client_data: dict):
+                    """Create call center agent from pre-loaded client data."""
+                    try:
+                        if client_data:
+                            from src.Agents.graph_call_center_agent import create_call_center_agent
+                            from src.Agents.call_center_agent.call_scripts import ScriptType
+                            from langchain_ollama import ChatOllama
+                            
+                            llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0, num_ctx=32000)
+                            
+                            return create_call_center_agent(
+                                model=llm,
+                                client_data=client_data,
+                                script_type=ScriptType.RATIO_1_INFLOW.value,
+                                config=CONFIG
+                            )
+                        return None
+                    except Exception as e:
+                        print(f"Error creating workflow: {e}")
+                        return None
                 
-            
+                # Create voice handler with workflow factory
+                voice_handler = VoiceInteractionHandler(CONFIG, workflow_factory)
+                
+                # Create voice chat block with client data loader
+                voice_chat_block = create_voice_chat_block(
+                    voice_handler=voice_handler, 
+                    workflow=None, 
+                    workflow_factory=workflow_factory,
+                    client_data_loader=self.load_client_data_for_voice
+                )
+                
             # Define all outputs
             outputs = [
                 vehicles_table, profile_md,  # Profile (2)
@@ -483,6 +547,20 @@ class ClientDashboard:
                 mandates_table, mandates_summary,  # Mandates (2)
                 *notes_outputs  # Notes & Letters (3)
             ]
+            
+            # Function to update voice chat user ID and load client data
+            def update_voice_chat_user_id_and_data(user_id: str) -> Tuple[str, str]:
+                """Update the voice chat user ID and load client data."""
+                # Update user ID state
+                user_id = user_id.strip() if user_id else ""
+                
+                # Update client data in voice chat
+                if user_id:
+                    status = self.update_voice_client_data(user_id, voice_chat_block)
+                else:
+                    status = "❌ No client selected"
+                
+                return user_id, status
             
             # Event handlers
             search_button.click(
@@ -501,6 +579,27 @@ class ClientDashboard:
                 fn=self.update_all_data,
                 inputs=[user_id_input],
                 outputs=outputs
+            )
+            
+            # CRITICAL: Update voice chat when user_id_input changes
+            user_id_input.change(
+                fn=update_voice_chat_user_id_and_data,
+                inputs=[user_id_input],
+                outputs=[voice_chat_block.current_user_id, voice_chat_block.client_status_display]
+            )
+            
+            # Also update on search
+            search_button.click(
+                fn=update_voice_chat_user_id_and_data,
+                inputs=[user_id_input],
+                outputs=[voice_chat_block.current_user_id, voice_chat_block.client_status_display]
+            )
+            
+            # Initialize voice chat with initial client data
+            demo.load(
+                fn=update_voice_chat_user_id_and_data,
+                inputs=[user_id_input],
+                outputs=[voice_chat_block.current_user_id, voice_chat_block.client_status_display]
             )
         
         return demo, user_id_input
