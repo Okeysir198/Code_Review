@@ -107,7 +107,7 @@ async def _load_client_data(user_id):
     """Load client data at module level."""
     return await get_client_data_async_cache(user_id)
 
-user_id = "83905"  # Example user ID, can be changed as needed
+user_id = "83906"  # Example user ID, can be changed as needed
 client_data = asyncio.run(_load_client_data(user_id))
 logger.info(f"✅ Client data loaded at module level for user: {client_data.get('user_id', 'unknown')}")
 

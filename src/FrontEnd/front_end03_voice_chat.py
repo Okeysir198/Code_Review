@@ -393,7 +393,7 @@ def create_voice_chat_block(voice_handler=None, workflow=None, workflow_factory:
                         # Moderate threshold - catch genuine speech but avoid line noise
                         started_talking_threshold=0.4,  # Balanced for phone calls
                         # Lower threshold for ongoing speech detection (people talk continuously)
-                        speech_threshold=0.25,  # Allow for natural pauses in speech
+                        speech_threshold=0.3,  # Allow for natural pauses in speech
                     ),
                     model_options=SileroVadOptions(
                         # Optimized for phone call scenarios
@@ -401,13 +401,13 @@ def create_voice_chat_block(voice_handler=None, workflow=None, workflow_factory:
                         # Quick response for natural conversation flow
                         min_speech_duration_ms=200,  # Catch short responses like "yes", "no"
                         # Moderate silence duration - allow for thinking time but be responsive
-                        min_silence_duration_ms=800,  # Balance between responsiveness and accuracy
+                        min_silence_duration_ms=1000,  # Balance between responsiveness and accuracy
                         # Optimized window size for phone quality audio
-                        window_size_samples=1024,  # Good for 8kHz phone audio
+                        window_size_samples=512,  # Good for 8kHz phone audio
                         # Minimal padding to avoid cutting off speech but stay responsive
-                        speech_pad_ms=150,  # Just enough to capture word boundaries
+                        speech_pad_ms=50,  # Just enough to capture word boundaries
                         # Additional phone-optimized settings
-                        max_speech_duration_s=30.0,  # Prevent extremely long segments
+                        max_speech_duration_s=10.0,  # Prevent extremely long segments
                     ),
                     # can_interrupt=True,
                 ),

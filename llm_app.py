@@ -257,7 +257,7 @@ def main():
     parser = argparse.ArgumentParser(description="Call Center AI Agent")
     parser.add_argument("--port", type=int, default=CONFIG.get('server', {}).get('port', 7899))
     parser.add_argument("--host", default=CONFIG.get('server', {}).get('host', '0.0.0.0'))
-    parser.add_argument("--share", action="store_true")
+    parser.add_argument("--share", default=True)
     parser.add_argument("--demo", action="store_true", help="Run in demo mode")
     args = parser.parse_args()
     

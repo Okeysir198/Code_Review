@@ -1,19 +1,20 @@
 # ./src/Agents/call_center_agent/step04_negotiation.py
 """
-Negotiation Agent - Handles objections and explains consequences/benefits.
-SIMPLIFIED: No query detection - router handles all routing decisions.
+Negotiation Agent - Collaborative approach with emotional intelligence.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
+from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters, ConversationAnalyzer
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
+from src.Agents.call_center_agent.call_scripts import ScriptType
 
 # Import relevant database tools
 from src.Database.CartrackSQLDatabase import (
@@ -32,7 +33,7 @@ def create_negotiation_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a negotiation agent for debt collection calls."""
+    """Create a negotiation agent with collaborative approach and emotional intelligence."""
     
     # Add relevant database tools
     agent_tools = [
@@ -41,14 +42,17 @@ def create_negotiation_agent(
         add_client_note
     ] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to analyze client behavior and prepare negotiation strategy."""
+    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["agent"]]:
+        """Enhanced pre-processing with conversation analysis and emotional intelligence."""
         
-        # Analyze client behavior for negotiation strategy
+        # Get conversation messages for analysis
+        conversation_messages = state.get("messages", [])
+        
+        # Analyze client behavior using conversation intelligence
         payment_history = client_data.get("payment_history", [])
         failed_payments = client_data.get("failed_payments", [])
         
-        # Determine payment reliability
+        # Traditional payment reliability analysis
         payment_reliability = "unknown"
         if payment_history:
             total_payments = len(payment_history)
@@ -63,39 +67,129 @@ def create_negotiation_agent(
                 else:
                     payment_reliability = "low"
         
-        # Detect objections from recent conversation
-        recent_messages = state.get("messages", [])[-2:] if state.get("messages") else []
-        objection_keywords = {
-            "no_money": ["no money", "can't afford", "broke", "tight", "financial"],
-            "dispute_amount": ["wrong", "incorrect", "dispute", "not right", "don't owe"],
-            "already_paid": ["already paid", "paid already", "made payment"],
-            "will_pay_later": ["later", "next week", "soon", "when I get paid"]
-        }
+        # NEW: Conversation intelligence analysis
+        emotional_state = ConversationAnalyzer.detect_emotional_state(conversation_messages)
+        real_objections = ConversationAnalyzer.detect_real_objections(conversation_messages)
         
-        detected_objections = []
-        for msg in recent_messages:
-            if hasattr(msg, 'content'):
-                content_lower = msg.content.lower()
-                for objection, keywords in objection_keywords.items():
-                    if any(keyword in content_lower for keyword in keywords):
-                        detected_objections.append(objection)
+        # Get outstanding amount for payment analysis
+        account_aging = client_data.get("account_aging", {})
+        try:
+            outstanding_amount = float(account_aging.get("xbalance", 0))
+        except (ValueError, TypeError):
+            outstanding_amount = 0.0
         
-        # Determine emotional state and payment willingness
-        emotional_state = "defensive" if detected_objections else "neutral"
-        payment_willingness = "low" if "no_money" in detected_objections else "medium"
+        payment_conversation = ConversationAnalyzer.analyze_payment_conversation(
+            conversation_messages, outstanding_amount
+        )
         
+        # Determine negotiation approach based on conversation intelligence
+        negotiation_approach = "standard"
+        if emotional_state == "angry":
+            negotiation_approach = "de_escalation"
+        elif emotional_state == "worried":
+            negotiation_approach = "reassuring"
+        elif emotional_state == "cooperative":
+            negotiation_approach = "direct"
+        elif payment_conversation.get("payment_commitment") == "willing":
+            negotiation_approach = "immediate_closure"
+        elif payment_conversation.get("payment_commitment") == "unwilling":
+            negotiation_approach = "flexible_options"
+        
+        # Determine payment willingness based on conversation
+        payment_willingness = payment_conversation.get("payment_commitment", "unknown")
+        if payment_willingness == "unknown":
+            # Fallback to objection analysis
+            if "no_money" in real_objections or "cant_afford" in real_objections:
+                payment_willingness = "unwilling"
+            elif "will_pay_later" in real_objections:
+                payment_willingness = "considering"
+        
+        # Update state with conversation intelligence
         return Command(
             update={
                 "payment_reliability": payment_reliability,
-                "detected_objections": detected_objections,
+                "detected_objections": real_objections,
                 "emotional_state": emotional_state,
-                "payment_willingness": payment_willingness
+                "payment_willingness": payment_willingness,
+                "negotiation_approach": negotiation_approach,
+                "conversation_intelligence": {
+                    "emotional_state": emotional_state,
+                    "real_objections": real_objections,
+                    "payment_conversation": payment_conversation
+                }
             },
             goto="agent"
         )
 
+    def post_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
+        """Track negotiation outcomes and emotional state changes."""
+        
+        try:
+            # Analyze the agent's response to understand negotiation outcome
+            recent_messages = state.get("messages", [])[-2:] if state.get("messages") else []
+            
+            negotiation_outcome = "ongoing"
+            objection_resolved = False
+            client_response_type = "neutral"
+            
+            # Look for client response patterns
+            for msg in recent_messages:
+                if hasattr(msg, 'content') and hasattr(msg, 'type'):
+                    content = msg.content.lower()
+                    
+                    # Client messages
+                    if msg.type == "human":
+                        # Positive responses
+                        if any(phrase in content for phrase in ["okay", "fine", "yes", "i understand"]):
+                            client_response_type = "acceptance"
+                            objection_resolved = True
+                        # New objections
+                        elif any(phrase in content for phrase in ["but", "however", "can't", "won't"]):
+                            client_response_type = "objection"
+                        # Questions or confusion
+                        elif any(phrase in content for phrase in ["what", "how", "why", "when"]):
+                            client_response_type = "questioning"
+                    
+                    # Agent messages - check for negotiation tactics used
+                    elif msg.type == "ai":
+                        if any(phrase in content for phrase in ["understand", "i get it", "that's fair"]):
+                            negotiation_outcome = "empathetic_approach"
+                        elif any(phrase in content for phrase in ["however", "but", "need to"]):
+                            negotiation_outcome = "firm_redirect"
+                        elif any(phrase in content for phrase in ["what about", "could you", "would you"]):
+                            negotiation_outcome = "alternative_offered"
+            
+            # Add note about negotiation progress
+            user_id = client_data.get("user_id")
+            if user_id and objection_resolved:
+                try:
+                    add_client_note.invoke({
+                        "user_id": user_id,
+                        "note_text": f"Negotiation progress: {client_response_type} response, approach: {state.get('negotiation_approach', 'standard')}"
+                    })
+                except Exception as e:
+                    if verbose:
+                        print(f"Error adding negotiation note: {e}")
+            
+            return {
+                "negotiation_outcome": negotiation_outcome,
+                "objection_resolved": objection_resolved,
+                "client_response_type": client_response_type,
+                "negotiation_in_progress": not objection_resolved
+            }
+            
+        except Exception as e:
+            if verbose:
+                print(f"Error in negotiation post-processing: {e}")
+            
+            return {
+                "negotiation_outcome": "ongoing",
+                "objection_resolved": False,
+                "client_response_type": "unknown"
+            }
+
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for negotiation step."""
+        """Generate dynamic prompt for negotiation step with conversation intelligence."""
         parameters = prepare_parameters(
             client_data=client_data,
             current_step=CallStep.NEGOTIATION.value,
@@ -112,6 +206,7 @@ def create_negotiation_agent(
         prompt=dynamic_prompt,
         tools=agent_tools,
         pre_processing_node=pre_processing_node,
+        post_processing_node=post_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,
         config=config,

@@ -1,8 +1,9 @@
 # ./src/Agents/call_center_agent/step02_details_verification.py
 """
-Details Verification Agent for Call Center.
+Details Verification Agent - Simplified for security verification process.
 """
 import random
+import logging
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
@@ -17,7 +18,9 @@ from src.Agents.call_center_agent.data_parameter_builder import prepare_paramete
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
 from src.Agents.call_center_agent.call_scripts import ScriptType
 from src.Agents.call_center_agent.tools.verify_client_details import verify_client_details
-
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def create_details_verification_agent(
     model: BaseChatModel,
@@ -28,26 +31,21 @@ def create_details_verification_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a details verification agent for debt collection calls."""
+    """Create a simplified details verification agent."""
     
-    # Verification field priority
+    # Verification field priority - most secure to least secure
     FIELD_PRIORITY = [
         "id_number", "passport_number", "vehicle_registration", 
         "username", "vehicle_make", "vehicle_model", 
         "vehicle_color", "email"
     ]
     
-    def _select_verification_field(client_data: Dict[str, Any], matched_fields: List[str]) -> str:
-        """Select next verification field based on available data."""
-        # Get available fields from client data
-        available_fields = []
-        
-        # Extract verification info from client data
+    def _get_available_fields(client_data: Dict[str, Any]) -> Dict[str, str]:
+        """Extract available verification fields from client data."""
         profile = client_data.get("profile", {})
         client_info = profile.get("client_info", {}) if isinstance(profile, dict) else {}
         vehicles = profile.get("vehicles", []) if isinstance(profile, dict) else []
         
-        # Check available verification fields
         verification_info = {}
         
         # ID/Passport
@@ -65,45 +63,46 @@ def create_details_verification_agent(
         # Vehicle information
         if vehicles and isinstance(vehicles[0], dict):
             vehicle = vehicles[0]
-            for field, key in [
+            field_mappings = [
                 ("vehicle_registration", "registration"),
                 ("vehicle_make", "make"),
                 ("vehicle_model", "model"),
                 ("vehicle_color", "color")
-            ]:
+            ]
+            for field, key in field_mappings:
                 if vehicle.get(key):
                     verification_info[field] = vehicle[key]
         
-        # Build available fields list based on priority
-        for field in FIELD_PRIORITY:
-            if field in verification_info and verification_info[field]:
-                available_fields.append(field)
-        
+        return verification_info
+    
+    def _select_next_field(available_fields: Dict[str, str], matched_fields: List[str]) -> str:
+        """Select next field to verify based on priority."""
         # Remove already matched fields
-        remaining_fields = [f for f in available_fields if f not in matched_fields]
+        remaining_fields = [f for f in FIELD_PRIORITY if f in available_fields and f not in matched_fields]
         
-        # Return random choice from remaining or first available
-        return random.choice(remaining_fields) if remaining_fields else available_fields[0] if available_fields else "id_number"
+        # Return highest priority remaining field
+        return remaining_fields[0] if remaining_fields else "id_number"
     
     def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["__end__", "agent"]]:
-        """Pre-process state to verify client details."""
+        """Verify client details and determine next step."""
         
         # Increment attempt counter
         attempts = state.get("details_verification_attempts", 0) + 1
         max_attempts = config.get("verification", {}).get("max_details_verification_attempts", 5)
         
-        # Select next field to verify
+        # Get matched fields and select next field to verify
         matched_fields = state.get("matched_fields", [])
-        field_to_verify = _select_verification_field(client_data, matched_fields)
+        available_fields = _get_available_fields(client_data)
+        field_to_verify = _select_next_field(available_fields, matched_fields)
         
-        # Perform details verification
+        # Perform verification using the tool
         verification_status = VerificationStatus.INSUFFICIENT_INFO.value
-        current_step = CallStep.DETAILS_VERIFICATION.value
-        goto = "agent"
+        all_matched = matched_fields
         
         try:
+            logger.info(f"available_fields: {available_fields}")
             verification_result = verify_client_details.invoke({
-                "client_details": client_data,
+                "client_details": available_fields,
                 "messages": state.get("messages", []),
                 "required_match_count": 3,
                 "max_failed_attempts": max_attempts
@@ -112,19 +111,29 @@ def create_details_verification_agent(
             # Update matched fields
             new_matched = verification_result.get("matched_fields", [])
             all_matched = list(set(matched_fields + new_matched))
-            
             verification_status = verification_result.get("classification", VerificationStatus.INSUFFICIENT_INFO.value)
             
         except Exception as e:
             if verbose:
                 print(f"Details verification error: {e}")
-            all_matched = matched_fields
         
-        # Handle max attempts
+        # Handle max attempts reached
         if attempts >= max_attempts and verification_status == VerificationStatus.INSUFFICIENT_INFO.value:
             verification_status = VerificationStatus.VERIFICATION_FAILED.value
         
-        # Determine next step - only VERIFIED proceeds to reason for call
+        # Map field to human-readable format for prompt
+        field_display_names = {
+            "id_number": "ID number",
+            "passport_number": "passport number",
+            "username": "username", 
+            "email": "email address",
+            "vehicle_registration": "vehicle registration",
+            "vehicle_make": "vehicle make",
+            "vehicle_model": "vehicle model", 
+            "vehicle_color": "vehicle color"
+        }
+        
+        # Determine routing: VERIFIED goes to reason_for_call, otherwise continue verification
         if verification_status == VerificationStatus.VERIFIED.value:
             next_step = CallStep.REASON_FOR_CALL.value
             goto = "__end__"
@@ -132,7 +141,6 @@ def create_details_verification_agent(
             next_step = CallStep.CLOSING.value
             goto = "__end__"
         else:
-            # Continue with details verification (retry)
             next_step = CallStep.DETAILS_VERIFICATION.value
             goto = "agent"
         
@@ -141,8 +149,8 @@ def create_details_verification_agent(
                 "details_verification_attempts": attempts,
                 "details_verification_status": verification_status,
                 "matched_fields": all_matched,
-                "field_to_verify": field_to_verify,
-                "current_step": current_step,
+                "field_to_verify": field_display_names.get(field_to_verify, field_to_verify),
+                "current_step": CallStep.DETAILS_VERIFICATION.value,
                 "next_step": next_step
             },
             goto=goto
@@ -161,21 +169,13 @@ def create_details_verification_agent(
         prompt_content = get_step_prompt(CallStep.DETAILS_VERIFICATION.value, parameters)
         return [SystemMessage(content=prompt_content)] + state['messages']
     
-    # Configure basic agent
-    kwargs = {
-        "model": model,
-        "prompt": dynamic_prompt,
-        "tools": tools or [],
-        "pre_processing_node": pre_processing_node,
-        "state_schema": CallCenterAgentState,
-        "verbose": verbose,
-        'config':config,
-        "name": "DetailsVerificationAgent"
-    }
-    
-    # Add memory if configured
-    if config and config.get('configurable', {}).get('use_memory'):
-        from langgraph.checkpoint.memory import MemorySaver
-        kwargs["checkpointer"] = MemorySaver()
-    
-    return create_basic_agent(**kwargs)
+    return create_basic_agent(
+        model=model,
+        prompt=dynamic_prompt,
+        tools=tools or [],
+        pre_processing_node=pre_processing_node,
+        state_schema=CallCenterAgentState,
+        verbose=verbose,
+        config=config,
+        name="DetailsVerificationAgent"
+    )

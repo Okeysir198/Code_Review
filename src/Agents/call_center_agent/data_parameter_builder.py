@@ -1,12 +1,10 @@
-# ./src/Agents/call_center_center/data_parameter_builder.py
+# ./src/Agents/call_center_agent/data_parameter_builder.py
 """
-Optimized data parameter builder for call center AI agents.
-Integrates real client data with behavioral intelligence and tactical guidance.
+Enhanced data parameter builder with conversation intelligence and emotional analysis.
 """
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import functools
-
 import logging
 from typing import Dict, Any, Optional, List, Callable, Coroutine
 from datetime import datetime, timedelta
@@ -40,6 +38,164 @@ class VerificationStatus(Enum):
     UNAVAILABLE = "UNAVAILABLE"
     WRONG_PERSON = "WRONG_PERSON"
     VERIFICATION_FAILED = "VERIFICATION_FAILED"
+
+########################################################################################
+# NEW: Conversation Analysis for Emotional Intelligence
+########################################################################################
+
+class ConversationAnalyzer:
+    """Analyzes conversation for emotional states, objections, and payment indicators."""
+    
+    @staticmethod
+    def get_message_content(msg: Any) -> str:
+        """Safely extract message content from various message formats."""
+        if hasattr(msg, 'content'):
+            return str(msg.content)
+        elif isinstance(msg, dict):
+            return str(msg.get('content', ''))
+        else:
+            return str(msg)
+    
+    @staticmethod
+    def detect_emotional_state(messages: List[Any]) -> str:
+        """Detect client emotional state from conversation."""
+        emotional_indicators = {
+            "frustrated": ["ridiculous", "stupid", "waste of time", "fed up", "annoying", "irritating"],
+            "angry": ["angry", "pissed off", "furious", "sick of this", "damn", "hell"],
+            "worried": ["worried", "stressed", "don't know what", "struggling", "scared", "nervous"],
+            "embarrassed": ["sorry", "embarrassed", "didn't realize", "my fault", "apologize"],
+            "defensive": ["not my fault", "why should I", "leave me alone", "stop calling"],
+            "cooperative": ["understand", "help me", "what can we do", "let's sort this", "okay"]
+        }
+        
+        # Check last 3 client messages
+        recent_messages = messages[-6:] if messages else []
+        client_messages = []
+        
+        for msg in recent_messages:
+            content = ConversationAnalyzer.get_message_content(msg)
+            # Check if it's a client message (not agent)
+            if hasattr(msg, 'type') and msg.type == "human":
+                client_messages.append(content.lower())
+            elif isinstance(msg, dict) and msg.get("role") in ["user", "human"]:
+                client_messages.append(content.lower())
+        
+        # Analyze emotional indicators in client messages
+        for emotion, keywords in emotional_indicators.items():
+            for message_content in client_messages:
+                if any(keyword in message_content for keyword in keywords):
+                    return emotion
+        
+        return "neutral"
+    
+    @staticmethod
+    def detect_real_objections(messages: List[Any]) -> List[str]:
+        """Detect actual objections from conversation."""
+        objection_patterns = {
+            "no_money": ["no money", "can't afford", "broke", "tight", "don't have", "financial problems"],
+            "dispute_amount": ["wrong", "incorrect", "not right", "don't owe", "dispute", "too much"],
+            "already_paid": ["already paid", "paid already", "made payment", "paid last week"],
+            "will_pay_later": ["later", "next week", "when I get paid", "payday", "end of month"],
+            "bank_problems": ["bank declined", "card blocked", "no funds", "bank issues"],
+            "not_my_responsibility": ["not my fault", "not my debt", "someone else's"],
+            "need_time": ["need time", "let me think", "speak to wife", "check finances"]
+        }
+        
+        detected = []
+        # Check last 5 client messages
+        recent_messages = messages[-10:] if messages else []
+        
+        for msg in recent_messages:
+            content = ConversationAnalyzer.get_message_content(msg).lower()
+            # Only check client messages
+            is_client = (hasattr(msg, 'type') and msg.type == "human") or \
+                       (isinstance(msg, dict) and msg.get("role") in ["user", "human"])
+            
+            if is_client:
+                for objection, keywords in objection_patterns.items():
+                    if any(keyword in content for keyword in keywords):
+                        detected.append(objection)
+        
+        return list(set(detected))  # Remove duplicates
+    
+    @staticmethod
+    def analyze_payment_conversation(messages: List[Any], outstanding_amount: float) -> Dict[str, Any]:
+        """Analyze conversation for payment-related information."""
+        
+        payment_commitment = "unknown"
+        mentioned_amount = None
+        payment_timeframe = None
+        payment_method_preference = None
+        
+        # Check last 5 messages for payment indicators
+        recent_messages = messages[-10:] if messages else []
+        
+        for msg in recent_messages:
+            content = ConversationAnalyzer.get_message_content(msg).lower()
+            
+            # Only analyze client messages
+            is_client = (hasattr(msg, 'type') and msg.type == "human") or \
+                       (isinstance(msg, dict) and msg.get("role") in ["user", "human"])
+            
+            if is_client:
+                # Detect payment willingness
+                willing_phrases = ["can pay", "will pay", "able to pay", "yes", "okay", "fine"]
+                unwilling_phrases = ["can't pay", "cannot pay", "no money", "refuse", "won't pay"]
+                
+                if any(phrase in content for phrase in willing_phrases):
+                    payment_commitment = "willing"
+                elif any(phrase in content for phrase in unwilling_phrases):
+                    payment_commitment = "unwilling"
+                
+                # Extract mentioned amounts using regex
+                import re
+                amount_patterns = [
+                    r'r\s*(\d+)',  # R100
+                    r'(\d+)\s*rand',  # 100 rand
+                    r'(\d+)\s*r',  # 100R
+                    r'(\d{2,4})'  # Just numbers 100-9999
+                ]
+                
+                for pattern in amount_patterns:
+                    match = re.search(pattern, content)
+                    if match:
+                        try:
+                            amount = float(match.group(1))
+                            if 50 <= amount <= outstanding_amount * 2:  # Reasonable range
+                                mentioned_amount = amount
+                                break
+                        except:
+                            continue
+                
+                # Extract timeframes
+                timeframe_indicators = {
+                    "immediate": ["today", "now", "immediately", "right now"],
+                    "this_week": ["tomorrow", "friday", "monday", "tuesday", "wednesday", "thursday"],
+                    "next_week": ["next week", "next friday", "next monday"],
+                    "month_end": ["end of month", "month end", "30th", "31st"],
+                    "payday": ["payday", "when I get paid", "salary day"]
+                }
+                
+                for timeframe, keywords in timeframe_indicators.items():
+                    if any(keyword in content for keyword in keywords):
+                        payment_timeframe = timeframe
+                        break
+                
+                # Detect payment method preferences
+                if any(word in content for word in ["debit", "bank", "account"]):
+                    payment_method_preference = "debicheck"
+                elif any(word in content for word in ["online", "portal", "link", "internet"]):
+                    payment_method_preference = "payment_portal"
+                elif any(word in content for word in ["card", "credit", "visa", "mastercard"]):
+                    payment_method_preference = "card"
+        
+        return {
+            "payment_commitment": payment_commitment,
+            "mentioned_amount": mentioned_amount,
+            "payment_timeframe": payment_timeframe,
+            "payment_method_preference": payment_method_preference,
+            "negotiation_position": "flexible" if mentioned_amount and mentioned_amount < outstanding_amount else "standard"
+        }
 
 ########################################################################################
 class ClientDataBuilder:
@@ -80,22 +236,22 @@ class ClientDataBuilder:
             if not profile:
                 raise ValueError(f"Client profile not found for user_id: {user_id}")
             
-            # # Load account overview and financial data
+            # Load account overview and financial data
             account_overview = get_client_account_overview.invoke(user_id)
             account_aging = get_client_account_aging.invoke(user_id)
             banking_details = get_client_banking_details.invoke(user_id)
             
-            # # Load subscription and payment data
+            # Load subscription and payment data
             subscription_data = get_client_subscription_amount.invoke(user_id)
             payment_history = get_client_payment_history.invoke(user_id)
             failed_payments = get_client_failed_payments.invoke(user_id)
             last_payment = get_client_last_successful_payment.invoke(user_id)
             
-            # # Load contracts and billing analysis
+            # Load contracts and billing analysis
             contracts = get_client_contracts.invoke(user_id)
             billing_analysis = get_client_billing_analysis.invoke(user_id)
             
-            # # load existing_mandates
+            # Load existing_mandates
             existing_mandates = get_client_debit_mandates.invoke(user_id)
 
             # Consolidate all data
@@ -156,11 +312,11 @@ class ClientDataBuilder:
 
 ########################################################################################
 class AsyncClientDataBuilder:
-    """Async version of ClientDataBuilder for faster data fetching."""
+    """FIXED: Async version with all database calls enabled."""
     
     _cache = {}
     _cache_duration = timedelta(hours=1)
-    _executor = ThreadPoolExecutor(max_workers=10)  # Adjust based on your DB capacity
+    _executor = ThreadPoolExecutor(max_workers=10)
     
     @classmethod
     async def get_client_data(cls, user_id: str, force_reload: bool = False) -> Dict[str, Any]:
@@ -187,7 +343,7 @@ class AsyncClientDataBuilder:
     
     @classmethod
     async def _fetch_client_data_async(cls, user_id: str) -> Dict[str, Any]:
-        """Fetch data from database using async calls for speed."""
+        """FIXED: Fetch data from database using async calls with ALL tools enabled."""
         try:
             # Convert sync tool calls to async using thread pool
             async def call_tool_async(tool_func: Callable, *args, **kwargs):
@@ -198,19 +354,19 @@ class AsyncClientDataBuilder:
                     functools.partial(tool_func.invoke, *args, **kwargs)
                 )
             
-            # Create all async tasks
+            # Create all async tasks - UNCOMMENTED ALL CALLS
             tasks = {
                 "profile": call_tool_async(get_client_profile, user_id),
-                # "account_overview": call_tool_async(get_client_account_overview, user_id),
-                # "account_aging": call_tool_async(get_client_account_aging, user_id),
-                # "banking_details": call_tool_async(get_client_banking_details, user_id),
-                # "subscription_data": call_tool_async(get_client_subscription_amount, user_id),
-                # "payment_history": call_tool_async(get_client_payment_history, user_id),
-                # "failed_payments": call_tool_async(get_client_failed_payments, user_id),
-                # "last_payment": call_tool_async(get_client_last_successful_payment, user_id),
-                # "contracts": call_tool_async(get_client_contracts, user_id),
-                # "billing_analysis": call_tool_async(get_client_billing_analysis, user_id),
-                # "existing_mandates": call_tool_async(get_client_debit_mandates, user_id),
+                "account_overview": call_tool_async(get_client_account_overview, user_id),
+                "account_aging": call_tool_async(get_client_account_aging, user_id),
+                "banking_details": call_tool_async(get_client_banking_details, user_id),
+                "subscription_data": call_tool_async(get_client_subscription_amount, user_id),
+                "payment_history": call_tool_async(get_client_payment_history, user_id),
+                "failed_payments": call_tool_async(get_client_failed_payments, user_id),
+                "last_payment": call_tool_async(get_client_last_successful_payment, user_id),
+                "contracts": call_tool_async(get_client_contracts, user_id),
+                "billing_analysis": call_tool_async(get_client_billing_analysis, user_id),
+                "existing_mandates": call_tool_async(get_client_debit_mandates, user_id),
             }
             
             # Execute all tasks concurrently
@@ -244,16 +400,16 @@ class AsyncClientDataBuilder:
             client_data = {
                 "user_id": user_id,
                 "profile": profile,
-                # "account_overview": data_results.get("account_overview"),
-                # "account_aging": cls._safe_get_first(data_results.get("account_aging")),
-                # "banking_details": cls._safe_get_first(data_results.get("banking_details")),
-                # "subscription": data_results.get("subscription_data"),
-                # "payment_history": cls._safe_slice(data_results.get("payment_history"), 5),
-                # "failed_payments": cls._safe_slice(data_results.get("failed_payments"), 3),
-                # "last_successful_payment": data_results.get("last_payment"),
-                # "contracts": data_results.get("contracts"),
-                # "billing_analysis": cls._safe_get_first(data_results.get("billing_analysis")),
-                # "existing_mandates": data_results.get("existing_mandates"),
+                "account_overview": data_results.get("account_overview"),
+                "account_aging": cls._safe_get_first(data_results.get("account_aging")),
+                "banking_details": cls._safe_get_first(data_results.get("banking_details")),
+                "subscription": data_results.get("subscription_data"),
+                "payment_history": cls._safe_slice(data_results.get("payment_history"), 5),
+                "failed_payments": cls._safe_slice(data_results.get("failed_payments"), 3),
+                "last_successful_payment": data_results.get("last_payment"),
+                "contracts": data_results.get("contracts"),
+                "billing_analysis": cls._safe_get_first(data_results.get("billing_analysis")),
+                "existing_mandates": data_results.get("existing_mandates"),
                 "loaded_at": datetime.now(),
                 "load_duration_seconds": duration
             }
@@ -318,15 +474,9 @@ class AsyncClientDataBuilder:
         """Shutdown the thread pool executor."""
         cls._executor.shutdown(wait=True)
 
-
-# Async convenience functions
-async def get_client_data_async(user_id: str, force_reload: bool = False) -> Dict[str, Any]:
-    """Get client data asynchronously with caching."""
-    return await AsyncClientDataBuilder.get_client_data(user_id, force_reload)
-
 ########################################################################################
 class PaymentFlexibilityAnalyzer:
-    """Analyzes client payment capacity and determines flexibility options."""
+    """ENHANCED: Analyzes client payment capacity with conversation intelligence."""
     
     @staticmethod
     def assess_payment_capacity(client_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -429,18 +579,17 @@ class PaymentFlexibilityAnalyzer:
         if len(payment_history) == 0:
             indicators.append("no_payment_history")
         
-        # Add more sophisticated hardship detection here
         return indicators
 
-#####################################################################################
+########################################################################################
 class BehavioralAnalyzer:
-    """Analyzes client behavior and provides tactical guidance."""
+    """ENHANCED: Analyzes client behavior with conversation intelligence."""
     
     @staticmethod
-    def analyze_client_profile(client_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze client behavior patterns."""
+    def analyze_client_profile(client_data: Dict[str, Any], conversation_messages: List[Any] = None) -> Dict[str, Any]:
+        """Enhanced analysis including conversation intelligence."""
         try:
-            # Safe data extraction
+            # Traditional data analysis
             payment_history = client_data.get("payment_history", [])
             account_aging = client_data.get("account_aging", {})
             billing_analysis = client_data.get("billing_analysis", {})
@@ -458,29 +607,50 @@ class BehavioralAnalyzer:
             except (ValueError, TypeError):
                 balance = 0.0
             
-            # Calculate metrics
+            # Calculate traditional metrics
             days_overdue = BehavioralAnalyzer._get_days_overdue(billing_analysis, account_aging)
             reliability = BehavioralAnalyzer._assess_payment_reliability(payment_history, failed_payments)
+            risk_level = BehavioralAnalyzer._assess_risk_level(days_overdue, balance)
+            
+            # NEW: Conversation intelligence
+            conversation_analysis = {}
+            if conversation_messages:
+                conversation_analysis = {
+                    "emotional_state": ConversationAnalyzer.detect_emotional_state(conversation_messages),
+                    "real_objections": ConversationAnalyzer.detect_real_objections(conversation_messages),
+                    "payment_conversation": ConversationAnalyzer.analyze_payment_conversation(conversation_messages, balance)
+                }
+            
+            # Predict objections (traditional + conversation)
             objections = BehavioralAnalyzer._predict_objections(client_data, balance, days_overdue)
-            approach = BehavioralAnalyzer._determine_approach(days_overdue, reliability, balance)
+            if conversation_analysis.get("real_objections"):
+                # Prioritize real objections from conversation
+                objections = conversation_analysis["real_objections"] + [obj for obj in objections if obj not in conversation_analysis["real_objections"]]
+            
+            # Determine approach with conversation context
+            approach = BehavioralAnalyzer._determine_approach(days_overdue, reliability, balance, conversation_analysis)
             
             return {
                 "days_overdue": days_overdue,
                 "payment_reliability": reliability,
-                "likely_objections": objections,
+                "likely_objections": objections[:5],  # Top 5
                 "optimal_approach": approach,
-                "risk_level": BehavioralAnalyzer._assess_risk_level(days_overdue, balance),
-                "success_probability": BehavioralAnalyzer._calculate_success_probability(reliability, balance, days_overdue)
+                "risk_level": risk_level,
+                "success_probability": BehavioralAnalyzer._calculate_success_probability(reliability, balance, days_overdue),
+                # NEW: Conversation intelligence
+                "conversation_intelligence": conversation_analysis
             }
         
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error in behavioral analysis: {e}")
             return {
                 "days_overdue": 0,
                 "payment_reliability": "unknown",
                 "likely_objections": ["will_pay_later"],
                 "optimal_approach": "professional_persistent",
                 "risk_level": "medium",
-                "success_probability": "medium"
+                "success_probability": "medium",
+                "conversation_intelligence": {}
             }
     
     @staticmethod
@@ -528,7 +698,6 @@ class BehavioralAnalyzer:
         if total_attempts == 0:
             return "low" if failed_attempts > 0 else "unknown"
         
-        # Calculate success rate
         success_rate = (total_attempts - failed_attempts) / total_attempts if total_attempts > 0 else 0
         
         if success_rate >= 0.8:
@@ -543,7 +712,6 @@ class BehavioralAnalyzer:
         """Predict likely client objections based on real data."""
         objections = []
         account_overview = client_data.get("account_overview", {})
-        payment_history = client_data.get("payment_history", [])
         failed_payments = client_data.get("failed_payments", [])
         
         # High balance objections
@@ -556,11 +724,11 @@ class BehavioralAnalyzer:
         
         # Failed payment patterns
         if failed_payments:
-            objections.append("bank_error")
+            objections.append("bank_problems")
         
         # Long overdue accounts
         if days_overdue > 90:
-            objections.extend(["not_my_debt", "will_pay_later"])
+            objections.extend(["not_my_responsibility", "will_pay_later"])
         
         # Account status specific
         if isinstance(account_overview, dict) and account_overview.get("account_status") == "Overdue":
@@ -570,11 +738,28 @@ class BehavioralAnalyzer:
         if "will_pay_later" not in objections:
             objections.append("will_pay_later")
         
-        return objections[:5]  # Limit to top 5 objections
+        return objections[:5]
     
     @staticmethod
-    def _determine_approach(days_overdue: int, reliability: str, balance: float) -> str:
-        """Determine optimal tactical approach based on real data."""
+    def _determine_approach(days_overdue: int, reliability: str, balance: float, conversation_analysis: Dict[str, Any]) -> str:
+        """Determine optimal approach with conversation context."""
+        
+        # Check conversation intelligence first
+        if conversation_analysis:
+            emotional_state = conversation_analysis.get("emotional_state", "neutral")
+            payment_info = conversation_analysis.get("payment_conversation", {})
+            
+            # Adjust approach based on emotional state
+            if emotional_state in ["angry", "frustrated"]:
+                return "calm_de_escalation"
+            elif emotional_state == "worried":
+                return "reassuring_solution_focused"
+            elif emotional_state == "cooperative":
+                return "collaborative_direct"
+            elif payment_info.get("payment_commitment") == "willing":
+                return "immediate_closure"
+        
+        # Fallback to traditional approach
         if days_overdue <= 30 and reliability == "high":
             return "friendly_reminder"
         elif days_overdue <= 60:
@@ -600,12 +785,8 @@ class BehavioralAnalyzer:
         score = 0
         
         # Reliability factor
-        if reliability == "high":
-            score += 3
-        elif reliability == "medium":
-            score += 2
-        elif reliability == "low":
-            score += 1
+        reliability_scores = {"high": 3, "medium": 2, "low": 1, "unknown": 0}
+        score += reliability_scores.get(reliability, 0)
         
         # Balance factor
         if balance < 300:
@@ -626,7 +807,7 @@ class BehavioralAnalyzer:
             return "medium"
         else:
             return "low"
-        
+
 ########################################################################################
 class ScriptFormatter:
     """Handles formatting of script content with real parameter values."""
@@ -684,31 +865,7 @@ class ScriptFormatter:
             "field_to_verify": parameters.get("field_to_verify", "ID number")
         }
         
-        # Add step-specific parameters
-        if current_step in ["reason_for_call", "negotiation", "discount_offer"]:
-            format_params.update({
-                "paid_amount": parameters.get("paid_amount", "R 0.00"),
-                "payment_date": parameters.get("payment_date", "N/A"),
-                "agreed_amount": parameters.get("agreed_amount", parameters.get("outstanding_amount", "R 0.00")),
-                "shortfall_amount": parameters.get("shortfall_amount", "R 0.00"),
-                "additional_consequences": parameters.get("additional_consequences", ""),
-                "discount_percentage": parameters.get("discount_percentage", "20"),
-                "discounted_amount": parameters.get("discounted_amount", "R 0.00"),
-                "discounted_amount_50": parameters.get("discounted_amount_50", "R 0.00"),
-                "campaign_end_date": parameters.get("campaign_end_date", "month-end"),
-                "campaign_first_date": parameters.get("campaign_first_date", "15th")
-            })
-        
-        elif current_step in ["escalation", "closing", "third_party_message"]:
-            format_params.update({
-                "department": parameters.get("department", "Supervisor"),
-                "response_time": parameters.get("response_time", "24-48 hours"),
-                "ticket_number": parameters.get("ticket_number", "TKT123456"),
-                "outcome_summary": parameters.get("outcome_summary", "Thank you for your time"),
-                "payment_method": parameters.get("payment_method", "agreed method")
-            })
-        
-        # Convert any None values to empty strings to prevent formatting errors
+        # Convert any None values to empty strings
         for key, value in format_params.items():
             if value is None:
                 format_params[key] = ""
@@ -717,10 +874,9 @@ class ScriptFormatter:
         
         return format_params
 
-
 ########################################################################################
 class ParameterBuilder:
-    """Builds complete parameters for prompt generation."""
+    """ENHANCED: Builds complete parameters with conversation intelligence."""
     
     @staticmethod
     def build_parameters(
@@ -730,14 +886,20 @@ class ParameterBuilder:
         script_type: str = "ratio_1_inflow",
         agent_name: str = "AI Agent"
     ) -> Dict[str, Any]:
-        """Build complete parameters for prompt generation."""
+        """Build complete parameters with conversation intelligence."""
         
         try:
+            # Extract conversation messages for analysis
+            conversation_messages = state.get("messages", [])
+            
             # Extract all information
             basic_info = ParameterBuilder._extract_basic_info(client_data, agent_name)
             financial_info = ParameterBuilder._extract_financial_info(client_data)
             verification_info = ParameterBuilder._extract_verification_info(client_data)
-            behavioral_analysis = BehavioralAnalyzer.analyze_client_profile(client_data)
+            
+            # ENHANCED: Behavioral analysis with conversation intelligence
+            behavioral_analysis = BehavioralAnalyzer.analyze_client_profile(client_data, conversation_messages)
+            
             state_info = ParameterBuilder._build_state_info(state, current_step)
             
             # Combine all parameters
@@ -969,44 +1131,12 @@ class ParameterBuilder:
                 raw_script_content, parameters, current_step
             )
             
-            # Get additional scripts based on step
-            additional_scripts = {}
-            
-            if current_step == "name_verification":
-                script_text = script_instance.SCRIPTS.get("third_party_message", 
-                    "{salutation}, kindly advise {client_title} {client_full_name} that Cartrack called regarding an outstanding account. Please ask them to contact us urgently at 011 250 3000.")
-                additional_scripts["third_party_message"] = ScriptFormatter.format_script_content(
-                    script_text, parameters, "third_party_message")
-            
-            elif current_step == "details_verification":
-                script_text = script_instance.SCRIPTS.get("details_verification",
-                    "This call is recorded for quality and security. To ensure I'm speaking with the right person, could you please confirm your {field_to_verify}?")
-                additional_scripts["details_verification_script"] = ScriptFormatter.format_script_content(
-                    script_text, parameters, "details_verification")
-            
-            elif current_step == "negotiation":
-                scripts = {
-                    "consequences_script": script_instance.SCRIPTS.get("negotiation_consequences",
-                        "Without payment, your Cartrack app will be suspended, you'll lose vehicle positioning, and notifications will stop working."),
-                    "benefits_script": script_instance.SCRIPTS.get("negotiation_benefits",
-                        "Payment today restores all services immediately and keeps your account in good standing."),
-                    "discount_offer_script": script_instance.SCRIPTS.get("discount_offer",
-                        "To prevent further complications, we can offer a {discount_percentage}% discount if you pay {discounted_amount} by {campaign_end_date}."),
-                    "legal_consequences_script": script_instance.SCRIPTS.get("legal_consequences",
-                        "Continued non-payment may result in legal action and additional recovery costs.")
-                }
-                
-                for key, script_text in scripts.items():
-                    additional_scripts[key] = ScriptFormatter.format_script_content(
-                        script_text, parameters, key.replace("_script", ""))
-            
             return {
                 "script_content": formatted_script_content,
                 "script_text": formatted_script_content,
                 "objection_responses": guidance["objection_responses"],
                 "emotional_responses": guidance["emotional_responses"],
-                "escalation_responses": guidance["escalation_responses"],
-                **additional_scripts
+                "escalation_responses": guidance["escalation_responses"]
             }
             
         except Exception as e:
@@ -1014,12 +1144,6 @@ class ParameterBuilder:
             return {
                 "script_content": "",
                 "script_text": "",
-                "third_party_message": "",
-                "details_verification_script": "",
-                "consequences_script": "",
-                "benefits_script": "",
-                "discount_offer_script": "",
-                "legal_consequences_script": "",
                 "objection_responses": {},
                 "emotional_responses": {},
                 "escalation_responses": {}
@@ -1028,7 +1152,6 @@ class ParameterBuilder:
     @staticmethod
     def _build_state_info(state: Dict[str, Any], current_step: str) -> Dict[str, Any]:
         """Build state information for prompts."""
-        # Add bridge selection
         previous_step = state.get("previous_step", "")
         bridge_phrase = ""
         
@@ -1039,7 +1162,8 @@ class ParameterBuilder:
             elif current_step == "reason_for_call" and previous_step == "details_verification":
                 bridge_phrase = get_conversation_bridge("verification_to_account")
             elif current_step == "negotiation":
-                bridge_phrase = get_conversation_bridge("account_to_consequences")
+                bridge_phrase = get_conversation_bridge("account_to_payment")
+        
         return {
             "current_step": current_step,
             "name_verification_status": state.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value),
@@ -1055,14 +1179,6 @@ class ParameterBuilder:
                 "payment_willingness": state.get("payment_willingness", "unknown"),
                 "rapport_level": state.get("rapport_level", "establishing")
             },
-            # Add additional context for specific steps
-            "department": state.get("department", "Supervisor"),
-            "response_time": state.get("response_time", "24-48 hours"),
-            "ticket_number": state.get("ticket_number", f"TKT{datetime.now().strftime('%Y%m%d%H%M')}"),
-            "outcome_summary": state.get("outcome_summary", "We have discussed your account"),
-            "payment_method": state.get("payment_method", "agreed payment method"),
-            "campaign_end_date": state.get("campaign_end_date", "month-end"),
-            "campaign_first_date": state.get("campaign_first_date", "15th of the month"),
             "previous_step": previous_step,
             "bridge_phrase": bridge_phrase,
         }
@@ -1079,16 +1195,41 @@ class ParameterBuilder:
         likely_objections = behavioral_analysis.get("likely_objections", [])
         days_overdue = behavioral_analysis.get("days_overdue", 0)
         
+        # Check conversation intelligence for enhanced guidance
+        conversation_intel = behavioral_analysis.get("conversation_intelligence", {})
+        emotional_state = conversation_intel.get("emotional_state", "neutral")
+        payment_info = conversation_intel.get("payment_conversation", {})
+        
         guidance = {
             "recommended_approach": approach,
             "urgency_level": ParameterBuilder._determine_urgency_level(risk_level, script_type, days_overdue),
             "key_motivators": ParameterBuilder._get_key_motivators(script_type, days_overdue),
             "objection_predictions": ", ".join(likely_objections[:3]),
             "success_probability": behavioral_analysis.get("success_probability", "medium"),
-            "backup_strategies": ParameterBuilder._get_backup_strategies(script_type, current_step)
+            "backup_strategies": ParameterBuilder._get_backup_strategies(script_type, current_step),
+            # NEW: Conversation-aware guidance
+            "emotional_awareness": emotional_state,
+            "payment_willingness": payment_info.get("payment_commitment", "unknown"),
+            "conversation_strategy": ParameterBuilder._get_conversation_strategy(emotional_state, payment_info)
         }
         
         return guidance
+    
+    @staticmethod
+    def _get_conversation_strategy(emotional_state: str, payment_info: Dict[str, Any]) -> str:
+        """Get conversation strategy based on emotional state and payment info."""
+        if emotional_state == "angry":
+            return "De-escalate first, then focus on solutions"
+        elif emotional_state == "worried":
+            return "Reassure and provide simple options"
+        elif emotional_state == "cooperative":
+            return "Direct and efficient closure"
+        elif payment_info.get("payment_commitment") == "willing":
+            return "Immediate payment processing"
+        elif payment_info.get("payment_commitment") == "unwilling":
+            return "Flexible options and empathy"
+        else:
+            return "Standard professional approach"
     
     @staticmethod
     def _determine_urgency_level(risk_level: str, script_type: str, days_overdue: int) -> str:
@@ -1185,6 +1326,10 @@ def get_client_data(user_id: str, force_reload: bool = False) -> Dict[str, Any]:
     """Get client data with caching."""
     return ClientDataBuilder.get_client_data(user_id, force_reload)
 
+async def get_client_data_async(user_id: str, force_reload: bool = False) -> Dict[str, Any]:
+    """Get client data asynchronously with caching."""
+    return await AsyncClientDataBuilder.get_client_data(user_id, force_reload)
+
 def prepare_parameters(
     client_data: Dict[str, Any],
     current_step: str,
@@ -1206,17 +1351,14 @@ def prepare_parameters_by_user_id(
     client_data = ClientDataBuilder.get_client_data(user_id)
     return ParameterBuilder.build_parameters(client_data, current_step, state, script_type, agent_name)
 
-def analyze_client_behavior(client_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Analyze client behavior patterns."""
-    return BehavioralAnalyzer.analyze_client_profile(client_data)
+def analyze_client_behavior(client_data: Dict[str, Any], conversation_messages: List[Any] = None) -> Dict[str, Any]:
+    """Analyze client behavior patterns with conversation intelligence."""
+    return BehavioralAnalyzer.analyze_client_profile(client_data, conversation_messages)
 
 def clear_client_cache(user_id: Optional[str] = None):
     """Clear cached client data."""
     ClientDataBuilder.clear_cache(user_id)
-
-
-
-
+    AsyncClientDataBuilder.clear_cache(user_id)
 
 ########################################################################################
 # State management helper
@@ -1286,6 +1428,3 @@ class ConversationState:
         for key, value in state_dict.items():
             if hasattr(self, key):
                 setattr(self, key, value)
-
-
-########################################################################################

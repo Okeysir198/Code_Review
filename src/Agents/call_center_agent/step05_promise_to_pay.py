@@ -1,7 +1,6 @@
 # ./src/Agents/call_center_agent/step05_promise_to_pay.py
 """
-Promise to Pay Agent - Secures payment arrangements and creates commitments.
-SIMPLIFIED: No query detection - router handles all routing decisions.
+Promise to Pay Agent - Progressive payment options with emotional intelligence.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -13,7 +12,7 @@ from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
+from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters, ConversationAnalyzer, PaymentFlexibilityAnalyzer
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, PaymentMethod
 
 # Import relevant database tools
@@ -37,7 +36,7 @@ def create_promise_to_pay_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a promise to pay agent for debt collection calls."""
+    """Create a promise to pay agent with progressive payment options."""
     
     # Add relevant database tools
     agent_tools = [
@@ -51,7 +50,7 @@ def create_promise_to_pay_agent(
     ] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["agent"]]:
-        """Pre-process to prepare payment options and analyze client response."""
+        """Enhanced pre-processing with payment flexibility and conversation analysis."""
         
         try:
             # Get client banking details
@@ -61,91 +60,88 @@ def create_promise_to_pay_agent(
             # Get payment arrangement types
             payment_types = get_payment_arrangement_types.invoke("all")
             
-            # Analyze recent messages for payment commitment
-            recent_messages = state.get("messages", [])[-5:] if state.get("messages") else []
+            # Get outstanding amount for calculations
+            account_aging = client_data.get("account_aging", {})
+            try:
+                outstanding_amount = float(account_aging.get("xbalance", 0))
+            except (ValueError, TypeError):
+                outstanding_amount = 0.0
             
-            payment_commitment = None
-            payment_amount = None
-            payment_date = None
-            payment_method_preference = None
+            # NEW: Enhanced conversation analysis
+            conversation_messages = state.get("messages", [])
             
-            for msg in recent_messages:
-                if hasattr(msg, 'content'):
-                    content = msg.content.lower()
-                    
-                    # Look for payment commitments
-                    if any(phrase in content for phrase in ["can pay", "will pay", "able to pay", "yes"]):
-                        payment_commitment = "willing"
-                    elif any(phrase in content for phrase in ["can't pay", "cannot pay", "no money", "refuse"]):
-                        payment_commitment = "unwilling"
-                    
-                    # Look for amounts (R100, 100, hundred)
-                    import re
-                    amount_patterns = [
-                        r'r\s*(\d+)',  # R100
-                        r'(\d+)\s*rand',  # 100 rand
-                        r'(\d+)\s*r',  # 100R
-                        r'(\d{2,4})'  # Just numbers 100-9999
-                    ]
-                    
-                    for pattern in amount_patterns:
-                        match = re.search(pattern, content)
-                        if match:
-                            try:
-                                payment_amount = float(match.group(1))
-                                break
-                            except:
-                                continue
-                    
-                    # Look for dates
-                    date_keywords = ["friday", "monday", "tuesday", "wednesday", "thursday", "saturday", "sunday", 
-                                   "tomorrow", "today", "next week", "end of month", "payday"]
-                    for keyword in date_keywords:
-                        if keyword in content:
-                            payment_date = keyword
-                            break
-                    
-                    # Look for payment method preferences
-                    if "debit" in content or "bank" in content:
-                        payment_method_preference = "debicheck"
-                    elif "portal" in content or "online" in content or "link" in content:
-                        payment_method_preference = "payment_portal"
+            # Analyze payment conversation intelligence
+            payment_conversation = ConversationAnalyzer.analyze_payment_conversation(
+                conversation_messages, outstanding_amount
+            )
             
-            # Determine recommended approach
-            if payment_commitment == "willing" and has_banking_details:
-                recommended_approach = "immediate_debit"
-            elif payment_commitment == "willing":
-                recommended_approach = "payment_portal"
-            elif payment_commitment == "unwilling":
-                recommended_approach = "partial_payment"
-            else:
-                recommended_approach = "ask_immediate_debit"
-            # Add payment flexibility assessment
-            from src.Agents.call_center_agent.data_parameter_builder import PaymentFlexibilityAnalyzer
-            
-            flexibility_analysis = PaymentFlexibilityAnalyzer.assess_payment_capacity(client_data)
+            # Assess payment flexibility based on client data
+            payment_flexibility = PaymentFlexibilityAnalyzer.assess_payment_capacity(client_data)
             
             # Determine current negotiation stage
             offers_made = state.get("payment_offers_made", [])
             current_offer_level = len(offers_made) + 1
             
-            # Select appropriate payment option based on stage
-            available_options = flexibility_analysis["payment_options"]
-            current_option = available_options[min(current_offer_level - 1, len(available_options) - 1)]
+            # Select appropriate payment option based on conversation and capacity
+            available_options = payment_flexibility["payment_options"]
+            
+            # Override option selection based on conversation intelligence
+            if payment_conversation.get("mentioned_amount"):
+                # Client mentioned a specific amount - be flexible
+                mentioned = payment_conversation["mentioned_amount"]
+                if mentioned >= outstanding_amount * 0.3:  # At least 30%
+                    current_option = {
+                        "type": "client_suggested",
+                        "amount": mentioned,
+                        "description": f"Client suggested amount: R {mentioned:.2f}",
+                        "priority": 1
+                    }
+                else:
+                    # Too low - counter with minimum
+                    current_option = {
+                        "type": "minimum_counter",
+                        "amount": outstanding_amount * 0.3,
+                        "description": f"Minimum payment: R {outstanding_amount * 0.3:.2f}",
+                        "priority": 1
+                    }
+            else:
+                # Use progressive options based on attempt number
+                current_option = available_options[min(current_offer_level - 1, len(available_options) - 1)]
+            
+            # Determine negotiation strategy based on emotional state and payment willingness
+            emotional_state = ConversationAnalyzer.detect_emotional_state(conversation_messages)
+            payment_commitment = payment_conversation.get("payment_commitment", "unknown")
+            
+            if emotional_state == "cooperative" and payment_commitment == "willing":
+                negotiation_strategy = "direct_closure"
+            elif emotional_state in ["worried", "embarrassed"] or payment_commitment == "unwilling":
+                negotiation_strategy = "supportive_flexible"
+            elif emotional_state in ["angry", "frustrated"]:
+                negotiation_strategy = "de_escalate_then_solve"
+            else:
+                negotiation_strategy = "progressive_standard"
+            
+            # Recommended payment approach
+            if payment_commitment == "willing" and has_banking_details:
+                recommended_approach = "immediate_debit"
+            elif payment_commitment == "willing":
+                recommended_approach = "payment_portal"
+            elif payment_conversation.get("payment_method_preference"):
+                recommended_approach = payment_conversation["payment_method_preference"]
+            else:
+                recommended_approach = "ask_preference"
 
             return Command(
                 update={
                     "has_banking_details": has_banking_details,
-                    "payment_commitment": payment_commitment or "unknown",
-                    "payment_amount": payment_amount,
-                    "payment_date": payment_date,
-                    "payment_method_preference": payment_method_preference,
-                    "recommended_approach": recommended_approach,
-                    "available_payment_types": payment_types or [],
-                    "payment_capacity_assessment": flexibility_analysis["capacity_level"],
+                    "payment_conversation": payment_conversation,
+                    "payment_flexibility": payment_flexibility,
                     "current_payment_option": current_option,
                     "negotiation_stage": current_offer_level,
-                    "payment_plan_eligible": flexibility_analysis["payment_plan_eligible"]
+                    "negotiation_strategy": negotiation_strategy,
+                    "recommended_approach": recommended_approach,
+                    "available_payment_types": payment_types or [],
+                    "outstanding_float": outstanding_amount
                 },
                 goto="agent"
             )
@@ -157,14 +153,15 @@ def create_promise_to_pay_agent(
             return Command(
                 update={
                     "has_banking_details": False,
-                    "payment_commitment": "unknown",
-                    "recommended_approach": "ask_immediate_debit"
+                    "recommended_approach": "ask_immediate_debit",
+                    "negotiation_strategy": "progressive_standard",
+                    "outstanding_float": 0.0
                 },
                 goto="agent"
             )
 
     def post_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
-        """Post-process to create actual payment arrangements if commitment secured."""
+        """Enhanced post-processing to create actual payment arrangements."""
         
         try:
             # Check if payment arrangement was agreed upon in the conversation
@@ -172,18 +169,31 @@ def create_promise_to_pay_agent(
             
             arrangement_created = False
             arrangement_details = {}
+            client_agreed = False
+            agent_confirmed = False
             
-            # Look for confirmation of payment arrangement
+            # Analyze conversation for payment agreement
             for msg in recent_messages:
                 if hasattr(msg, 'content') and hasattr(msg, 'type'):
                     content = msg.content.lower()
                     
-                    # If agent confirmed a payment arrangement
+                    # Client agreement indicators
+                    if (msg.type == "human" and 
+                        any(phrase in content for phrase in [
+                            "yes", "okay", "fine", "sure", "go ahead", "do it", "agreed"
+                        ]) and
+                        not any(phrase in content for phrase in [
+                            "no", "can't", "won't", "refuse", "decline"
+                        ])):
+                        client_agreed = True
+                    
+                    # Agent confirmation of arrangement
                     if (msg.type == "ai" and 
                         any(phrase in content for phrase in [
-                            "arrangement created", "payment scheduled", "debit order set up",
-                            "payment link sent", "arrangement confirmed"
+                            "perfect", "excellent", "great", "i'm setting up", 
+                            "arrangement created", "payment scheduled"
                         ])):
+                        agent_confirmed = True
                         
                         # Extract arrangement details from agent message
                         import re
@@ -193,7 +203,7 @@ def create_promise_to_pay_agent(
                         amount = float(amount_match.group(1)) if amount_match else None
                         
                         # Extract method
-                        if "debit" in content:
+                        if "debit" in content or "bank" in content:
                             method = PaymentMethod.DEBICHECK.value
                         elif "portal" in content or "link" in content:
                             method = PaymentMethod.PAYMENT_PORTAL.value
@@ -203,24 +213,48 @@ def create_promise_to_pay_agent(
                         arrangement_details = {
                             "payment_method": method,
                             "amount": amount,
+                            "date": "today",
                             "arrangement_created": True
                         }
-                        arrangement_created = True
-                        break
             
-            # Add note about payment arrangement
-            if arrangement_created:
+            # Create arrangement if both agreed and confirmed
+            if client_agreed and agent_confirmed and arrangement_details:
+                arrangement_created = True
+                
+                # Add detailed note about payment arrangement
                 user_id = client_data.get("user_id")
                 if user_id:
-                    note_text = f"Payment arrangement created: {arrangement_details.get('payment_method', 'Unknown')} for R{arrangement_details.get('amount', 'Unknown')}"
+                    note_text = (f"Payment arrangement: {arrangement_details.get('payment_method', 'Unknown')} "
+                               f"for R{arrangement_details.get('amount', 'Unknown')} "
+                               f"- Strategy: {state.get('negotiation_strategy', 'standard')}")
+                    
                     add_client_note.invoke({
                         "user_id": user_id,
                         "note_text": note_text
                     })
             
+            # Track payment offer made
+            current_option = state.get("current_payment_option", {})
+            if current_option:
+                payment_offer = {
+                    "amount": current_option.get("amount", 0),
+                    "type": current_option.get("type", "unknown"),
+                    "accepted": arrangement_created,
+                    "negotiation_stage": state.get("negotiation_stage", 1)
+                }
+                
+                # Add to offers made list
+                offers_made = state.get("payment_offers_made", [])
+                offers_made.append(payment_offer)
+            else:
+                offers_made = state.get("payment_offers_made", [])
+            
             return {
                 "payment_secured": arrangement_created,
-                "payment_arrangement": arrangement_details
+                "payment_arrangement": arrangement_details,
+                "client_agreed": client_agreed,
+                "agent_confirmed": agent_confirmed,
+                "payment_offers_made": offers_made
             }
             
         except Exception as e:
@@ -229,7 +263,9 @@ def create_promise_to_pay_agent(
             
             return {
                 "payment_secured": False,
-                "payment_arrangement": {}
+                "payment_arrangement": {},
+                "client_agreed": False,
+                "payment_offers_made": state.get("payment_offers_made", [])
             }
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:

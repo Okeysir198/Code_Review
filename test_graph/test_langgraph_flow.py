@@ -114,48 +114,48 @@ import datetime
 tools = [
     date_helper,
 
-    # get_client_vehicle_info,
-    # get_client_profile,
-    # client_call_verification,
+    get_client_vehicle_info,
+    get_client_profile,
+    client_call_verification,
 
-    # get_client_account_aging,
-    # get_client_account_status,
-    # get_client_billing_analysis,
+    get_client_account_aging,
+    get_client_account_status,
+    get_client_billing_analysis,
 
-    # get_client_contracts,
-    # get_client_account_overview,
+    get_client_contracts,
+    get_client_account_overview,
 
-    # get_client_account_statement,
-    # get_client_banking_details,
-    # get_client_payment_history,
+    get_client_account_statement,
+    get_client_banking_details,
+    get_client_payment_history,
 
-    # get_client_notes,
-    # get_client_debtor_letters,
+    get_client_notes,
+    get_client_debtor_letters,
 
-    # get_client_failed_payments,
-    # get_client_last_successful_payment,
-    # get_client_last_valid_payment,
-    # get_client_last_reversed_payment,
+    get_client_failed_payments,
+    get_client_last_successful_payment,
+    get_client_last_valid_payment,
+    get_client_last_reversed_payment,
 
-    # update_payment_arrangements,
+    update_payment_arrangements,
 
-    # get_payment_arrangement_types,
-    # get_client_debit_mandates,
+    get_payment_arrangement_types,
+    get_client_debit_mandates,
     
-    # create_mandate,
-    # create_debicheck_payment,
-    # create_payment_arrangement,
+    create_mandate,
+    create_debicheck_payment,
+    create_payment_arrangement,
 
-    # get_client_subscription_amount,
+    get_client_subscription_amount,
 
-    # create_payment_arrangement_payment_portal,
-    # generate_sms_payment_url,
+    create_payment_arrangement_payment_portal,
+    generate_sms_payment_url,
 
-    # get_bank_options,
-    # update_client_banking_details,
-    # update_client_contact_number,
-    # update_client_email,
-    # update_client_next_of_kin,
+    get_bank_options,
+    update_client_banking_details,
+    update_client_contact_number,
+    update_client_email,
+    update_client_next_of_kin,
 
     add_client_note,
     get_disposition_types,
@@ -169,7 +169,7 @@ user_id = '70997'
 # user_id= '1035923'
 user_id= '10003'
 # user_id ='1216242' # work for debtor letters
-# user_id ='1911088'
+user_id ='1911088'
 agent_name = "AI Assistant Agent"
 today_date = datetime.datetime.now().isoformat()
 DETAILED_SYSTEM_PROMPT = f"""
@@ -214,12 +214,12 @@ agent_with_tools = create_react_agent(
 #########################################################################################
 # Call Center Agents
 #########################################################################################
-from test_graph.client_data import client_data
-from src.Agents.call_center_agent.call_scripts import ScriptType
+# from test_graph.client_data import client_data
+# from src.Agents.call_center_agent.call_scripts import ScriptType
 # from src.Agents.agent00_callcenter_simulation import  AGENT_CONFIG
 # from src.Agents.graph_debtor_call_center_agent import CallCenterAgent
 
-from src.Agents.call_center_agent.introduction import create_introduction_agent
+# from src.Agents.call_center_agent.introduction import create_introduction_agent
 # from src.Agents.call_center_agent.name_verification import NameVerificationAgent
 # from src.Agents.call_center_agent.details_verification import DetailsVerificationAgent
 
