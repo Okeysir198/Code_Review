@@ -1,16 +1,17 @@
 # ./src/Agents/call_center_agent/step12_query_resolution.py
 """
-Query Resolution Agent - Brief answers with smart redirect to payment goal.
+Query Resolution Agent - Optimized with pre-processing only.
+Brief answers with smart redirect to payment goal.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
-from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
+from src.Agents.call_center_agent.prompts import get_step_prompt
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
 from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
 
@@ -31,215 +32,140 @@ def create_query_resolution_agent(
     
     agent_tools = [add_client_note] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["agent"]]:
-        """Analyze query and determine appropriate redirect strategy."""
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
+        """Pre-process to analyze query and determine appropriate redirect strategy."""
         
-        try:
-            # Get the return step (where we should redirect to)
-            return_to_step = state.get("return_to_step", CallStep.CLOSING.value)
-            
-            # Analyze the client's question to categorize it
-            conversation_messages = state.get("messages", [])
-            last_client_message = ""
-            
-            if conversation_messages:
-                for msg in reversed(conversation_messages):
-                    if hasattr(msg, 'type') and msg.type == "human":
-                        last_client_message = msg.content.lower()
-                        break
-                    elif isinstance(msg, dict) and msg.get("role") in ["user", "human"]:
-                        last_client_message = msg.get("content", "").lower()
-                        break
-            
-            # Categorize the query type
-            query_type = "general"
-            if any(word in last_client_message for word in ["how", "what", "why", "when", "where"]):
-                if any(word in last_client_message for word in ["cartrack", "tracking", "work", "service"]):
-                    query_type = "service_question"
-                elif any(word in last_client_message for word in ["payment", "pay", "bank", "debit"]):
-                    query_type = "payment_question"
-                elif any(word in last_client_message for word in ["balance", "owe", "amount", "cost"]):
-                    query_type = "account_question"
-                else:
-                    query_type = "general_question"
-            
-            # Check verification status to determine redirect approach
-            name_verified = state.get("name_verification_status") == VerificationStatus.VERIFIED.value
-            details_verified = state.get("details_verification_status") == VerificationStatus.VERIFIED.value
-            is_fully_verified = name_verified and details_verified
-            
-            # Determine redirect strategy
-            if not name_verified:
-                redirect_strategy = "verify_name"
-                redirect_target = CallStep.NAME_VERIFICATION.value
-            elif not details_verified:
-                redirect_strategy = "verify_details"
-                redirect_target = CallStep.DETAILS_VERIFICATION.value
-            elif return_to_step in [CallStep.PROMISE_TO_PAY.value, CallStep.NEGOTIATION.value]:
-                redirect_strategy = "secure_payment"
-                redirect_target = return_to_step
-            else:
-                redirect_strategy = "continue_call"
-                redirect_target = return_to_step
-            
-            return Command(
-                update={
-                    "query_type": query_type,
-                    "redirect_strategy": redirect_strategy,
-                    "redirect_target": redirect_target,
-                    "is_fully_verified": is_fully_verified,
-                    "last_client_question": last_client_message
-                },
-                goto="agent"
-            )
-            
-        except Exception as e:
-            if verbose:
-                print(f"Error in query resolution pre-processing: {e}")
-            
-            return Command(
-                update={
-                    "query_type": "general",
-                    "redirect_strategy": "continue_call",
-                    "redirect_target": state.get("return_to_step", CallStep.CLOSING.value)
-                },
-                goto="agent"
-            )
-
-    def post_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
-        """Track query resolution and redirect success."""
+        # Get the return step (where we should redirect to)
+        return_to_step = state.get("return_to_step", CallStep.CLOSING.value)
         
-        try:
-            # Add note about query handled
-            user_id = client_data.get("user_id")
-            query_type = state.get("query_type", "unknown")
-            redirect_strategy = state.get("redirect_strategy", "unknown")
-            
-            if user_id:
-                try:
-                    add_client_note.invoke({
-                        "user_id": user_id,
-                        "note_text": f"Query resolved: {query_type}, redirect: {redirect_strategy}"
-                    })
-                except Exception as e:
-                    if verbose:
-                        print(f"Error adding query resolution note: {e}")
-            
-            return {
-                "query_resolved": True,
-                "redirect_completed": True,
-                "successful_pivot": True
-            }
-            
-        except Exception as e:
-            if verbose:
-                print(f"Error in query resolution post-processing: {e}")
-            
-            return {
-                "query_resolved": False,
-                "redirect_completed": False
-            }
+        # Analyze the client's question to categorize it
+        conversation_messages = state.get("messages", [])
+        last_client_message = ""
+        
+        if conversation_messages:
+            for msg in reversed(conversation_messages):
+                if hasattr(msg, 'type') and msg.type == "human":
+                    last_client_message = msg.content.lower()
+                    break
+                elif isinstance(msg, dict) and msg.get("role") in ["user", "human"]:
+                    last_client_message = msg.get("content", "").lower()
+                    break
+        
+        # Categorize the query type for appropriate response
+        query_type = "general"
+        query_keywords = {
+            "service_question": ["cartrack", "tracking", "work", "service", "how does", "what does"],
+            "payment_question": ["payment", "pay", "bank", "debit", "card", "money"],
+            "account_question": ["balance", "owe", "amount", "cost", "charge", "billing"],
+            "technical_question": ["app", "device", "installation", "setup", "not working"],
+            "policy_question": ["cancel", "contract", "terms", "conditions", "policy"]
+        }
+        
+        for category, keywords in query_keywords.items():
+            if any(keyword in last_client_message for keyword in keywords):
+                query_type = category
+                break
+        
+        # Check verification status to determine redirect approach
+        name_verified = state.get("name_verification_status") == VerificationStatus.VERIFIED.value
+        details_verified = state.get("details_verification_status") == VerificationStatus.VERIFIED.value
+        is_fully_verified = name_verified and details_verified
+        
+        # Determine redirect strategy based on verification and return step
+        if not name_verified:
+            redirect_strategy = "verify_name"
+            redirect_target = CallStep.NAME_VERIFICATION.value
+            redirect_message = f"Are you {client_data.get('profile', {}).get('client_info', {}).get('client_full_name', 'Client')}?"
+        elif not details_verified:
+            redirect_strategy = "verify_details"
+            redirect_target = CallStep.DETAILS_VERIFICATION.value
+            redirect_message = "Your ID number please?"
+        elif return_to_step in [CallStep.PROMISE_TO_PAY.value, CallStep.NEGOTIATION.value]:
+            redirect_strategy = "secure_payment"
+            redirect_target = return_to_step
+            outstanding_amount = state.get("outstanding_amount", "the amount")
+            redirect_message = f"Now, can we arrange {outstanding_amount} today?"
+        else:
+            redirect_strategy = "continue_call"
+            redirect_target = return_to_step
+            redirect_message = "Anything else I can help with?"
+        
+        # Create response template based on query type
+        response_templates = {
+            "service_question": "Vehicle tracking and security.",
+            "payment_question": "Payment methods include debit and online portal.",
+            "account_question": f"Your balance is {state.get('outstanding_amount', 'R 0.00')}.",
+            "technical_question": "Technical support: 011 250 3000.",
+            "policy_question": "Policy details available on request.",
+            "general": "I understand."
+        }
+        
+        brief_answer = response_templates.get(query_type, "I understand.")
+        
+        return Command(
+            update={
+                "query_type": query_type,
+                "redirect_strategy": redirect_strategy,
+                "redirect_target": redirect_target,
+                "redirect_message": redirect_message,
+                "brief_answer": brief_answer,
+                "is_fully_verified": is_fully_verified,
+                "last_client_question": last_client_message,
+                "return_to_step": return_to_step,
+                "current_step": CallStep.QUERY_RESOLUTION.value
+            },
+            goto="agent"
+        )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for query resolution with smart redirect."""
         
-        # Extract key information
+        # Extract key information from pre-processing
         query_type = state.get("query_type", "general")
         redirect_strategy = state.get("redirect_strategy", "continue_call")
-        is_fully_verified = state.get("is_fully_verified", False)
-        outstanding_amount = state.get("outstanding_amount", "the amount")
-        client_name = client_data.get("profile", {}).get("client_info", {}).get("client_full_name", "Client")
+        brief_answer = state.get("brief_answer", "I understand.")
+        redirect_message = state.get("redirect_message", "Anything else?")
         
-        # Build custom prompt based on verification status and query type
-        if redirect_strategy == "verify_name":
-            custom_prompt = f"""<role>You're {agent_name} from Cartrack.</role>
+        # Create custom prompt based on redirect strategy
+        custom_prompt = f"""<role>You're {client_data.get('profile', {}).get('client_info', {}).get('client_full_name', 'AI Agent')} from Cartrack.</role>
 
-<task>Answer their question briefly (under 10 words) then redirect to name verification.</task>
+<task>Answer their {query_type} question briefly (under 10 words) then redirect smartly.</task>
 
-<examples>
-Q: "Who are you?" 
-A: "I'm {agent_name} from Cartrack. Are you {client_name}?"
-
-Q: "What's this about?"
-A: "About your Cartrack account. First, are you {client_name}?"
-
-Q: "What company?"
-A: "Cartrack vehicle tracking. Is this {client_name}?"
-</examples>
-
-<pattern>Brief answer + "Are you {client_name}?"</pattern>
-<style>Maximum 15 words total. Sound natural and friendly.</style>"""
-
-        elif redirect_strategy == "verify_details":
-            field_to_verify = state.get("field_to_verify", "ID number")
-            custom_prompt = f"""<role>You're {agent_name} from Cartrack.</role>
-
-<task>Answer their question briefly (under 10 words) then redirect to details verification.</task>
+<response_pattern>
+Brief Answer: "{brief_answer}"
+Redirect: "{redirect_message}"
+</response_pattern>
 
 <examples>
-Q: "Who are you?"
-A: "I'm {agent_name} from Cartrack. What's your {field_to_verify}?"
+Client: "How does Cartrack work?"
+You: "Vehicle tracking and security. Now, can we arrange R399 today?"
 
-Q: "What's this about?"
-A: "Your Cartrack account. Please confirm your {field_to_verify}."
+Client: "What's my balance?"
+You: "R399 overdue. Can we debit this immediately?"
 
-Q: "What company?"
-A: "Cartrack vehicle tracking. Your {field_to_verify} please?"
+Client: "Why wasn't my payment taken?"
+You: "Bank declined it. Can we try a different method for R399?"
+
+Client: "Who are you again?"
+You: "AI Agent from Cartrack. Are you {client_data.get('profile', {}).get('client_info', {}).get('client_full_name', 'Client')}?"
 </examples>
 
-<pattern>Brief answer + "Your {field_to_verify} please?"</pattern>
-<style>Maximum 15 words total. Sound professional but friendly.</style>"""
+<critical_instructions>
+- MAXIMUM 15 words total
+- Answer briefly + redirect immediately
+- Stay focused on payment goal
+- Use exact redirect message: "{redirect_message}"
+</critical_instructions>
 
-        elif redirect_strategy == "secure_payment":
-            custom_prompt = f"""<role>You're {agent_name} from Cartrack.</role>
-
-<task>Answer their question briefly (under 10 words) then redirect to payment.</task>
-
-<examples>
-Q: "Who are you?"
-A: "I'm {agent_name} from Cartrack. About that {outstanding_amount} though..."
-
-Q: "What happens if I don't pay?"
-A: "Services stop working. Can we arrange {outstanding_amount} today?"
-
-Q: "How does Cartrack work?"
-A: "Vehicle tracking and security. Let's sort this {outstanding_amount} payment."
-
-Q: "Why wasn't my payment taken?"
-A: "Bank declined it. Can we try a different method for {outstanding_amount}?"
-</examples>
-
-<pattern>Brief answer + redirect to payment</pattern>
-<style>Maximum 15 words total. Stay focused on payment goal.</style>"""
-
-        else:
-            # Default: continue with call flow
-            custom_prompt = f"""<role>You're {agent_name} from Cartrack.</role>
-
-<task>Answer their question briefly (under 10 words) then continue the call.</task>
-
-<examples>
-Q: "How does this work?"
-A: "Vehicle tracking and security. Is there anything else I can help with?"
-
-Q: "What's my balance?"
-A: "It's {outstanding_amount}. Anything else about your account?"
-
-Q: "When is this due?"
-A: "It's overdue now. Any other questions?"
-</examples>
-
-<pattern>Brief answer + "Anything else?"</pattern>
-<style>Maximum 15 words total. Sound helpful and professional.</style>"""
+<style>Sound natural, confident, and solution-focused. No unnecessary pleasantries.</style>"""
         
-        return [SystemMessage(content=custom_prompt)] + state['messages']
+        return [SystemMessage(content=custom_prompt)] + state.get('messages', [])
     
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
         tools=agent_tools,
         pre_processing_node=pre_processing_node,
-        post_processing_node=post_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,
         config=config,

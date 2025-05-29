@@ -28,36 +28,22 @@ def create_further_assistance_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a further assistance agent for debt collection calls."""
+    """Create a further assistance agent."""
     
     agent_tools = [add_client_note] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to check for additional client concerns."""
         
-        # Check if client has additional questions or concerns
-        recent_messages = state.get("messages", [])[-2:] if state.get("messages") else []
-        
-        # Look for client responses indicating they have questions
-        has_concerns = False
-        for msg in recent_messages:
-            if hasattr(msg, 'content') and hasattr(msg, 'type') and msg.type == "human":
-                content = msg.content.lower()
-                concern_indicators = ["yes", "actually", "one more", "also", "question", "problem"]
-                if any(indicator in content for indicator in concern_indicators):
-                    has_concerns = True
-                    break
-        
         return Command(
             update={
-                "has_concerns": has_concerns,
+                "assistance_offer": "Is there anything else regarding your account I can help you with?",
                 "current_step": CallStep.FURTHER_ASSISTANCE.value
             },
             goto="agent"
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for further assistance step."""
         parameters = prepare_parameters(
             client_data=client_data,
             current_step=CallStep.FURTHER_ASSISTANCE.value,
@@ -65,9 +51,8 @@ def create_further_assistance_agent(
             script_type=script_type,
             agent_name=agent_name
         )
-        
         prompt_content = get_step_prompt(CallStep.FURTHER_ASSISTANCE.value, parameters)
-        return [SystemMessage(content=prompt_content)] + state['messages']
+        return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
         model=model,

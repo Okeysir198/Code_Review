@@ -1,181 +1,183 @@
-## Call Center Agent LLM Instructions
+# Call Center Agent LLM Instructions
 
-These instructions define the core architecture and operational patterns for building a robust call center agent system using sub-agents and a smart router.
+Lean, focused guidance for building a professional debt collection agent system with smart routing and specialized sub-agents.
 
-### 1. Sub-Agent Creation
+## 1. Sub-Agent Architecture
 
-Always create sub-agents directly using **individual variables**, not dictionaries.
-
-**Correct Example:**
+**Create individual sub-agents** - never use dictionaries, use variable directly:
 
 ```python
 introduction_agent = create_introduction_agent(model, client_data, script_type, agent_name, config=config)
 name_verification_agent = create_name_verification_agent(model, client_data, script_type, agent_name, config=config)
-# ... other specialized agents
 ```
 
-### 2. Node Implementation Pattern: Router → Sub-Agent → End
+## 2. Node Pattern: Router → Agent → End (with Smart Handoffs)
 
-The standard flow involves the **Router** directing to a sub-agent. Each **sub-agent handles one turn** of conversation and then transitions to `__end__` to await the debtor's response. A new message from the debtor will trigger the router again.
-
-#### Standard Node Structure (Most Nodes End at `__end__`)
-
-Nodes will invoke their respective sub-agent, update the state, and then typically go to `__end__`. Smart routing for direct handovers (e.g., after successful verification) is an exception.
-
-**Example: `name_verification_node`**
+**Standard Flow**: Router directs to sub-agent → Agent handles ONE turn → Smart handoff OR return to `__end__`
 
 ```python
 def name_verification_node(state: CallCenterAgentState) -> Command[Literal["details_verification", "__end__"]]:
-    """Name verification step: one turn, then end or direct handover if verified."""
     result = name_verification_agent.invoke(state)
-    messages = result.get("messages", state.get("messages", []))
-    name_status = result.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
-    name_attempts = result.get("name_verification_attempts", 0)
-
+    
     update = {
-        "messages": messages,
-        "name_verification_status": name_status,
-        "name_verification_attempts": name_attempts,
+        "messages": result.get("messages", []),
+        "name_verification_status": result.get("name_verification_status"),
         "current_step": CallStep.NAME_VERIFICATION.value
     }
-
-    # Smart Routing: If verified, directly move to details verification
-    if name_status == VerificationStatus.VERIFIED.value:
+    
+    # Smart handoff for smooth conversations
+    if result.get("name_verification_status") == VerificationStatus.VERIFIED.value:
         update["current_step"] = CallStep.DETAILS_VERIFICATION.value
         return Command(update=update, goto=CallStep.DETAILS_VERIFICATION.value)
-
-    # Otherwise, end and wait for debtor response
-    return Command(update=update, goto="__end__")
-```
-
-**Example: `negotiation_node` (Always Ends)**
-
-```python
-def negotiation_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
-    """Negotiation step: one turn, then end to wait for response."""
-    result = negotiation_agent.invoke(state)
-    messages = result.get("messages", state.get("messages", []))
-    return Command(
-        update={
-            "messages": messages,
-            "current_step": CallStep.NEGOTIATION.value
-        },
-        goto="__end__"  # End and wait for debtor response
-    )
-```
-
-### 3. Smart Router with Off-Topic Detection
-
-The router is central to managing call flow, detecting off-topic queries, and handling emergencies.
-
-```python
-def enhanced_router_node(state: CallCenterAgentState) -> str:
-    """Smart router with off-topic detection and return-to-goal logic."""
-
-    # 1. Emergency Routing (Highest Priority): Direct override if set.
-    if state.get("route_override"):
-        return state.get("route_override")
-
-    # 2. Emergency Keyword Detection: Check last message for critical keywords.
-    if state.get("messages"):
-        last_message = state["messages"][-1]
-        if hasattr(last_message, 'content'):
-            content_lower = last_message.content.lower()
-            if any(word in content_lower for word in ["cancel", "terminate", "stop service"]):
-                return CallStep.CANCELLATION.value
-            if any(word in content_lower for word in ["supervisor", "manager", "complaint"]):
-                return CallStep.ESCALATION.value
-
-    # 3. Off-Topic Query Detection (using LLM for classification):
-    if state.get("messages") and len(state["messages"]) > 1:
-        classification = classify_message_intent(state) # Assumes LLM-based classification
-        if classification == "QUERY_UNRELATED":
-            # Store current step to return after query resolution
-            state["return_to_step"] = state.get("current_step", CallStep.INTRODUCTION.value)
-            return CallStep.QUERY_RESOLUTION.value
-
-    # 4. Business Rule Routing: Handle verification failures or max attempts.
-    if has_hard_state_override(state): # Assumes function for business rule checks
-        return get_state_override_route(state)
-
-    # 5. Normal Call Flow Progression: Default advancement.
-    current_step = state.get("current_step", CallStep.INTRODUCTION.value)
-    return get_default_next_step(current_step, state) # Assumes function for normal progression
-```
-
-### 4. Query Resolution with Return-to-Goal
-
-Handle off-topic queries briefly and then return to the main call objective.
-
-```python
-def query_resolution_node(state: CallCenterAgentState) -> Command[Literal["reason_for_call", "negotiation", "promise_to_pay", "closing", "__end__"]]:
-    """Query resolution: answer briefly, then return to main goal."""
-    result = query_resolution_agent.invoke(state)
-    messages = result.get("messages", state.get("messages", []))
-    return_to_step = state.get("return_to_step", CallStep.CLOSING.value) # Default to closing if no return step
-
-    # Clear the return step and go back to the main call goal
-    return Command(
-        update={
-            "messages": messages,
-            "current_step": return_to_step, # Direct return to main goal
-            "return_to_step": None  # Clear return step
-        },
-        goto="__end__"  # End and wait for debtor response
-    )
-```
-
-### 5. Escalation/Cancellation with Return Logic
-
-Handle emergency requests and then determine the appropriate next step based on call progress.
-
-```python
-def escalation_node(state: CallCenterAgentState) -> Command[Literal["reason_for_call", "negotiation", "closing", "__end__"]]:
-    """Escalation: handle request, then return to main goal or close."""
-    result = escalation_agent.invoke(state)
-    messages = result.get("messages", state.get("messages", []))
     
-    # Determine where to return after escalation based on call progress
-    if state.get("details_verification_status") == VerificationStatus.VERIFIED.value:
-        next_step = CallStep.NEGOTIATION.value if not state.get("payment_secured") else CallStep.CLOSING.value
-    else:
-        next_step = CallStep.CLOSING.value # If not verified, close the call
+    return Command(update=update, goto="__end__")  # Wait for debtor
+```
 
-    return Command(
-        update={
-            "messages": messages,
-            "current_step": next_step
-        },
-        goto="__end__"  # End and wait for debtor response
+
+## 4. Sub-Agent Design: Pre-Processing Only
+
+**Each sub-agent uses ONLY pre-processing node** - no post-processing:
+
+```python
+def create_promise_to_pay_agent(model, client_data, script_type, agent_name, config):
+    
+    def pre_processing_node(state) -> Command[Literal["agent"]]:
+        # Analyze conversation and prepare context
+        payment_analysis = analyze_payment_willingness(state.get("messages", []))
+        
+        return Command(
+            update={
+                "payment_willingness": payment_analysis["willingness"],
+                "suggested_amount": payment_analysis["amount"],
+                "payment_method_preference": payment_analysis["method"],
+                "outstanding_amount": outstanding_amount  # Calculated overdue amount
+            },
+            goto="agent"
+        )
+    
+    def dynamic_prompt(state) -> SystemMessage:
+        parameters = prepare_parameters(client_data, current_step, state, script_type, agent_name)
+        prompt_content = get_step_prompt(CallStep.PROMISE_TO_PAY.value, parameters)
+        return [SystemMessage(content=prompt_content)] + state['messages']
+    
+    return create_basic_agent(
+        model=model,
+        prompt=dynamic_prompt,
+        pre_processing_node=pre_processing_node,  # ONLY pre-processing
+        # NO post_processing_node
+        state_schema=CallCenterAgentState,
+        config=config,
+        name="PromiseToPayAgent"
     )
 ```
 
----
-
-## Core Principles Summarized
-
-* **Router-Driven Flow**: The router orchestrates the entire call flow, including smart routing for interruptions.
-* **One Turn Per Agent**: Each sub-agent is designed to complete a single conversational exchange before yielding control.
-* **Default to `__end__`**: Most nodes conclude by returning to `__end__`, allowing the system to wait for the next debtor input. Direct handovers are specific exceptions.
-* **Return-to-Goal**: After resolving off-topic queries or emergencies, the system prioritizes returning to the primary call objective.
-* **State Tracking**: Utilize `return_to_step` in the state to maintain context for returning to previous goals.
-* **Emergency Override**: Critical events like cancellation or escalation can interrupt any active step.
-* **No Router to `__end__` Directly**: The router routes to *nodes*. If a call truly ends, it should route to a dedicated closing node, which then goes to `__end__`.
-
----
-
-## Flow Examples
-
-### Normal Flow
-
-`Router` → `Name Verification` → (if verified) → `Details Verification` → (if verified) → `Reason for Call` → `__END__`
-
-### Off-Topic Interruption
-
-`Router` → `Negotiation` → `__END__` → (debtor asks off-topic query) → `Router` → `Query Resolution` (updates current step back to Negotiation) → `__END__`
-
-### Emergency Interruption
-
-`Router` → `Negotiation` → `__END__` → (debtor says "cancel") → `Router` → `Cancellation` → `Closing` → `__END__`
 
 
+## 7. Smart Router Logic
+
+**Priority Order**: Emergency → Business Rules → Off-Topic Detection → Normal Flow
+
+```python
+def router_node(state: CallCenterAgentState) -> str:
+    # 1. Emergency keywords (highest priority)
+    if last_message_contains(["supervisor", "cancel"]):
+        return CallStep.ESCALATION.value
+    
+    # 2. Business rule overrides
+    if verification_failed(state) or max_attempts_reached(state):
+        return CallStep.CLOSING.value
+    
+    # 3. Off-topic detection (LLM classification)
+    if classify_message_intent(state) == "QUERY_UNRELATED":
+        state["return_to_step"] = state.get("current_step")
+        return CallStep.QUERY_RESOLUTION.value
+    
+    # 4. Normal progression
+    return get_next_step(state.get("current_step"))
+```
+
+
+
+## 9. Smart Handoff Conditions
+
+**Immediate handoffs for smooth conversations**:
+
+```python
+# Name Verification → Details Verification
+if name_verification_status == VerificationStatus.VERIFIED.value:
+    return Command(update=update, goto=CallStep.DETAILS_VERIFICATION.value)
+
+# Details Verification → Reason for Call  
+if details_verification_status == VerificationStatus.VERIFIED.value:
+    return Command(update=update, goto=CallStep.REASON_FOR_CALL.value)
+
+# Reason for Call → Negotiation (always handoff)
+return Command(update=update, goto=CallStep.NEGOTIATION.value)
+
+# Negotiation → Promise to Pay (always handoff)
+return Command(update=update, goto=CallStep.PROMISE_TO_PAY.value)
+
+# Promise to Pay → Payment Method
+if payment_secured and payment_method == "debicheck":
+    return Command(update=update, goto=CallStep.DEBICHECK_SETUP.value)
+elif payment_secured and payment_method == "payment_portal":
+    return Command(update=update, goto=CallStep.PAYMENT_PORTAL.value)
+```
+
+## 10. Core Principles
+
+- **Pre-Processing Only**: Sub-agents use ONLY pre-processing nodes
+- **Prompt Logging**: Complete prompts logged to console for debugging
+- **One Turn Rule**: Each agent handles exactly one conversational exchange
+- **Smart Handoffs**: Chain multiple steps in smooth conversations
+- **Default to `__end__`**: Return here when waiting for debtor response
+- **Router Controls Flow**: All routing decisions centralized in router by update current_step in state
+- **Brief Responses**: Target 10-20 words per agent response
+- **Payment Focus**: Always redirect conversations toward payment resolution
+
+## 11. Response Guidelines
+
+**Professional Debt Collection Voice**:
+- Direct but respectful
+- Solution-focused, not confrontational
+- Create urgency without aggression
+- Minimal pleasantries
+- Avoid repetitive "thank you"
+- No generic support phrases
+
+**Example Responses**:
+- "We didn't receive your payment. Can we debit R399 today?"
+- "Services stop without payment. Let's arrange this now."
+- "I understand. What amount can you manage today?"
+
+## 12. Handoff Triggers
+
+**Automatic progression when**:
+- ✅ Identity verified → Move to details verification
+- ✅ Details verified → Move to reason for call
+- ✅ Account explained → Move to negotiation
+- ✅ Negotiation completed → Move to promise to pay
+- ✅ Payment agreed → Move to specific payment method
+- ✅ Payment completed → Move to subscription reminder
+
+**Wait for response at the current step when**:
+- ❓ Verification incomplete
+- ❓ Objections raised
+- ❓ Client needs time to respond
+- ❓ Payment method being processed
+
+## 13. Special Requirements
+
+**Details Verification**: For first attempt, always mention: "This call is recorded for quality and security"
+
+**Query Handling**: Answer in ≤15 words, then redirect:
+- Q: "Who are you?" 
+- A: "I'm [Agent] from Cartrack. Can we debit R399 today?"
+
+**Emergency Keywords**: "supervisor", "manager", "cancel" → Immediate escalation
+
+**Parameter Logging**: Every prompt logged with complete parameter resolution and aging breakdown before LLM invocation
+
+**No Post-Processing**: Sub-agents focus solely on generating appropriate responses through pre-processing context and dynamic prompts
+
+This architecture ensures focused, professional debt collection calls with smart routing, natural conversation flow, efficient handoffs, clean separation of concerns, robust parameter validation, accurate outstanding amount calculation, and full debugging visibility.

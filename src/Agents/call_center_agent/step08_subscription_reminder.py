@@ -1,7 +1,6 @@
 # ./src/Agents/call_center_agent/step08_subscription_reminder.py
 """
-Subscription Reminder Agent - Clarifies arrears vs ongoing subscription.
-SIMPLIFIED: No query detection - router handles all routing decisions.
+Subscription Reminder Agent - Optimized with pre-processing only.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -15,11 +14,7 @@ from src.Agents.call_center_agent.prompts import get_step_prompt
 from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 
-# Import relevant database tools
-from src.Database.CartrackSQLDatabase import (
-    get_client_subscription_amount,
-    add_client_note
-)
+from src.Database.CartrackSQLDatabase import get_client_subscription_amount, add_client_note
 
 
 def create_subscription_reminder_agent(
@@ -31,15 +26,12 @@ def create_subscription_reminder_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a subscription reminder agent for debt collection calls."""
+    """Create a subscription reminder agent."""
     
-    agent_tools = [
-        get_client_subscription_amount,
-        add_client_note
-    ] + (tools or [])
+    agent_tools = [get_client_subscription_amount, add_client_note] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to prepare subscription information only."""
+        """Pre-process to prepare subscription information."""
         
         # Get subscription information
         subscription = client_data.get("subscription", {})
@@ -53,13 +45,14 @@ def create_subscription_reminder_agent(
         return Command(
             update={
                 "subscription_amount": subscription_str,
-                "subscription_date": "5th of each month"
+                "subscription_date": "5th of each month",
+                "clarification_message": "Today's payment covers arrears, regular subscription continues",
+                "current_step": CallStep.SUBSCRIPTION_REMINDER.value
             },
             goto="agent"
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for subscription reminder step."""
         parameters = prepare_parameters(
             client_data=client_data,
             current_step=CallStep.SUBSCRIPTION_REMINDER.value,
@@ -67,9 +60,8 @@ def create_subscription_reminder_agent(
             script_type=script_type,
             agent_name=agent_name
         )
-        
         prompt_content = get_step_prompt(CallStep.SUBSCRIPTION_REMINDER.value, parameters)
-        return [SystemMessage(content=prompt_content)] + state['messages']
+        return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
         model=model,

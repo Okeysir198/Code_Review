@@ -62,17 +62,17 @@ def calculate_outstanding_amount(account_aging_data: Dict[str, Any]) -> float:
         # Outstanding = Total - Current (non-overdue)
         outstanding_amount = xbalance - x0
         
-        # Log calculation for debugging
-        logger.info(f"Outstanding calculation:")
-        logger.info(f"  Total balance (xbalance): R {xbalance:.2f}")
-        logger.info(f"  Current balance (x0): R {x0:.2f}")
-        logger.info(f"  Outstanding amount: R {outstanding_amount:.2f}")
-        logger.info(f"  Breakdown - 30d: R{x30:.2f}, 60d: R{x60:.2f}, 90d: R{x90:.2f}, 120d+: R{x120:.2f}")
+        # # Log calculation for debugging
+        # logger.info(f"Outstanding calculation:")
+        # logger.info(f"  Total balance (xbalance): R {xbalance:.2f}")
+        # logger.info(f"  Current balance (x0): R {x0:.2f}")
+        # logger.info(f"  Outstanding amount: R {outstanding_amount:.2f}")
+        # logger.info(f"  Breakdown - 30d: R{x30:.2f}, 60d: R{x60:.2f}, 90d: R{x90:.2f}, 120d+: R{x120:.2f}")
         
         return max(outstanding_amount, 0.0)  # Never negative
         
     except (ValueError, TypeError) as e:
-        logger.error(f"Outstanding calculation error: {e}")
+        # logger.error(f"Outstanding calculation error: {e}")
         return 0.0
 
 def format_outstanding_amount(client_data: Dict[str, Any]) -> str:
@@ -846,16 +846,16 @@ class ParameterBuilder:
             logger.info(f"Risk Level: {behavioral_analysis.get('risk_level', 'unknown')}")
             logger.info(f"Payment Reliability: {behavioral_analysis.get('payment_reliability', 'unknown')}")
             
-            # Log aging breakdown for transparency
-            account_aging = client_data.get("account_aging", {})
-            if account_aging:
-                logger.info("Account aging breakdown:")
-                logger.info(f"  Current (x0): R {account_aging.get('x0', 0)}")
-                logger.info(f"  30 days (x30): R {account_aging.get('x30', 0)}")
-                logger.info(f"  60 days (x60): R {account_aging.get('x60', 0)}")
-                logger.info(f"  90 days (x90): R {account_aging.get('x90', 0)}")
-                logger.info(f"  120+ days (x120): R {account_aging.get('x120', 0)}")
-                logger.info(f"  Total balance: R {account_aging.get('xbalance', 0)}")
+            # # Log aging breakdown for transparency
+            # account_aging = client_data.get("account_aging", {})
+            # if account_aging:
+            #     logger.info("Account aging breakdown:")
+            #     logger.info(f"  Current (x0): R {account_aging.get('x0', 0)}")
+            #     logger.info(f"  30 days (x30): R {account_aging.get('x30', 0)}")
+            #     logger.info(f"  60 days (x60): R {account_aging.get('x60', 0)}")
+            #     logger.info(f"  90 days (x90): R {account_aging.get('x90', 0)}")
+            #     logger.info(f"  120+ days (x120): R {account_aging.get('x120', 0)}")
+            #     logger.info(f"  Total balance: R {account_aging.get('xbalance', 0)}")
             
             logger.info("=" * 80)
             

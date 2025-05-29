@@ -33,15 +33,15 @@ def create_cancellation_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a cancellation agent for debt collection calls."""
+    """Create a cancellation agent."""
     
-    agent_tools = [
-        add_client_note,
-        get_client_account_aging
-    ] + (tools or [])
+    agent_tools = [add_client_note, get_client_account_aging] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to calculate cancellation fees and create ticket."""
+        
+        import uuid
+        from datetime import datetime
         
         # Calculate cancellation fee and total balance
         account_aging = client_data.get("account_aging", {})
@@ -85,7 +85,6 @@ def create_cancellation_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for cancellation step."""
         parameters = prepare_parameters(
             client_data=client_data,
             current_step=CallStep.CANCELLATION.value,
@@ -93,9 +92,8 @@ def create_cancellation_agent(
             script_type=script_type,
             agent_name=agent_name
         )
-        
         prompt_content = get_step_prompt(CallStep.CANCELLATION.value, parameters)
-        return [SystemMessage(content=prompt_content)] + state['messages']
+        return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
         model=model,

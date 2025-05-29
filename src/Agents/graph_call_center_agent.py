@@ -1,6 +1,6 @@
 """
-Fixed Call Center Agent Workflow with Current Step Validation for Handoffs
-Only handoff to next step by checking current_step value and ensuring current step is complete
+Optimized Call Center Agent Workflow - Enhanced Router with Step-Aware Classification
+Router intelligently detects step relevance, completion, and handles routing decisions
 """
 import logging
 from typing import Literal, Optional, Dict, Any
@@ -14,7 +14,7 @@ from langchain_ollama import ChatOllama
 
 # Import existing components
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
-from src.Agents.call_center_agent.prompts import get_router_prompt, parse_router_decision
+from src.Agents.call_center_agent.prompts import parse_router_decision
 
 # Import all specialized sub-agents
 from src.Agents.call_center_agent.step00_introduction import create_introduction_agent
@@ -45,112 +45,310 @@ def create_call_center_agent(
     agent_name: str = "AI Agent",
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create the complete call center agent workflow with current step validation."""
+    """Create the complete call center agent workflow with optimized router."""
     
     config = config or {}
     max_name_attempts = CONFIG.get("verification", {}).get("max_name_verification_attempts", 5)
     max_details_attempts = CONFIG.get("verification", {}).get("max_details_verification_attempts", 5)
 
-    # Create all specialized sub-agents
-    agents = {
-        "introduction": create_introduction_agent(model, client_data, script_type, agent_name, config=config),
-        "name_verification": create_name_verification_agent(model, client_data, script_type, agent_name, config=config),
-        "details_verification": create_details_verification_agent(model, client_data, script_type, agent_name, config=config),
-        "reason_for_call": create_reason_for_call_agent(model, client_data, script_type, agent_name, config=config),
-        "negotiation": create_negotiation_agent(model, client_data, script_type, agent_name, config=config),
-        "promise_to_pay": create_promise_to_pay_agent(model, client_data, script_type, agent_name, config=config),
-        "debicheck_setup": create_debicheck_setup_agent(model, client_data, script_type, agent_name, config=config),
-        "payment_portal": create_payment_portal_agent(model, client_data, script_type, agent_name, config=config),
-        "subscription_reminder": create_subscription_reminder_agent(model, client_data, script_type, agent_name, config=config),
-        "client_details_update": create_client_details_update_agent(model, client_data, script_type, agent_name, config=config),
-        "referrals": create_referrals_agent(model, client_data, script_type, agent_name, config=config),
-        "further_assistance": create_further_assistance_agent(model, client_data, script_type, agent_name, config=config),
-        "query_resolution": create_query_resolution_agent(model, client_data, script_type, agent_name, config=config),
-        "escalation": create_escalation_agent(model, client_data, script_type, agent_name, config=config),
-        "cancellation": create_cancellation_agent(model, client_data, script_type, agent_name, config=config),
-        "closing": create_closing_agent(model, client_data, script_type, agent_name, config=config)
-    }
+    # Create all specialized sub-agents as variables (direct instantiation)
+    introduction_agent = create_introduction_agent(model, client_data, script_type, agent_name, config=config)
+    name_verification_agent = create_name_verification_agent(model, client_data, script_type, agent_name, config=config)
+    details_verification_agent = create_details_verification_agent(model, client_data, script_type, agent_name, config=config)
+    reason_for_call_agent = create_reason_for_call_agent(model, client_data, script_type, agent_name, config=config)
+    negotiation_agent = create_negotiation_agent(model, client_data, script_type, agent_name, config=config)
+    promise_to_pay_agent = create_promise_to_pay_agent(model, client_data, script_type, agent_name, config=config)
+    debicheck_setup_agent = create_debicheck_setup_agent(model, client_data, script_type, agent_name, config=config)
+    payment_portal_agent = create_payment_portal_agent(model, client_data, script_type, agent_name, config=config)
+    subscription_reminder_agent = create_subscription_reminder_agent(model, client_data, script_type, agent_name, config=config)
+    client_details_update_agent = create_client_details_update_agent(model, client_data, script_type, agent_name, config=config)
+    referrals_agent = create_referrals_agent(model, client_data, script_type, agent_name, config=config)
+    further_assistance_agent = create_further_assistance_agent(model, client_data, script_type, agent_name, config=config)
+    query_resolution_agent = create_query_resolution_agent(model, client_data, script_type, agent_name, config=config)
+    escalation_agent = create_escalation_agent(model, client_data, script_type, agent_name, config=config)
+    cancellation_agent = create_cancellation_agent(model, client_data, script_type, agent_name, config=config)
+    closing_agent = create_closing_agent(model, client_data, script_type, agent_name, config=config)
 
-    # Helper functions
-    def has_emergency_keywords(state: CallCenterAgentState) -> bool:
-        """Check for emergency keywords that bypass normal flow."""
-        if not state.get("messages"):
+    # OPTIMIZED ROUTER LLM PROMPT - Step-Aware Classification
+    def get_optimized_router_prompt(state):
+        """Generate highly optimized step-aware router classification prompt."""
+        current_step = state.get("current_step", "unknown")
+        
+        # Get last client message
+        messages = state.get("messages", [])
+        last_client_message = ""
+        last_ai_message = ""
+        
+        for msg in reversed(messages):
+            if isinstance(msg, dict):
+                if msg.get("type") == "human" and not last_client_message:
+                    last_client_message = msg.get("content", "")
+                elif msg.get("type") == "ai" and not last_ai_message:
+                    last_ai_message = msg.get("content", "")
+            elif hasattr(msg, 'type'):
+                if msg.type == "human" and not last_client_message:
+                    last_client_message = msg.content
+                elif msg.type == "ai" and not last_ai_message:
+                    last_ai_message = msg.content
+
+        # Pre-analyze message for keyword patterns
+        msg_lower = last_client_message.lower()
+        
+        # Determine likely classification based on patterns
+        has_escalation_words = any(word in msg_lower for word in [
+            "supervisor", "manager", "complaint", "harassment", "legal", "lawyer"
+        ])
+        
+        has_cancellation_words = any(word in msg_lower for word in [
+            "cancel", "terminate", "stop service", "end service", "disconnect"
+        ])
+        
+        has_question_words = any(pattern in msg_lower for pattern in [
+            "how does", "what happens", "why wasn", "what's included", "how do you"
+        ])
+        
+        has_agreement_words = any(word in msg_lower for word in [
+            "okay", "yes", "fine", "alright", "let's do", "sure"
+        ])
+        
+        has_objection_words = any(pattern in msg_lower for pattern in [
+            "can't afford", "don't have", "no money", "won't pay", "refuse", "wrong", "dispute"
+        ])
+
+        return f"""<role>Debt Collection Call Router</role>
+
+    <message_to_classify>"{last_client_message}"</message_to_classify>
+
+    <context>
+    Current Step: {current_step}
+    AI Said: "{last_ai_message}"
+    </context>
+
+    <classification_rules>
+    1. ESCALATION: Contains "supervisor", "manager", "complaint", "harassment", "legal"
+    Examples: "I want a supervisor", "This is harassment", "Filing a complaint"
+
+    2. CANCELLATION: Contains "cancel", "terminate", "stop service", "disconnect"  
+    Examples: "Cancel my account", "Stop all services", "Terminate this"
+
+    3. QUERY_UNRELATED: Questions about service features/technical issues unrelated to payment
+    Examples: "How does Cartrack work?", "What happens if stolen?", "Why wasn't payment taken?"
+
+    4. STEP_RELATED: Directly answers current step's purpose
+    Examples: Name confirmations, providing ID, payment discussions, verification responses
+
+    5. AGREEMENT: Clear acceptance of AI's request
+    Examples: "Okay let's arrange payment", "Yes I understand", "Fine I'll pay"
+
+    6. OBJECTION: Refusal or resistance to current step  
+    Examples: "Can't afford", "Don't have money", "That's wrong", "Won't pay"
+    </classification_rules>
+
+    <keyword_analysis>
+    Escalation keywords detected: {has_escalation_words}
+    Cancellation keywords detected: {has_cancellation_words}  
+    Question keywords detected: {has_question_words}
+    Agreement keywords detected: {has_agreement_words}
+    Objection keywords detected: {has_objection_words}
+    </keyword_analysis>
+
+    <step_context>
+    For {current_step}:
+    - Identity confirmations (name, ID) = STEP_RELATED
+    - Payment amount questions = STEP_RELATED
+    - Service feature questions = QUERY_UNRELATED
+    - Financial refusals = OBJECTION
+    - Positive responses to requests = AGREEMENT
+    </step_context>
+
+    <critical_examples>
+    "I want to speak to a supervisor" → ESCALATION (supervisor keyword)
+    "Stop all services immediately" → CANCELLATION (stop + services keywords)  
+    "How does Cartrack work?" → QUERY_UNRELATED (service question)
+    "Yes, this is John Smith" → STEP_RELATED (identity confirmation)
+    "I can't afford R199" → OBJECTION (financial refusal)
+    "Okay, let's arrange payment" → AGREEMENT (accepting request)
+    "Can I pay half now?" → STEP_RELATED (payment discussion)
+    "Why wasn't my payment taken?" → QUERY_UNRELATED (technical question)
+    </critical_examples>
+
+    <instructions>
+    1. Check for escalation keywords FIRST
+    2. Check for cancellation keywords SECOND  
+    3. Distinguish questions (QUERY_UNRELATED) from responses (STEP_RELATED)
+    4. Financial refusals are always OBJECTION
+    5. Clear acceptance is AGREEMENT
+    6. Direct responses to current step are STEP_RELATED
+    </instructions>
+
+    <output_format>
+    Respond with EXACTLY ONE WORD: ESCALATION, CANCELLATION, STEP_RELATED, QUERY_UNRELATED, AGREEMENT, or OBJECTION
+    </output_format>"""
+
+    # STEP COMPLETION DETECTION
+    def is_step_complete(step: str, state: CallCenterAgentState) -> bool:
+        """Enhanced step completion detection using state values and conversation analysis."""
+        
+        if step == CallStep.NAME_VERIFICATION.value:
+            return state.get("name_verification_status") == VerificationStatus.VERIFIED.value
+            
+        elif step == CallStep.DETAILS_VERIFICATION.value:
+            return state.get("details_verification_status") == VerificationStatus.VERIFIED.value
+            
+        elif step == CallStep.REASON_FOR_CALL.value:
+            # Complete after one AI explanation of reason
+            messages = state.get("messages", [])
+            if len(messages) >= 2:
+                # Check if AI explained the overdue amount
+                for msg in reversed(messages):
+                    if hasattr(msg, 'type') and msg.type == "ai":
+                        content = msg.content.lower()
+                        if any(indicator in content for indicator in ["overdue", "payment", "owe", "balance"]):
+                            return True
             return False
-        last_message = state["messages"][-1]
-        if hasattr(last_message, 'content'):
-            content_lower = last_message.content.lower()
-            emergency_words = ["supervisor", "manager", "cancel", "complaint"]
-            return any(word in content_lower for word in emergency_words)
+            
+        elif step == CallStep.NEGOTIATION.value:
+            # Complete if client shows agreement or objections are addressed
+            messages = state.get("messages", [])
+            if len(messages) >= 2:
+                # Check last client response for agreement
+                for msg in reversed(messages):
+                    if hasattr(msg, 'type') and msg.type == "human":
+                        content = msg.content.lower()
+                        agreement_indicators = ["okay", "fine", "yes", "understand", "let's do it"]
+                        if any(indicator in content for indicator in agreement_indicators):
+                            return True
+                        break
+            return False
+            
+        elif step == CallStep.PROMISE_TO_PAY.value:
+            # Complete if payment arrangement was secured (AI confirms arrangement)
+            messages = state.get("messages", [])
+            for msg in reversed(messages):
+                if hasattr(msg, 'type') and msg.type == "ai":
+                    content = msg.content.lower()
+                    secured_indicators = ["perfect", "excellent", "great", "setting up", "arranging", "processing"]
+                    if any(indicator in content for indicator in secured_indicators):
+                        return True
+                    break
+            return False
+            
+        elif step in [
+            CallStep.DEBICHECK_SETUP.value, 
+            CallStep.PAYMENT_PORTAL.value,
+            CallStep.SUBSCRIPTION_REMINDER.value, 
+            CallStep.CLIENT_DETAILS_UPDATE.value, 
+            CallStep.REFERRALS.value,
+            CallStep.FURTHER_ASSISTANCE.value
+        ]:
+            # These steps complete after one AI turn
+            messages = state.get("messages", [])
+            return len(messages) >= 2  # At least one AI response after entry
+            
         return False
-    
-    def has_hard_state_override(state: CallCenterAgentState) -> bool:
-        """Check if state requires hard override (verification failures, etc.)"""
-        if (state.get("name_verification_attempts", 0) >= max_name_attempts and 
-            state.get("name_verification_status") != VerificationStatus.VERIFIED.value):
-            return True
-        if (state.get("details_verification_attempts", 0) >= max_details_attempts and 
-            state.get("details_verification_status") != VerificationStatus.VERIFIED.value):
-            return True
-        return state.get("route_override") or state.get("is_call_ended")
-    
-    def classify_message_intent(state: CallCenterAgentState) -> str:
-        """Use small LLM to classify message intent."""
-        router_llm = ChatOllama(model="qwen2.5:3b-instruct", temperature=0)
-        prompt_content = get_router_prompt(state.to_dict() if hasattr(state, 'to_dict') else state)
+
+    def get_next_step_after_completion(step: str, state: CallCenterAgentState) -> str:
+        """Determine next step after current step is complete."""
+        
+        step_progression = {
+            CallStep.NAME_VERIFICATION.value: CallStep.DETAILS_VERIFICATION.value,
+            CallStep.DETAILS_VERIFICATION.value: CallStep.REASON_FOR_CALL.value,
+            CallStep.REASON_FOR_CALL.value: CallStep.NEGOTIATION.value,
+            CallStep.NEGOTIATION.value: CallStep.PROMISE_TO_PAY.value,
+            CallStep.SUBSCRIPTION_REMINDER.value: CallStep.CLIENT_DETAILS_UPDATE.value,
+            CallStep.CLIENT_DETAILS_UPDATE.value: CallStep.REFERRALS.value,
+            CallStep.REFERRALS.value: CallStep.FURTHER_ASSISTANCE.value,
+            CallStep.FURTHER_ASSISTANCE.value: CallStep.CLOSING.value
+        }
+        
+        # Special logic for promise to pay
+        if step == CallStep.PROMISE_TO_PAY.value:
+            # Detect payment method from conversation
+            messages = state.get("messages", [])
+            for msg in reversed(messages):
+                if hasattr(msg, 'type') and msg.type == "ai":
+                    content = msg.content.lower()
+                    if "debicheck" in content or "bank" in content:
+                        return CallStep.DEBICHECK_SETUP.value
+                    elif "portal" in content or "link" in content:
+                        return CallStep.PAYMENT_PORTAL.value
+                    break
+            return CallStep.SUBSCRIPTION_REMINDER.value
+        
+        # Special logic for payment method steps
+        if step in [CallStep.DEBICHECK_SETUP.value, CallStep.PAYMENT_PORTAL.value]:
+            return CallStep.SUBSCRIPTION_REMINDER.value
+        
+        return step_progression.get(step, CallStep.CLOSING.value)
+
+    # OPTIMIZED ROUTER NODE WITH ENHANCED LOGIC
+    def router_node(state: CallCenterAgentState) -> Dict[str, Any]:
+        """Enhanced router with step-aware classification and robust completion detection."""
+        
+        # Skip for first message
+        if len(state.get("messages", [])) < 2:
+            return {"current_step": CallStep.INTRODUCTION.value}
+        
+        current_step = state.get("current_step", CallStep.INTRODUCTION.value)
+        
+        # 1. Business rule overrides (highest priority)
+        name_failed = (state.get("name_verification_attempts", 0) >= max_name_attempts and 
+                      state.get("name_verification_status") != VerificationStatus.VERIFIED.value)
+        details_failed = (state.get("details_verification_attempts", 0) >= max_details_attempts and 
+                         state.get("details_verification_status") != VerificationStatus.VERIFIED.value)
+        
+        if name_failed or details_failed or state.get("is_call_ended"):
+            logger.info("Business rule override - routing to closing")
+            return {"current_step": CallStep.CLOSING.value}
+        
+        # 2. Use optimized router LLM for classification
+        router_llm = ChatOllama(model="qwen2.5:7b-instruct-q5_K_M", temperature=0, num_ctx=4096)
+        prompt_content = get_optimized_router_prompt(state)
         prompt = [SystemMessage(content=prompt_content)]
         
         try:
             response = router_llm.invoke(prompt)
-            classification = parse_router_decision(response, state)
-            logger.info(f"Router classified message as: {classification}")
-            return classification
-        except Exception as e:
-            logger.warning(f"Router LLM failed: {e}, defaulting to STEP_RELATED")
-            return "STEP_RELATED"
-    
-    def determine_next_step(state: CallCenterAgentState) -> str:
-        """SINGLE SOURCE OF TRUTH: All routing decisions happen here."""
-        
-        # 1. Hard state overrides (business rules)
-        if has_hard_state_override(state):
-            logger.info("Hard state override - routing to closing")
-            return CallStep.CLOSING.value
-        
-        # 2. Emergency keywords (bypass LLM)
-        if has_emergency_keywords(state):
-            logger.info("Emergency keyword detected - routing to escalation")
-            return CallStep.ESCALATION.value
-        
-        # 3. LLM classification for off-topic detection
-        if state.get("messages") and len(state["messages"]) > 1:
-            classification = classify_message_intent(state)
+            classification = response.content.strip().upper()
+            logger.info(f"Router LLM classified: {classification} for step: {current_step}")
+            
+            # 3. Handle classification results
             if classification == "ESCALATION":
-                return CallStep.ESCALATION.value
+                logger.info("Escalation detected - routing to escalation")
+                return {"current_step": CallStep.ESCALATION.value}
+            
+            elif classification == "CANCELLATION":
+                logger.info("Cancellation detected - routing to cancellation")
+                return {"current_step": CallStep.CANCELLATION.value}
+            
             elif classification == "QUERY_UNRELATED":
-                return CallStep.QUERY_RESOLUTION.value
+                logger.info(f"Off-topic query detected - routing to query resolution, will return to {current_step}")
+                return {
+                    "current_step": CallStep.QUERY_RESOLUTION.value,
+                    "return_to_step": current_step
+                }
+            
+            # 4. For STEP_RELATED, AGREEMENT, OBJECTION - check if step is complete
+            if classification in ["STEP_RELATED", "AGREEMENT", "OBJECTION"]:
+                if is_step_complete(current_step, state):
+                    next_step = get_next_step_after_completion(current_step, state)
+                    logger.info(f"Step {current_step} complete - progressing to {next_step}")
+                    return {"current_step": next_step}
+                else:
+                    logger.info(f"Step {current_step} not complete - staying in current step")
+                    return {"current_step": current_step}
         
-        # 4. Default: stay in current step (let individual nodes decide progression)
-        return state.get("current_step", CallStep.INTRODUCTION.value)
-
-    # Router node - ONLY updates state
-    def router_node(state: CallCenterAgentState) -> Dict[str, Any]:
-        """Router: ONLY updates state with next step. No execution control."""
+        except Exception as e:
+            logger.warning(f"Router LLM failed: {e}, using fallback logic")
         
-        # Skip router for first message (introduction)
-        if len(state.get("messages", [])) < 2: 
-            return {"current_step": CallStep.INTRODUCTION.value}
+        # 5. Fallback: Check step completion without LLM classification
+        if is_step_complete(current_step, state):
+            next_step = get_next_step_after_completion(current_step, state)
+            logger.info(f"Fallback: Step {current_step} complete - progressing to {next_step}")
+            return {"current_step": next_step}
         
-        next_step = determine_next_step(state)
-        
-        updates = {"current_step": next_step}
-        
-        # Set return step for query resolution
-        if next_step == CallStep.QUERY_RESOLUTION.value:
-            updates["return_to_step"] = state.get("current_step", CallStep.INTRODUCTION.value)
-            logger.info(f"Setting return_to_step: {updates['return_to_step']}")
-        
-        logger.info(f"Router: Setting current_step to {next_step}")
-        return updates
+        # 6. Default: Stay in current step
+        logger.info(f"Default: Staying in current step: {current_step}")
+        return {"current_step": current_step}
 
     def execution_router(state: CallCenterAgentState) -> str:
         """Simple execution router: reads current_step and routes to that node."""
@@ -162,477 +360,233 @@ def create_call_center_agent(
         logger.info(f"Execution router: Routing to {current_step}")
         return current_step
 
-    # Helper function to analyze AI messages for payment agreements
-    def get_last_ai_message(messages: list) -> str:
-        """Get the last AI message content."""
-        for msg in reversed(messages):
-            if hasattr(msg, 'type') and msg.type == "ai":
-                return msg.content.lower()
-        return ""
+    # NODE IMPLEMENTATIONS - Following Architecture Guide
 
-    # STEP COMPLETION VALIDATION FUNCTIONS
-    def is_step_complete(step: str, state: CallCenterAgentState, result: Dict[str, Any]) -> bool:
-        """Check if current step is complete and ready for handoff."""
-        
-        if step == CallStep.NAME_VERIFICATION.value:
-            # Complete if VERIFIED
-            return result.get("name_verification_status") == VerificationStatus.VERIFIED.value
-            
-        elif step == CallStep.DETAILS_VERIFICATION.value:
-            # Complete if VERIFIED
-            return result.get("details_verification_status") == VerificationStatus.VERIFIED.value
-            
-        elif step == CallStep.REASON_FOR_CALL.value:
-            # Always complete after one turn - handoff to negotiation
-            return True
-            
-        elif step == CallStep.NEGOTIATION.value:
-            # Always complete after one turn - handoff to promise to pay
-            return True
-            
-        elif step == CallStep.PROMISE_TO_PAY.value:
-            # Complete if payment was secured
-            messages = result.get("messages", [])
-            last_ai_message = get_last_ai_message(messages)
-            return any(word in last_ai_message for word in ["perfect", "excellent", "great", "i'm setting up", "arranging"])
-            
-        elif step in [CallStep.DEBICHECK_SETUP.value, CallStep.PAYMENT_PORTAL.value]:
-            # Always complete after explaining process - handoff to subscription reminder
-            return True
-            
-        elif step in [
-            CallStep.SUBSCRIPTION_REMINDER.value, 
-            CallStep.CLIENT_DETAILS_UPDATE.value, 
-            CallStep.REFERRALS.value
-        ]:
-            # Always complete after one turn - continue to next step
-            return True
-            
-        elif step == CallStep.FURTHER_ASSISTANCE.value:
-            # Always complete - handoff to closing
-            return True
-            
-        # Default: step not complete, wait for more interaction
-        return False
-
-    def get_next_step_after_completion(step: str, state: CallCenterAgentState, result: Dict[str, Any]) -> str:
-        """Get next step after current step is complete."""
-        
-        if step == CallStep.NAME_VERIFICATION.value:
-            return CallStep.DETAILS_VERIFICATION.value
-            
-        elif step == CallStep.DETAILS_VERIFICATION.value:
-            return CallStep.REASON_FOR_CALL.value
-            
-        elif step == CallStep.REASON_FOR_CALL.value:
-            return CallStep.NEGOTIATION.value
-            
-        elif step == CallStep.NEGOTIATION.value:
-            return CallStep.PROMISE_TO_PAY.value
-            
-        elif step == CallStep.PROMISE_TO_PAY.value:
-            # Route based on payment method if payment secured
-            messages = result.get("messages", [])
-            last_ai_message = get_last_ai_message(messages)
-            
-            if "debicheck" in last_ai_message or "bank" in last_ai_message:
-                return CallStep.DEBICHECK_SETUP.value
-            elif "portal" in last_ai_message or "link" in last_ai_message:
-                return CallStep.PAYMENT_PORTAL.value
-            else:
-                return CallStep.SUBSCRIPTION_REMINDER.value
-                
-        elif step in [CallStep.DEBICHECK_SETUP.value, CallStep.PAYMENT_PORTAL.value]:
-            return CallStep.SUBSCRIPTION_REMINDER.value
-            
-        elif step == CallStep.SUBSCRIPTION_REMINDER.value:
-            return CallStep.CLIENT_DETAILS_UPDATE.value
-            
-        elif step == CallStep.CLIENT_DETAILS_UPDATE.value:
-            return CallStep.REFERRALS.value
-            
-        elif step == CallStep.REFERRALS.value:
-            return CallStep.FURTHER_ASSISTANCE.value
-            
-        elif step == CallStep.FURTHER_ASSISTANCE.value:
-            return CallStep.CLOSING.value
-            
-        # Default: go to closing
-        return CallStep.CLOSING.value
-
-    # OPTIMIZED NODE FUNCTIONS WITH STEP COMPLETION VALIDATION
-
-    def introduction_node(state: CallCenterAgentState) -> Command[Literal["name_verification", "__end__"]]:
+    # RARE HANDOFF: Introduction → Always handoff to name verification
+    def introduction_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
         """Introduction step - always handoff to name verification."""
-        result = agents["introduction"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Introduction always hands off to name verification
+ 
+        result = introduction_agent.invoke(state)
+        logger.info("Introduction complete - handing off to name verification")
         return Command(
             update={
-                "messages": messages, 
+                "messages": result.get("messages", []),
                 "current_step": CallStep.NAME_VERIFICATION.value
             },
-            goto=CallStep.NAME_VERIFICATION.value
+            goto="__end__"
         )
 
-    def name_verification_node(state: CallCenterAgentState) -> Command[Literal["details_verification", "__end__"]]:
+    # RARE HANDOFF: Name Verification → Handoff only if VERIFIED
+    def name_verification_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
         """Name verification step - handoff only if VERIFIED."""
-        
-        # Only proceed if we're actually in name verification step
-        if state.get("current_step") != CallStep.NAME_VERIFICATION.value:
-            logger.warning(f"Name verification called but current_step is {state.get('current_step')}")
-            return Command(update={}, goto="__end__")
-        
-        result = agents["name_verification"].invoke(state)
-        
-        messages = result.get("messages", state.get("messages", []))
-        name_verification_status = result.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
-        name_verification_attempts = result.get("name_verification_attempts", 0)
 
+        result = name_verification_agent.invoke(state)
+        
         update = {
-            "messages": messages,
-            "name_verification_status": name_verification_status,
-            "name_verification_attempts": name_verification_attempts,
+            "messages": result.get("messages", []),
+            "name_verification_status": result.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value),
+            "name_verification_attempts": result.get("name_verification_attempts", 0),
             "current_step": CallStep.NAME_VERIFICATION.value
         }
         
-        # CRITICAL: Only handoff if step is complete (VERIFIED)
-        if is_step_complete(CallStep.NAME_VERIFICATION.value, state, result):
-            next_step = get_next_step_after_completion(CallStep.NAME_VERIFICATION.value, state, result)
-            update["current_step"] = next_step
-            logger.info(f"Name verification COMPLETE - handing off to {next_step}")
-            return Command(update=update, goto=next_step)
+        # RARE HANDOFF: Only if VERIFIED
+        if result.get("name_verification_status") == VerificationStatus.VERIFIED.value:
+            update["current_step"] = CallStep.DETAILS_VERIFICATION.value
+            logger.info("Name verification VERIFIED - handing off to details verification")
+            return Command(update=update, goto=CallStep.DETAILS_VERIFICATION.value)
         
-        # Step not complete - wait for more interaction
-        logger.info("Name verification INCOMPLETE - waiting for more interaction")
+        logger.info("Name verification incomplete - returning to __end__")
         return Command(update=update, goto="__end__")
 
-    def details_verification_node(state: CallCenterAgentState) -> Command[Literal["reason_for_call", "__end__"]]:
+    # RARE HANDOFF: Details Verification → Handoff only if VERIFIED  
+    def details_verification_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
         """Details verification step - handoff only if VERIFIED."""
         
-        # Only proceed if we're actually in details verification step
-        if state.get("current_step") != CallStep.DETAILS_VERIFICATION.value:
-            logger.warning(f"Details verification called but current_step is {state.get('current_step')}")
-            return Command(update={}, goto="__end__")
+        result = details_verification_agent.invoke(state)
         
-        result = agents["details_verification"].invoke(state)
-        
-        messages = result.get("messages", state.get("messages", []))
-        details_verification_status = result.get("details_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
-        details_verification_attempts = result.get("details_verification_attempts", 0)
-        matched_fields = result.get("matched_fields", [])
-
         update = {
-            "messages": messages,
-            "details_verification_status": details_verification_status,
-            "details_verification_attempts": details_verification_attempts,
-            "matched_fields": matched_fields,
+            "messages": result.get("messages", []),
+            "details_verification_status": result.get("details_verification_status", VerificationStatus.INSUFFICIENT_INFO.value),
+            "details_verification_attempts": result.get("details_verification_attempts", 0),
+            "matched_fields": result.get("matched_fields", []),
             "current_step": CallStep.DETAILS_VERIFICATION.value
         }
         
-        # CRITICAL: Only handoff if step is complete (VERIFIED)
-        if is_step_complete(CallStep.DETAILS_VERIFICATION.value, state, result):
-            next_step = get_next_step_after_completion(CallStep.DETAILS_VERIFICATION.value, state, result)
-            update["current_step"] = next_step
-            logger.info(f"Details verification COMPLETE - handing off to {next_step}")
-            return Command(update=update, goto=next_step)
+        # RARE HANDOFF: Only if VERIFIED
+        if result.get("details_verification_status") == VerificationStatus.VERIFIED.value:
+            update["current_step"] = CallStep.REASON_FOR_CALL.value
+            logger.info("Details verification VERIFIED - handing off to reason for call")
+            return Command(update=update, goto=CallStep.REASON_FOR_CALL.value)
         
-        # Step not complete - wait for more interaction
-        logger.info("Details verification INCOMPLETE - waiting for more interaction")
+        logger.info("Details verification incomplete - returning to __end__")
         return Command(update=update, goto="__end__")
 
+    
     def reason_for_call_node(state: CallCenterAgentState) -> Command[Literal["negotiation"]]:
-        """Reason for call step - always handoff to negotiation after one turn."""
+        """Reason for call step """
         
-        # Only proceed if we're actually in reason for call step
-        if state.get("current_step") != CallStep.REASON_FOR_CALL.value:
-            logger.warning(f"Reason for call called but current_step is {state.get('current_step')}")
-            return Command(update={}, goto="__end__")
-        
-        result = agents["reason_for_call"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-
-        # Always handoff to negotiation after explaining reason
-        next_step = CallStep.NEGOTIATION.value
-        logger.info(f"Reason for call COMPLETE - handing off to {next_step}")
-        
+        result = reason_for_call_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.NEGOTIATION.value
             },
-            goto=next_step
+            goto="negotiation"
         )
-
-    def negotiation_node(state: CallCenterAgentState) -> Command[Literal["promise_to_pay"]]:
-        """Negotiation step - always handoff to promise to pay after one turn."""
-        
-        # Only proceed if we're actually in negotiation step
-        if state.get("current_step") != CallStep.NEGOTIATION.value:
-            logger.warning(f"Negotiation called but current_step is {state.get('current_step')}")
-            return Command(update={}, goto="__end__")
-        
-        result = agents["negotiation"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-
-        # Always handoff to promise to pay after negotiation
-        next_step = CallStep.PROMISE_TO_PAY.value
-        logger.info(f"Negotiation COMPLETE - handing off to {next_step}")
-        
+    
+    # ALL OTHER STEPS → Return to __end__
+    def negotiation_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Negotiation step - return to __end__ after one turn."""
+           
+        result = negotiation_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.NEGOTIATION.value
             },
-            goto=next_step
+            goto="__end__"
         )
 
-    def promise_to_pay_node(state: CallCenterAgentState) -> Command[Literal["debicheck_setup", "payment_portal", "subscription_reminder", "__end__"]]:
-        """Promise to pay step - handoff based on payment agreement analysis."""
+    def promise_to_pay_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Promise to pay step - return to __end__ after one turn."""
         
-        # Only proceed if we're actually in promise to pay step
-        if state.get("current_step") != CallStep.PROMISE_TO_PAY.value:
-            logger.warning(f"Promise to pay called but current_step is {state.get('current_step')}")
-            return Command(update={}, goto="__end__")
-        
-        result = agents["promise_to_pay"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Analyze AI response for payment agreement
-        last_ai_message = get_last_ai_message(messages)
-        
-        # Detect payment secured
-        payment_secured = any(word in last_ai_message for word in 
-                             ["perfect", "excellent", "great", "i'm setting up", "arranging"])
-        
-        # Detect payment method
-        payment_method = "none"
-        if payment_secured:
-            if "debicheck" in last_ai_message or "bank" in last_ai_message:
-                payment_method = "debicheck"
-            elif "portal" in last_ai_message or "link" in last_ai_message:
-                payment_method = "payment_portal"
+        result = promise_to_pay_agent.invoke(state)
+        return Command(
+            update={
+                "messages": result.get("messages", []),
+                "current_step": CallStep.PROMISE_TO_PAY.value
+            },
+            goto="__end__"
+        )
 
-        update = {
-            "messages": messages,
-            "payment_secured": payment_secured,
-            "payment_method": payment_method,
-            "current_step": CallStep.PROMISE_TO_PAY.value
-        }
-        
-        # CRITICAL: Only handoff if step is complete (payment secured)
-        if is_step_complete(CallStep.PROMISE_TO_PAY.value, state, result):
-            next_step = get_next_step_after_completion(CallStep.PROMISE_TO_PAY.value, state, result)
-            update["current_step"] = next_step
-            logger.info(f"Promise to pay COMPLETE - payment secured, handing off to {next_step}")
-            return Command(update=update, goto=next_step)
-        
-        # Step not complete - no payment secured, wait for more interaction
-        logger.info("Promise to pay INCOMPLETE - no payment secured, waiting for more interaction")
-        return Command(update=update, goto="__end__")
-
-    def debicheck_setup_node(state: CallCenterAgentState) -> Command[Literal["subscription_reminder"]]:
-        """DebiCheck setup step - always handoff to subscription reminder after explanation."""
-        
-        # Only proceed if we're actually in debicheck setup step
+    def debicheck_setup_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """DebiCheck setup step - return to __end__ after one turn."""
         if state.get("current_step") != CallStep.DEBICHECK_SETUP.value:
-            logger.warning(f"DebiCheck setup called but current_step is {state.get('current_step')}")
             return Command(update={}, goto="__end__")
         
-        result = agents["debicheck_setup"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Always handoff to subscription reminder after explaining DebiCheck
-        next_step = CallStep.SUBSCRIPTION_REMINDER.value
-        logger.info(f"DebiCheck setup COMPLETE - handing off to {next_step}")
-        
+        result = debicheck_setup_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.DEBICHECK_SETUP.value
             },
-            goto=next_step
+            goto="__end__"
         )
 
-    def payment_portal_node(state: CallCenterAgentState) -> Command[Literal["subscription_reminder"]]:
-        """Payment portal step - always handoff to subscription reminder after guidance."""
-        
-        # Only proceed if we're actually in payment portal step
+    def payment_portal_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Payment portal step - return to __end__ after one turn."""
         if state.get("current_step") != CallStep.PAYMENT_PORTAL.value:
-            logger.warning(f"Payment portal called but current_step is {state.get('current_step')}")
             return Command(update={}, goto="__end__")
         
-        result = agents["payment_portal"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Always handoff to subscription reminder after portal guidance
-        next_step = CallStep.SUBSCRIPTION_REMINDER.value
-        logger.info(f"Payment portal COMPLETE - handing off to {next_step}")
-        
+        result = payment_portal_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.PAYMENT_PORTAL.value
             },
-            goto=next_step
+            goto="__end__"
         )
 
-    def subscription_reminder_node(state: CallCenterAgentState) -> Command[Literal["client_details_update"]]:
-        """Subscription reminder step - always handoff to client details update."""
-        
-        # Only proceed if we're actually in subscription reminder step
+    def subscription_reminder_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Subscription reminder step - return to __end__ after one turn."""
         if state.get("current_step") != CallStep.SUBSCRIPTION_REMINDER.value:
-            logger.warning(f"Subscription reminder called but current_step is {state.get('current_step')}")
             return Command(update={}, goto="__end__")
         
-        result = agents["subscription_reminder"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Always handoff to client details update
-        next_step = CallStep.CLIENT_DETAILS_UPDATE.value
-        logger.info(f"Subscription reminder COMPLETE - handing off to {next_step}")
-        
+        result = subscription_reminder_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.SUBSCRIPTION_REMINDER.value
             },
-            goto=next_step
+            goto="__end__"
         )
 
-    def client_details_update_node(state: CallCenterAgentState) -> Command[Literal["referrals"]]:
-        """Client details update step - always handoff to referrals."""
-        
-        # Only proceed if we're actually in client details update step
+    def client_details_update_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Client details update step - return to __end__ after one turn."""
         if state.get("current_step") != CallStep.CLIENT_DETAILS_UPDATE.value:
-            logger.warning(f"Client details update called but current_step is {state.get('current_step')}")
             return Command(update={}, goto="__end__")
         
-        result = agents["client_details_update"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Always handoff to referrals
-        next_step = CallStep.REFERRALS.value
-        logger.info(f"Client details update COMPLETE - handing off to {next_step}")
-        
+        result = client_details_update_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.CLIENT_DETAILS_UPDATE.value
             },
-            goto=next_step
+            goto="__end__"
         )
 
-    def referrals_node(state: CallCenterAgentState) -> Command[Literal["further_assistance"]]:
-        """Referrals step - always handoff to further assistance."""
-        
-        # Only proceed if we're actually in referrals step
+    def referrals_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Referrals step - return to __end__ after one turn."""
         if state.get("current_step") != CallStep.REFERRALS.value:
-            logger.warning(f"Referrals called but current_step is {state.get('current_step')}")
             return Command(update={}, goto="__end__")
         
-        result = agents["referrals"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Always handoff to further assistance
-        next_step = CallStep.FURTHER_ASSISTANCE.value
-        logger.info(f"Referrals COMPLETE - handing off to {next_step}")
-        
+        result = referrals_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.REFERRALS.value
             },
-            goto=next_step
+            goto="__end__"
         )
 
-    def further_assistance_node(state: CallCenterAgentState) -> Command[Literal["closing"]]:
-        """Further assistance step - always handoff to closing."""
-        
-        # Only proceed if we're actually in further assistance step
+    def further_assistance_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Further assistance step - return to __end__ after one turn."""
         if state.get("current_step") != CallStep.FURTHER_ASSISTANCE.value:
-            logger.warning(f"Further assistance called but current_step is {state.get('current_step')}")
             return Command(update={}, goto="__end__")
         
-        result = agents["further_assistance"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Always handoff to closing
-        next_step = CallStep.CLOSING.value
-        logger.info(f"Further assistance COMPLETE - handing off to {next_step}")
-        
+        result = further_assistance_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.FURTHER_ASSISTANCE.value
             },
-            goto=next_step
+            goto="__end__"
         )
 
     def query_resolution_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
         """Query resolution - answer briefly then return to main goal."""
-        result = agents["query_resolution"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
+        result = query_resolution_agent.invoke(state)
         return_to_step = state.get("return_to_step", CallStep.CLOSING.value)
         
-        # Always return to previous step after query resolution
-        logger.info(f"Query resolution COMPLETE - returning to {return_to_step}")
-        
+        logger.info(f"Query resolution complete - returning to {return_to_step}")
         return Command(
             update={
-                "messages": messages,
+                "messages": result.get("messages", []),
                 "current_step": return_to_step,
                 "return_to_step": None
             },
             goto="__end__"
         )
 
-    def escalation_node(state: CallCenterAgentState) -> Command[Literal["closing"]]:
-        """Escalation step - always handoff to closing."""
-        result = agents["escalation"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Always handoff to closing after escalation
-        next_step = CallStep.CLOSING.value
-        logger.info(f"Escalation COMPLETE - handing off to {next_step}")
-        
+    def escalation_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Escalation step - return to __end__ after handling."""
+        result = escalation_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.CLOSING.value  # Route to closing after escalation
             },
-            goto=next_step
+            goto="__end__"
         )
 
-    def cancellation_node(state: CallCenterAgentState) -> Command[Literal["closing"]]:
-        """Cancellation step - always handoff to closing."""
-        result = agents["cancellation"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Always handoff to closing after cancellation
-        next_step = CallStep.CLOSING.value
-        logger.info(f"Cancellation COMPLETE - handing off to {next_step}")
-        
+    def cancellation_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
+        """Cancellation step - return to __end__ after handling."""
+        result = cancellation_agent.invoke(state)
         return Command(
             update={
-                "messages": messages, 
-                "current_step": next_step
+                "messages": result.get("messages", []),
+                "current_step": CallStep.CLOSING.value  # Route to closing after cancellation
             },
-            goto=next_step
+            goto="__end__"
         )
 
     def closing_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
         """Closing step - ends the call."""
-        result = agents["closing"].invoke(state)
-        messages = result.get("messages", state.get("messages", []))
-        
-        # Call is complete - set ended flag
-        logger.info("Closing COMPLETE - call ended")
-        
+        result = closing_agent.invoke(state)
+        logger.info("Closing complete - call ended")
         return Command(
             update={
-                "messages": messages,
+                "messages": result.get("messages", []),
                 "is_call_ended": True,
                 "current_step": CallStep.CLOSING.value
             },

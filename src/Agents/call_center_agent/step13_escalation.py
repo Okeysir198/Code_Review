@@ -33,15 +33,15 @@ def create_escalation_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create an escalation agent for debt collection calls."""
+    """Create an escalation agent."""
     
-    agent_tools = [
-        add_client_note,
-        save_call_disposition
-    ] + (tools or [])
+    agent_tools = [add_client_note, save_call_disposition] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to create escalation ticket and prepare response."""
+        
+        import uuid
+        from datetime import datetime
         
         # Generate ticket details
         ticket_number = f"ESC{datetime.now().strftime('%Y%m%d%H%M')}{str(uuid.uuid4())[:4].upper()}"
@@ -72,7 +72,6 @@ def create_escalation_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for escalation step."""
         parameters = prepare_parameters(
             client_data=client_data,
             current_step=CallStep.ESCALATION.value,
@@ -80,9 +79,8 @@ def create_escalation_agent(
             script_type=script_type,
             agent_name=agent_name
         )
-        
         prompt_content = get_step_prompt(CallStep.ESCALATION.value, parameters)
-        return [SystemMessage(content=prompt_content)] + state['messages']
+        return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
         model=model,
