@@ -1,26 +1,22 @@
 # ./src/Agents/call_center_agent/step06_debicheck_setup.py
 """
-DebiCheck Setup Agent - Explains DebiCheck process and creates mandates.
-SIMPLIFIED: No query detection - router handles all routing decisions.
+DebiCheck Setup Agent - Optimized with only pre-processing.
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
-from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
+from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters, calculate_outstanding_amount
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 
 # Import relevant database tools
 from src.Database.CartrackSQLDatabase import (
     get_client_debit_mandates,
-    create_mandate,
-    get_client_banking_details,
     add_client_note
 )
 
@@ -34,25 +30,16 @@ def create_debicheck_setup_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a DebiCheck setup agent for debt collection calls."""
+    """Create a DebiCheck setup agent."""
     
-    # Add relevant database tools
-    agent_tools = [
-        get_client_debit_mandates,
-        create_mandate,
-        get_client_banking_details,
-        add_client_note
-    ] + (tools or [])
+    agent_tools = [get_client_debit_mandates, add_client_note] + (tools or [])
     
-    def pre_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Command[Literal["agent"]]:
-        """Pre-process to check existing mandates and prepare DebiCheck setup."""
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
+        """Prepare DebiCheck setup context."""
         
         try:
-            # Get existing debit mandates
+            # Get existing mandates
             existing_mandates = client_data.get('existing_mandates', [])
-            
-            # Get banking details
-            banking_details = client_data.get('banking_details', {})
             
             # Check for active mandates
             active_mandates = []
@@ -62,19 +49,20 @@ def create_debicheck_setup_agent(
                     if m.get("debicheck_mandate_state") in ["Created", "Authenticated"]
                 ]
             
+            # Get outstanding amount
+            account_aging = client_data.get("account_aging", {})
+            outstanding_amount = calculate_outstanding_amount(account_aging)
+            
+            # Calculate amount with DebiCheck fee
+            mandate_fee = 10.0
+            total_amount = outstanding_amount + mandate_fee
+            
             # Determine if new mandate needed
             needs_new_mandate = len(active_mandates) == 0
             
-            # Get payment arrangement details from state
-            payment_arrangement = getattr(state, 'payment_arrangement', {})
-            amount = payment_arrangement.get('amount', 0)
-            
-            # Calculate amount with fee
-            mandate_fee = 10.0
-            total_amount = amount + mandate_fee if amount else mandate_fee
-            
-            # Prepare mandate creation if needed
-            mandate_ready = needs_new_mandate and banking_details and amount > 0
+            # Get banking details
+            banking_details = client_data.get('banking_details', {})
+            mandate_ready = needs_new_mandate and banking_details and outstanding_amount > 0
             
             return Command(
                 update={
@@ -83,7 +71,8 @@ def create_debicheck_setup_agent(
                     "needs_new_mandate": needs_new_mandate,
                     "mandate_ready": mandate_ready,
                     "amount_with_fee": f"R {total_amount:.2f}",
-                    "mandate_fee": mandate_fee
+                    "mandate_fee": mandate_fee,
+                    "outstanding_float": outstanding_amount
                 },
                 goto="agent"
             )
@@ -101,82 +90,6 @@ def create_debicheck_setup_agent(
                 },
                 goto="agent"
             )
-
-    def post_processing_node(state: CallCenterAgentState, config: RunnableConfig) -> Dict[str, Any]:
-        """Post-process to create mandate if client agreed to DebiCheck."""
-        
-        try:
-            # Check if client agreed to DebiCheck from conversation
-            recent_messages = state.get("messages", [])[-3:] if state.get("messages") else []
-            
-            client_agreed = False
-            mandate_created = False
-            mandate_id = None
-            user_id = client_data.get("user_id")
-            
-            # Look for client agreement
-            for msg in recent_messages:
-                if hasattr(msg, 'content') and hasattr(msg, 'type'):
-                    content = msg.content.lower()
-                    
-                    # Client agreement indicators
-                    if (msg.type == "human" and 
-                        any(phrase in content for phrase in [
-                            "yes", "okay", "ok", "agree", "approve", "go ahead", "fine"
-                        ]) and
-                        not any(phrase in content for phrase in [
-                            "no", "don't", "refuse", "decline"
-                        ])):
-                        client_agreed = True
-                        break
-            
-            # Create mandate if client agreed and we have the necessary info
-            if client_agreed and state.get('mandate_ready', False):
-                try:
-                    # Get payment amount from state
-                    payment_arrangement = getattr(state, 'payment_arrangement', {})
-                    amount = payment_arrangement.get('amount', 0)
-                    
-                    if amount > 0:
-                        # Create the mandate
-                        mandate_result = create_mandate.invoke({
-                            "user_id": int(user_id),
-                            "service": "PTP",
-                            "amount": amount,
-                            "collection_date": None,  # For recurring mandate
-                            "authentication_code": None
-                        })
-                        
-                        if mandate_result.get("success"):
-                            mandate_created = True
-                            mandate_id = mandate_result.get("mandate_id")
-                            
-                            # Add note about mandate creation
-                            add_client_note.invoke({
-                                "user_id": user_id,
-                                "note_text": f"DebiCheck mandate created. ID: {mandate_id}, Amount: R{amount}"
-                            })
-                            
-                except Exception as mandate_error:
-                    if verbose:
-                        print(f"Error creating mandate: {mandate_error}")
-            
-            return {
-                "client_agreed_debicheck": client_agreed,
-                "mandate_created": mandate_created,
-                "mandate_id": mandate_id,
-                "debicheck_setup_complete": mandate_created
-            }
-            
-        except Exception as e:
-            if verbose:
-                print(f"Error in DebiCheck post-processing: {e}")
-            
-            return {
-                "client_agreed_debicheck": False,
-                "mandate_created": False,
-                "debicheck_setup_complete": False
-            }
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for DebiCheck setup step."""
@@ -196,7 +109,7 @@ def create_debicheck_setup_agent(
         prompt=dynamic_prompt,
         tools=agent_tools,
         pre_processing_node=pre_processing_node,
-        post_processing_node=post_processing_node,
+        # NO post_processing_node - removed as per instructions
         state_schema=CallCenterAgentState,
         verbose=verbose,
         config=config,
