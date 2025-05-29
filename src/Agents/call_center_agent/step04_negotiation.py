@@ -111,7 +111,7 @@ Handle objections and explain consequences using aging-appropriate urgency and t
 </consequences_framework>
 
 <aging_specific_objection_responses>
-{chr(10).join([f"- \"{key}\": \"{value}\"" for key, value in objection_responses.items()])}
+{chr(10).join([f"- '{key}': '{value}'" for key, value in objection_responses.items()])}
 </aging_specific_objection_responses>
 
 <urgency_adaptation>

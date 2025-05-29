@@ -113,7 +113,7 @@ Guide client through payment portal using aging-appropriate urgency and support 
 </aging_specific_guidance>
 
 <step_by_step_instructions>
-{chr(10).join([f"{i+1}. \"{instruction}\"" for i, instruction in enumerate(instructions)])}
+{chr(10).join([f"{i+1}. '{instruction}'" for i, instruction in enumerate(instructions)])}
 </step_by_step_instructions>
 
 <urgency_adaptation>

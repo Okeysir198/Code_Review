@@ -15,6 +15,10 @@ from src.Database.CartrackSQLDatabase import (
     get_client_account_aging,
     get_client_banking_details,
     get_client_subscription_amount,
+    get_client_payment_history,
+    get_client_account_statement,
+    get_client_debit_mandates
+
 )
 
 logger = logging.getLogger(__name__)
@@ -59,6 +63,7 @@ def _fetch_concurrent_data(user_id: str) -> Dict[str, Any]:
         'account_aging': lambda: get_client_account_aging.invoke(user_id),
         'banking_details': lambda: get_client_banking_details.invoke(user_id),
         'subscription': lambda: get_client_subscription_amount.invoke(user_id),
+        'payment_history': lambda: get_client_payment_history.invoke(user_id),
     }
     
     results = {}
@@ -96,6 +101,7 @@ def _fetch_concurrent_data(user_id: str) -> Dict[str, Any]:
         "account_aging": _extract_first_item(results['account_aging']),
         "banking_details": _extract_first_item(results['banking_details']),
         "subscription": results['subscription'] or {},
+        "payment_history" : results['payment_history'], 
         "loaded_at": datetime.now(),
         "failed_tasks": failed_tasks if failed_tasks else None
     }

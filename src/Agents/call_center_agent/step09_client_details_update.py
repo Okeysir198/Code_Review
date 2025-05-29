@@ -114,7 +114,7 @@ Update client contact information using aging-appropriate justification and urge
 </aging_specific_approach>
 
 <verification_process>
-{chr(10).join([f"{i+1}. \"{step}\"" for i, step in enumerate(verification_process)])}
+{chr(10).join([f"{i+1}. '{step}'" for i, step in enumerate(verification_process)])}
 </verification_process>
 
 <urgency_context>

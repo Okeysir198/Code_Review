@@ -97,9 +97,29 @@ def get_query_resolution_prompt(client_data: Dict[str, Any], state: Dict[str, An
     
     urgency_level = aging_context['urgency']
     response_examples = response_examples_by_urgency.get(urgency_level, response_examples_by_urgency["Medium"])
-    
+
     # Base prompt
-    base_prompt = f"""<role>
+    base_prompt_un_verified = f"""<role>
+You are a professional debt collection specialist from Cartrack Account Department.
+</role>
+
+<context>
+- Client: {client_full_name}
+</context>
+
+<task>
+Answer question BRIEFLY then redirect to verification step.
+</task>
+
+<style>
+- {response_examples['max_words']}
+- {aging_context['tone']}
+- Stay focused on payment goal with appropriate urgency
+- Natural, conversational tone
+- Use exact redirect message
+</style>"""
+    
+    base_prompt_verified = f"""<role>
 You are a professional debt collection specialist from Cartrack.
 </role>
 
@@ -131,7 +151,6 @@ A: "{response_examples['payment_question']}"
 
 <redirect_target>
 Return to: {return_to_step}
-Redirect message: "{redirect_message}"
 </redirect_target>
 
 <urgency_adaptation>
@@ -145,6 +164,14 @@ Redirect message: "{redirect_message}"
 - Natural, conversational tone
 - Use exact redirect message
 </style>"""
+    # Context
+    name_verification_status = state.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
+    details_verification_status = state.get("details_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
+    if name_verification_status != VerificationStatus.VERIFIED or details_verification_status != VerificationStatus.VERIFIED:
+        base_prompt = base_prompt_un_verified
+        return base_prompt
+    else:
+        base_prompt = base_prompt_verified
 
     # Enhance with script content
     return ScriptManager.get_script_enhanced_prompt(
@@ -166,7 +193,8 @@ def create_query_resolution_agent(
 ) -> CompiledGraph:
     """Create a query resolution agent with aging-aware scripts."""
     
-    agent_tools = [add_client_note] + (tools or [])
+    # agent_tools = [add_client_note] + (tools or [])
+    agent_tools = (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         # Get the return step
@@ -246,6 +274,7 @@ def create_query_resolution_agent(
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         prompt_content = get_query_resolution_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
+        print(prompt_content)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
