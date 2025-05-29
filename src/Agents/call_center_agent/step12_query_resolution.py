@@ -1,10 +1,10 @@
 # ===============================================================================
-# STEP 12: QUERY RESOLUTION AGENT - Enhanced with Aging-Aware Prompts
+# STEP 12: QUERY RESOLUTION AGENT - Enhanced with Call Scripts & 2-Step Verification
 # ===============================================================================
 
 # src/Agents/call_center_agent/step12_query_resolution.py
 """
-Query Resolution Agent - Enhanced with aging-aware script integration
+Query Resolution Agent - Enhanced with call scripts and 2-step verification using basic_agent
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -20,8 +20,8 @@ from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as
 
 from src.Database.CartrackSQLDatabase import add_client_note
 
-def get_query_resolution_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-    """Generate aging-aware query resolution prompt."""
+def get_query_resolution_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
+    """Generate query resolution prompt with call scripts and 2-step verification."""
     
     # Determine script type from aging
     account_aging = client_data.get("account_aging", {})
@@ -30,101 +30,170 @@ def get_query_resolution_prompt(client_data: Dict[str, Any], state: Dict[str, An
     
     # Extract client info
     client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
-    
-    # Calculate outstanding amount
     outstanding_float = calculate_outstanding_amount(account_aging)
     outstanding_amount = format_currency(outstanding_float)
     
     # Get redirect info
     return_to_step = state.get("return_to_step", "closing")
     redirect_message = state.get("redirect_message", "Anything else?")
+    last_client_question = state.get("last_client_question", "")
     
-    # Build aging-specific redirect strategies
-    redirect_strategies_by_category = {
-        "First Missed Payment": {
-            "payment_redirect": f"Now, can we arrange {outstanding_amount} today?",
-            "service_question": f"That's how it works. Can we debit {outstanding_amount} to restore services?",
-            "tone": "helpful and solution-focused"
-        },
-        "Failed Promise to Pay": {
-            "payment_redirect": f"Let's honor your commitment with {outstanding_amount} now",
-            "service_question": f"Services restore once you pay the {outstanding_amount} as agreed",
-            "tone": "accountability-focused"
-        },
-        "2-3 Months Overdue": {
-            "payment_redirect": f"We need {outstanding_amount} immediately to prevent escalation",
-            "service_question": f"Services suspended until {outstanding_amount} is paid",
-            "tone": "urgent and direct"
-        },
-        "Pre-Legal 120+ Days": {
-            "payment_redirect": f"{outstanding_amount} required now to prevent court action",
-            "service_question": f"Services and legal issues resolved with {outstanding_amount} payment",
-            "tone": "serious and final opportunity"
-        },
-        "Legal 150+ Days": {
-            "payment_redirect": f"Legal demand for {outstanding_amount} - immediate payment required",
-            "service_question": f"Court proceedings stop only with {outstanding_amount} payment",
-            "tone": "legal authority and urgency"
-        }
-    }
+    # Check verification status (2-step verification)
+    name_verified = state.get("name_verification_status") == VerificationStatus.VERIFIED.value
+    details_verified = state.get("details_verification_status") == VerificationStatus.VERIFIED.value
     
-    category = aging_context['category']
-    redirect_strategy = redirect_strategies_by_category.get(category, redirect_strategies_by_category["First Missed Payment"])
-    
-    # Build urgency-appropriate response lengths and examples
-    response_examples_by_urgency = {
-        "Medium": {
-            "cartrack_question": f"Vehicle tracking and security. Now, can we arrange {outstanding_amount} today?",
-            "payment_question": f"Bank declined it. Can we try a different method for {outstanding_amount}?",
-            "max_words": "15 words maximum"
-        },
-        "High": {
-            "cartrack_question": f"Tracking system. {outstanding_amount} needed urgently to restore services.",
-            "payment_question": f"Payment failed. {outstanding_amount} required immediately.",
-            "max_words": "12 words maximum"
-        },
-        "Very High": {
-            "cartrack_question": f"Vehicle security. {outstanding_amount} needed now to prevent escalation.",
-            "payment_question": f"Payment issue. {outstanding_amount} required to stop legal action.",
-            "max_words": "10 words maximum"
-        },
-        "Critical": {
-            "cartrack_question": f"Security system. Pay {outstanding_amount} now to stop court proceedings.",
-            "payment_question": f"Payment failed. {outstanding_amount} required immediately for legal compliance.",
-            "max_words": "8 words maximum"
-        }
-    }
-    
-    urgency_level = aging_context['urgency']
-    response_examples = response_examples_by_urgency.get(urgency_level, response_examples_by_urgency["Medium"])
-
-    # Base prompt
-    base_prompt_un_verified = f"""<role>
+    # === STAGE 1: NAME VERIFICATION NEEDED ===
+    if not name_verified:
+        base_prompt = f"""<role>
 You are a professional debt collection specialist from Cartrack Account Department.
 </role>
 
 <context>
-- Client: {client_full_name}
+- Client called but NOT name verified yet
+- Target Client: {client_full_name}
+- Outstanding: {outstanding_amount}
+- Verification Stage: Name confirmation required
 </context>
 
 <task>
-Answer question BRIEFLY then redirect to verification step.
+Answer client question BRIEFLY (max 8 words) then redirect to name verification.
+NO account details until name verified.
 </task>
 
+<client_question>
+"{last_client_question}"
+</client_question>
+
+<verification_redirect>
+"Are you {client_full_name}?"
+</verification_redirect>
+
+<examples>
+Q: "How does Cartrack work?" → "Vehicle tracking system. Are you {client_full_name}?"
+Q: "Why are you calling?" → "Account matter. Are you {client_full_name}?"
+Q: "What do I owe?" → "Account inquiry. Are you {client_full_name}?"
+Q: "Can I get extension?" → "Need to discuss. Are you {client_full_name}?"
+</examples>
+
 <style>
-- {response_examples['max_words']}
-- {aging_context['tone']}
-- Stay focused on payment goal with appropriate urgency
+- Professional and courteous
+- Maximum 8 words before verification redirect
+- No account specifics until name verified
+- Always end with exact name verification question
 - Natural, conversational tone
-- Use exact redirect message
+- Do not say "sure" or "yes"..., just answer quickly
 </style>"""
+        return base_prompt
     
-    base_prompt_verified = f"""<role>
-You are a professional debt collection specialist from Cartrack.
+    # === STAGE 2: DETAILS VERIFICATION NEEDED ===
+    elif not details_verified:
+        base_prompt = f"""<role>
+You are a professional debt collection specialist from Cartrack Account Department.
 </role>
 
 <context>
-- Client: {client_full_name}
+- Client: {client_full_name} (NAME VERIFIED ✓)
+- Outstanding: {outstanding_amount}
+- Verification Stage: Details/ID confirmation required
+</context>
+
+<task>
+Answer client question BRIEFLY (max 10 words) then redirect to details verification.
+Basic account info OK since name verified.
+</task>
+
+<client_question>
+"{last_client_question}"
+</client_question>
+
+<verification_redirect>
+"Your ID number please?"
+</verification_redirect>
+
+<examples>
+Q: "How much do I owe?" → "Outstanding is {outstanding_amount}. Your ID number please?"
+Q: "When is payment due?" → "Payment overdue. Your ID number please?"
+Q: "Can I get extension?" → "Need to discuss options. Your ID number please?"
+Q: "How does Cartrack work?" → "Vehicle tracking service. Your ID number please?"
+</examples>
+
+<style>
+- Professional and focused
+- Maximum 10 words before verification redirect
+- Can mention amounts/basic facts since name verified
+- Always end with ID verification request
+- Maintain urgency appropriate to account status
+- Do not say "sure" or "yes"..., just answer quickly
+</style>"""
+        return base_prompt
+    
+    # === STAGE 3: FULLY VERIFIED - USE CALL SCRIPTS SYSTEM ===
+    else:
+        # Build aging-specific redirect strategies using call scripts
+        redirect_strategies_by_category = {
+            "First Missed Payment": {
+                "payment_redirect": f"Now, can we arrange {outstanding_amount} today?",
+                "service_question": f"That's how it works. Can we debit {outstanding_amount} to restore services?",
+                "tone": "helpful and solution-focused"
+            },
+            "Failed Promise to Pay": {
+                "payment_redirect": f"Let's honor your commitment with {outstanding_amount} now",
+                "service_question": f"Services restore once you pay the {outstanding_amount} as agreed",
+                "tone": "accountability-focused"
+            },
+            "2-3 Months Overdue": {
+                "payment_redirect": f"We need {outstanding_amount} immediately to prevent escalation",
+                "service_question": f"Services suspended until {outstanding_amount} is paid",
+                "tone": "urgent and direct"
+            },
+            "Pre-Legal 120+ Days": {
+                "payment_redirect": f"{outstanding_amount} required now to prevent court action",
+                "service_question": f"Services and legal issues resolved with {outstanding_amount} payment",
+                "tone": "serious and final opportunity"
+            },
+            "Legal 150+ Days": {
+                "payment_redirect": f"Legal demand for {outstanding_amount} - immediate payment required",
+                "service_question": f"Court proceedings stop only with {outstanding_amount} payment",
+                "tone": "legal authority and urgency"
+            }
+        }
+        
+        category = aging_context['category']
+        redirect_strategy = redirect_strategies_by_category.get(category, redirect_strategies_by_category["First Missed Payment"])
+        
+        # Build urgency-appropriate response lengths and examples
+        response_examples_by_urgency = {
+            "Medium": {
+                "cartrack_question": f"Vehicle tracking and security. Now, can we arrange {outstanding_amount} today?",
+                "payment_question": f"Bank declined it. Can we try a different method for {outstanding_amount}?",
+                "max_words": "15 words maximum"
+            },
+            "High": {
+                "cartrack_question": f"Tracking system. {outstanding_amount} needed urgently to restore services.",
+                "payment_question": f"Payment failed. {outstanding_amount} required immediately.",
+                "max_words": "12 words maximum"
+            },
+            "Very High": {
+                "cartrack_question": f"Vehicle security. {outstanding_amount} needed now to prevent escalation.",
+                "payment_question": f"Payment issue. {outstanding_amount} required to stop legal action.",
+                "max_words": "10 words maximum"
+            },
+            "Critical": {
+                "cartrack_question": f"Security system. Pay {outstanding_amount} now to stop court proceedings.",
+                "payment_question": f"Payment failed. {outstanding_amount} required immediately for legal compliance.",
+                "max_words": "8 words maximum"
+            }
+        }
+        
+        urgency_level = aging_context['urgency']
+        response_examples = response_examples_by_urgency.get(urgency_level, response_examples_by_urgency["Medium"])
+
+        base_prompt = f"""<role>
+You are a professional debt collection specialist from Cartrack Account Department.
+</role>
+
+<context>
+- Client: {client_full_name} (FULLY VERIFIED ✓)
 - Outstanding: {outstanding_amount}
 - Aging Category: {category}
 - Urgency Level: {urgency_level}
@@ -134,6 +203,10 @@ You are a professional debt collection specialist from Cartrack.
 <task>
 Answer question BRIEFLY then redirect to payment using aging-appropriate urgency.
 </task>
+
+<client_question>
+"{last_client_question}"
+</client_question>
 
 <aging_specific_examples>
 Q: "How does Cartrack work?"
@@ -162,25 +235,17 @@ Return to: {return_to_step}
 - {aging_context['tone']}
 - Stay focused on payment goal with appropriate urgency
 - Natural, conversational tone
-- Use exact redirect message
+- Use aging-appropriate redirect message
 </style>"""
-    # Context
-    name_verification_status = state.get("name_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
-    details_verification_status = state.get("details_verification_status", VerificationStatus.INSUFFICIENT_INFO.value)
-    if name_verification_status != VerificationStatus.VERIFIED or details_verification_status != VerificationStatus.VERIFIED:
-        base_prompt = base_prompt_un_verified
-        return base_prompt
-    else:
-        base_prompt = base_prompt_verified
 
-    # Enhance with script content
-    return ScriptManager.get_script_enhanced_prompt(
-        base_prompt=base_prompt,
-        script_type=script_type,
-        step=ScriptCallStep.QUERY_RESOLUTION,
-        client_data=client_data,
-        state=state
-    )
+        # Enhance with call scripts system for fully verified users
+        return ScriptManager.get_script_enhanced_prompt(
+            base_prompt=base_prompt,
+            script_type=script_type,
+            step=ScriptCallStep.QUERY_RESOLUTION,
+            client_data=client_data,
+            state=state
+        )
 
 def create_query_resolution_agent(
     model: BaseChatModel,
@@ -191,9 +256,8 @@ def create_query_resolution_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a query resolution agent with aging-aware scripts."""
+    """Create a query resolution agent with call scripts and 2-step verification."""
     
-    # agent_tools = [add_client_note] + (tools or [])
     agent_tools = (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
@@ -228,33 +292,48 @@ def create_query_resolution_agent(
                 query_type = category
                 break
         
-        # Check verification status
+        # Check verification status (2-step verification)
         name_verified = state.get("name_verification_status") == VerificationStatus.VERIFIED.value
         details_verified = state.get("details_verification_status") == VerificationStatus.VERIFIED.value
-        is_fully_verified = name_verified and details_verified
         
-        # Determine redirect strategy based on verification and urgency
+        # Determine redirect strategy based on verification stage
         account_aging = client_data.get("account_aging", {})
         script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
         aging_context = ScriptManager.get_aging_context(script_type)
         
         if not name_verified:
+            # Stage 1: Name verification needed
             redirect_strategy = "verify_name"
             redirect_target = CallStep.NAME_VERIFICATION.value
             redirect_message = f"Are you {get_safe_value(client_data, 'profile.client_info.client_full_name', 'Client')}?"
+            verification_stage = "name_verification_needed"
         elif not details_verified:
+            # Stage 2: Details verification needed
             redirect_strategy = "verify_details"
             redirect_target = CallStep.DETAILS_VERIFICATION.value
             redirect_message = "Your ID number please?"
-        elif return_to_step in [CallStep.PROMISE_TO_PAY.value, CallStep.NEGOTIATION.value]:
-            redirect_strategy = "secure_payment"
-            redirect_target = return_to_step
-            outstanding_amount = state.get("outstanding_amount", "the amount")
-            redirect_message = f"Now, can we arrange {outstanding_amount} today?"
+            verification_stage = "details_verification_needed"
         else:
-            redirect_strategy = "continue_call"
-            redirect_target = return_to_step
-            redirect_message = "Anything else I can help with?"
+            # Stage 3: Fully verified - apply aging-aware logic
+            verification_stage = "fully_verified"
+            if return_to_step in [CallStep.PROMISE_TO_PAY.value, CallStep.NEGOTIATION.value]:
+                redirect_strategy = "secure_payment"
+                redirect_target = return_to_step
+                outstanding_amount = state.get("outstanding_amount", format_currency(calculate_outstanding_amount(account_aging)))
+                
+                # Use aging-appropriate redirect
+                if aging_context['urgency'] == "Critical":
+                    redirect_message = f"Pay {outstanding_amount} now to stop court proceedings."
+                elif aging_context['urgency'] == "Very High":
+                    redirect_message = f"{outstanding_amount} required now to prevent escalation."
+                elif aging_context['urgency'] == "High":
+                    redirect_message = f"We need {outstanding_amount} immediately to prevent escalation."
+                else:
+                    redirect_message = f"Now, can we arrange {outstanding_amount} today?"
+            else:
+                redirect_strategy = "continue_call"
+                redirect_target = return_to_step
+                redirect_message = "Anything else I can help with?"
         
         return Command(
             update={
@@ -262,7 +341,10 @@ def create_query_resolution_agent(
                 "redirect_strategy": redirect_strategy,
                 "redirect_target": redirect_target,
                 "redirect_message": redirect_message,
-                "is_fully_verified": is_fully_verified,
+                "verification_stage": verification_stage,
+                "is_name_verified": name_verified,
+                "is_details_verified": details_verified,
+                "is_fully_verified": name_verified and details_verified,
                 "last_client_question": last_client_message,
                 "return_to_step": return_to_step,
                 "aging_category": aging_context['category'],
@@ -273,8 +355,12 @@ def create_query_resolution_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        prompt_content = get_query_resolution_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
-        print(prompt_content)
+        prompt_content = get_query_resolution_prompt(client_data, agent_name, state.to_dict() if hasattr(state, 'to_dict') else state)
+        print(f"Prompt: {prompt_content}")
+        if verbose:
+            print("=== QUERY RESOLUTION PROMPT ===")
+            print(prompt_content)
+            print("===============================")
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

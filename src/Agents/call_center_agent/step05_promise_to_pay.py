@@ -19,7 +19,7 @@ from src.Database.CartrackSQLDatabase import (
     add_client_note
 )
 
-def get_promise_to_pay_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+def get_promise_to_pay_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware promise to pay prompt."""
     
     # Determine script type from aging
@@ -85,7 +85,7 @@ def get_promise_to_pay_prompt(client_data: Dict[str, Any], state: Dict[str, Any]
     
     # Base prompt
     base_prompt = f"""<role>
-You are a professional debt collection specialist at Cartrack's Accounts Department.
+You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
 </role>
 
 <client_context>
@@ -191,7 +191,8 @@ def create_promise_to_pay_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        prompt_content = get_promise_to_pay_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
+        prompt_content = get_promise_to_pay_prompt(client_data, agent_name, state.to_dict() if hasattr(state, 'to_dict') else state)
+        print(f"Prompt: {prompt_content}")
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

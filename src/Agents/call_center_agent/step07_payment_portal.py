@@ -16,7 +16,7 @@ from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as
 
 from src.Database.CartrackSQLDatabase import generate_sms_payment_url, add_client_note
 
-def get_payment_portal_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+def get_payment_portal_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware payment portal prompt."""
     
     # Determine script type from aging
@@ -93,7 +93,7 @@ def get_payment_portal_prompt(client_data: Dict[str, Any], state: Dict[str, Any]
     
     # Base prompt
     base_prompt = f"""<role>
-You are a professional debt collection specialist from Cartrack.
+You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
 </role>
 
 <context>
@@ -200,7 +200,8 @@ def create_payment_portal_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        prompt_content = get_payment_portal_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
+        prompt_content = get_payment_portal_prompt(client_data, agent_name, state.to_dict() if hasattr(state, 'to_dict') else state)
+        print(f"Prompt: {prompt_content}")
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

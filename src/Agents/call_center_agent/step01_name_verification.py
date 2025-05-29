@@ -22,7 +22,7 @@ from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as
 
 logger = logging.getLogger(__name__)
 
-def get_name_verification_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+def get_name_verification_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware name verification prompt."""
     
     # Determine script type from aging
@@ -39,7 +39,7 @@ def get_name_verification_prompt(client_data: Dict[str, Any], state: Dict[str, A
     
     # Base prompt
     base_prompt = f"""<role>
-You are a professional debt collection specialist at Cartrack's Accounts Department.
+You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
 </role>
 
 <current_context>
@@ -62,7 +62,7 @@ Confirm client identity through name verification. Adapt tone to urgency level.
 
 **VERIFIED**: "Thank you for confirming. I'll need to verify security details before discussing your account"
 
-**THIRD_PARTY**: "Please have {client_full_name} call us urgently at 011 250 3000 regarding their Cartrack outstanding account matter"
+**THIRD_PARTY**: emphasize urgency "Please have {client_full_name} call us urgently at 011 250 3000 regarding their Cartrack outstanding account matter"
 
 **UNAVAILABLE**: "I understand. Please have {client_full_name} call 011 250 3000 urgently regarding your Cartrack outstanding account matter"
 
@@ -80,6 +80,7 @@ Confirm client identity through name verification. Adapt tone to urgency level.
 - {aging_context['tone']}
 - Build trust through competence
 - Match urgency to account status
+- Respond under 20 words
 </style>"""
 
     # Enhance with script content
@@ -138,7 +139,8 @@ def create_name_verification_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        prompt_content = get_name_verification_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
+        prompt_content = get_name_verification_prompt(client_data, agent_name, state.to_dict() if hasattr(state, 'to_dict') else state)
+        print(f"Prompt: {prompt_content}")
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

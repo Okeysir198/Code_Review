@@ -310,11 +310,11 @@ def create_call_center_agent(
         router_llm = ChatOllama(model="qwen2.5:3b-instruct", temperature=0, num_ctx=4096)
         prompt_content = _get_optimized_router_prompt(state)
         prompt = [SystemMessage(content=prompt_content)]
-        logger.info(f"Router prompt: {prompt}")
+        print(f"Router prompt: {prompt_content}")
         try:
             response = router_llm.invoke(prompt)
             classification = response.content.strip().upper()
-            logger.info(f"Router LLM classified: {classification} for step: {current_step}")
+            print(f"Router LLM classified: {classification} for step: {current_step}")
             
             # 3. Handle classification results
             if classification == "ESCALATION":

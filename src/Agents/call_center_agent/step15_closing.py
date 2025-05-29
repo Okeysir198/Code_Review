@@ -21,7 +21,7 @@ from src.Database.CartrackSQLDatabase import (
     update_payment_arrangements
 )
 
-def get_closing_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+def get_closing_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate closing specific prompt."""
     # Extract client info
     client_name = get_safe_value(client_data, "profile.client_info.first_name", "Client")
@@ -31,7 +31,7 @@ def get_closing_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> st
     outstanding_amount = state.get("outstanding_amount", "R 0.00")
     
     return f"""<role>
-You are a professional debt collection specialist from Cartrack.
+You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
 </role>
 
 <task>
@@ -109,7 +109,8 @@ def create_closing_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        prompt_content = get_closing_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
+        prompt_content = get_closing_prompt(client_data, agent_name, state.to_dict() if hasattr(state, 'to_dict') else state)
+        print(f"Prompt: {prompt_content}")
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
