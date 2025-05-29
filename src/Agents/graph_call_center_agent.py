@@ -14,6 +14,7 @@ from langchain_ollama import ChatOllama
 
 # Import existing components
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
+from src.Agents.call_center_agent.call_scripts import determine_script_type_from_aging
 
 # Import all specialized sub-agents (updated imports)
 from src.Agents.call_center_agent.step00_introduction import create_introduction_agent
@@ -40,12 +41,17 @@ logger = logging.getLogger(__name__)
 def create_call_center_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = "ratio_1_inflow",
+    script_type: str = None,
     agent_name: str = "AI Agent",
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
     """Create the complete call center agent workflow with optimized router."""
-    
+    # Auto-determine script type if not provided
+    if not script_type:
+        account_aging = client_data.get("account_aging", {})
+        script_type = determine_script_type_from_aging(account_aging, client_data)
+        logger.info(f"Auto-determined script type: {script_type}")
+
     config = config or {}
     max_name_attempts = CONFIG.get("verification", {}).get("max_name_verification_attempts", 5)
     max_details_attempts = CONFIG.get("verification", {}).get("max_details_verification_attempts", 5)
@@ -69,7 +75,7 @@ def create_call_center_agent(
     closing_agent = create_closing_agent(model, client_data, script_type, agent_name, config=config)
 
     # OPTIMIZED ROUTER LLM PROMPT - Step-Aware Classification
-    def get_optimized_router_prompt(state):
+    def _get_optimized_router_prompt(state):
         """Generate highly optimized step-aware router classification prompt."""
         current_step = state.get("current_step", "unknown")
         
@@ -301,10 +307,10 @@ def create_call_center_agent(
             return {"current_step": CallStep.CLOSING.value}
         
         # 2. Use optimized router LLM for classification
-        router_llm = ChatOllama(model="qwen2.5:7b-instruct-q5_K_M", temperature=0, num_ctx=4096)
-        prompt_content = get_optimized_router_prompt(state)
+        router_llm = ChatOllama(model="qwen2.5:3b-instruct", temperature=0, num_ctx=4096)
+        prompt_content = _get_optimized_router_prompt(state)
         prompt = [SystemMessage(content=prompt_content)]
-        
+        logger.info(f"Router prompt: {prompt}")
         try:
             response = router_llm.invoke(prompt)
             classification = response.content.strip().upper()

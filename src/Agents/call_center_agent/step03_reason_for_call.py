@@ -1,6 +1,10 @@
+# ===============================================================================
+# STEP 03: REASON FOR CALL AGENT - Updated with Aging-Aware Prompts
+# ===============================================================================
+
 # src/Agents/call_center_agent/step03_reason_for_call.py
 """
-Reason for Call Agent - Self-contained with own prompt
+Reason for Call Agent - Enhanced with aging-aware script integration
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -12,8 +16,8 @@ from langgraph.types import Command
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
+from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-# Import relevant database tools
 from src.Database.CartrackSQLDatabase import (
     get_client_account_aging,
     get_client_account_overview,
@@ -21,12 +25,17 @@ from src.Database.CartrackSQLDatabase import (
 )
 
 def get_reason_for_call_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-    """Generate reason for call specific prompt."""
+    """Generate aging-aware reason for call prompt."""
+    
+    # Determine script type from aging
+    account_aging = client_data.get("account_aging", {})
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+    aging_context = ScriptManager.get_aging_context(script_type)
+    
     # Extract client info
     client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
     
     # Calculate outstanding amount
-    account_aging = client_data.get("account_aging", {})
     outstanding_float = calculate_outstanding_amount(account_aging)
     outstanding_amount = format_currency(outstanding_float)
     
@@ -34,7 +43,22 @@ def get_reason_for_call_prompt(client_data: Dict[str, Any], state: Dict[str, Any
     account_overview = client_data.get("account_overview", {})
     account_status = account_overview.get("account_status", "Overdue") if account_overview else "Overdue"
     
-    return f"""<role>
+    # Build aging-specific approach
+    aging_approaches = {
+        "First Missed Payment": f"We didn't receive your subscription payment. Your account is overdue by {outstanding_amount}. Can we debit this today?",
+        "Failed Promise to Pay": f"We didn't receive your payment of {outstanding_amount} as arranged. Your account remains overdue.",
+        "New Installation Pro-Rata": f"We haven't received your pro-rata payment since fitment. Services activate once we receive {outstanding_amount}.",
+        "2-3 Months Overdue": f"Your account is overdue for over 2 months. An immediate payment of {outstanding_amount} is required.",
+        "2-3 Months Failed PTP": f"We didn't receive your payment of {outstanding_amount} as arranged. Your account remains seriously overdue.",
+        "Pre-Legal 120+ Days": f"Your account is 4+ months overdue and in our pre-legal department. A letter of demand was sent. Immediate payment of {outstanding_amount} is required.",
+        "Legal 150+ Days": f"Cartrack has handed your account to us as attorneys. Your arrears are {outstanding_amount}. Do you acknowledge this debt?"
+    }
+    
+    category = aging_context['category']
+    specific_approach = aging_approaches.get(category, aging_approaches["First Missed Payment"])
+    
+    # Base prompt
+    base_prompt = f"""<role>
 You are a professional debt collection specialist at Cartrack's Accounts Department.
 </role>
 
@@ -42,39 +66,59 @@ You are a professional debt collection specialist at Cartrack's Accounts Departm
 - Client VERIFIED: {client_full_name}
 - Outstanding Amount: {outstanding_amount}
 - Account Status: {account_status}
+- Aging Category: {category}
+- Urgency Level: {aging_context['urgency']}
 </client_context>
 
 <task>
-Clearly communicate account status and required payment. MAXIMUM 20 words.
+Clearly communicate account status and required payment using aging-appropriate approach.
 </task>
 
-<optimized_approach>
-"We didn't receive your subscription payment. Your account is overdue by {outstanding_amount}. Can we debit this today?"
-</optimized_approach>
+<aging_specific_approach>
+{specific_approach}
+</aging_specific_approach>
 
 <communication_strategy>
-1. **State status directly**: Clear, factual account status
+1. **State status directly**: Clear, factual account status appropriate to aging
 2. **Specify amount**: Exact outstanding amount
-3. **Ask for immediate action**: Direct payment request
+3. **Create appropriate urgency**: Match tone to account severity
+4. **Request immediate action**: Direct payment request
 </communication_strategy>
 
+<consequences_to_emphasize>
+{aging_context['consequences']}
+</consequences_to_emphasize>
+
+<tone_guidance>
+{aging_context['tone']} - {aging_context['approach']}
+</tone_guidance>
+
 <style>
-- MAXIMUM 20 words
-- Factual, not apologetic
+- Adapt formality to account severity
 - State amount clearly without hesitation
-- Create urgency without aggression
+- Create urgency matching account status
+- Professional but {aging_context['urgency'].lower()} priority
 </style>"""
+
+    # Enhance with script content
+    return ScriptManager.get_script_enhanced_prompt(
+        base_prompt=base_prompt,
+        script_type=script_type,
+        step=ScriptCallStep.REASON_FOR_CALL,
+        client_data=client_data,
+        state=state
+    )
 
 def create_reason_for_call_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = "ratio_1_inflow",
+    script_type: str = None,  # Auto-determined from aging
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a reason for call agent."""
+    """Create a reason for call agent with aging-aware scripts."""
     
     agent_tools = [
         get_client_account_aging,
@@ -83,25 +127,18 @@ def create_reason_for_call_agent(
     ] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to prepare account status information."""
-        
-        # Extract account information from client data
         account_aging = client_data.get("account_aging", {})
         account_overview = client_data.get("account_overview", {})
         
-        # Calculate outstanding amount
         outstanding_amount = calculate_outstanding_amount(account_aging)
         outstanding_formatted = format_currency(outstanding_amount)
         
-        # Determine account status
         account_status = account_overview.get("account_status", "Overdue") if account_overview else "Overdue"
         
-        # Create urgency level based on amount
-        urgency_level = "standard"
-        if outstanding_amount > 1000:
-            urgency_level = "high"
-        elif outstanding_amount > 500:
-            urgency_level = "medium"
+        # Determine script type for urgency level
+        script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+        aging_context = ScriptManager.get_aging_context(script_type)
+        urgency_level = aging_context['urgency'].lower()
         
         return Command(
             update={
@@ -109,13 +146,13 @@ def create_reason_for_call_agent(
                 "account_status": account_status,
                 "urgency_level": urgency_level,
                 "outstanding_float": outstanding_amount,
+                "aging_category": aging_context['category'],
                 "current_step": CallStep.REASON_FOR_CALL.value
             },
             goto="agent"
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for reason for call step."""
         prompt_content = get_reason_for_call_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     

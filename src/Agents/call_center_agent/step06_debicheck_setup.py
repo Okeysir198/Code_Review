@@ -1,6 +1,6 @@
 # src/Agents/call_center_agent/step06_debicheck_setup.py
 """
-DebiCheck Setup Agent - Self-contained with own prompt
+DebiCheck Setup Agent - Enhanced with aging-aware script integration
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -12,66 +12,153 @@ from langgraph.types import Command
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.data.client_data_fetcher import calculate_outstanding_amount, format_currency
+from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
 from src.Database.CartrackSQLDatabase import get_client_debit_mandates, add_client_note
 
 def get_debicheck_setup_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-    """Generate DebiCheck setup specific prompt."""
-    # Calculate amounts
+    """Generate aging-aware DebiCheck setup prompt."""
+    
+    # Determine script type from aging
     account_aging = client_data.get("account_aging", {})
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+    aging_context = ScriptManager.get_aging_context(script_type)
+    
+    # Calculate amounts
     outstanding_float = calculate_outstanding_amount(account_aging)
     total_with_fee = outstanding_float + 10
     amount_with_fee = format_currency(total_with_fee)
+    outstanding_amount = format_currency(outstanding_float)
     
-    return f"""<role>
+    # Build aging-specific DebiCheck explanations
+    debicheck_explanations_by_category = {
+        "First Missed Payment": {
+            "urgency": "to restore your services immediately",
+            "timeline": "You'll receive this within a few minutes",
+            "action": "Please approve this request to restore your vehicle protection"
+        },
+        "Failed Promise to Pay": {
+            "urgency": "to honor your payment commitment",
+            "timeline": "You'll receive this immediately",
+            "action": "You must approve this request to fulfill your previous agreement"
+        },
+        "2-3 Months Overdue": {
+            "urgency": "to prevent escalation to legal action",
+            "timeline": "You'll receive this within minutes",
+            "action": "You must approve this immediately to prevent account escalation"
+        },
+        "Pre-Legal 120+ Days": {
+            "urgency": "to prevent court proceedings",
+            "timeline": "You'll receive this immediately",
+            "action": "You must approve this now to stop legal action"
+        },
+        "Legal 150+ Days": {
+            "urgency": "to stop legal proceedings immediately",
+            "timeline": "You'll receive this within seconds",
+            "action": "Immediate approval required to prevent court judgment"
+        }
+    }
+    
+    category = aging_context['category']
+    explanation = debicheck_explanations_by_category.get(category, debicheck_explanations_by_category["First Missed Payment"])
+    
+    # Build urgency-based process emphasis
+    process_emphasis_by_urgency = {
+        "Medium": "This is a secure, standard banking process",
+        "High": "This is urgent - your bank requires immediate authorization",
+        "Very High": "Critical authorization required - bank authentication needed now",
+        "Critical": "Emergency authorization - immediate bank approval required"
+    }
+    
+    urgency_level = aging_context['urgency']
+    process_emphasis = process_emphasis_by_urgency.get(urgency_level, process_emphasis_by_urgency["Medium"])
+    
+    # Base prompt
+    base_prompt = f"""<role>
 You are a professional debt collection specialist from Cartrack.
 </role>
 
+<context>
+- Outstanding: {outstanding_amount}
+- Total with fee: {amount_with_fee}
+- Aging Category: {category}
+- Urgency Level: {urgency_level}
+</context>
+
 <task>
-Explain DebiCheck process and next steps. MAXIMUM 20 words per response.
+Explain DebiCheck process using aging-appropriate urgency and ensure client understanding.
 </task>
 
-<process_explanation>
-1. "Your bank will send an authentication request"
-2. "You'll receive this via your banking app or SMS"  
-3. "You must approve this request to authorize payment"
-4. "Total amount will be {amount_with_fee} including R10 processing fee"
-</process_explanation>
+<aging_specific_explanation>
+1. **Purpose**: "Your bank will send an authentication request {explanation['urgency']}"
+2. **Timeline**: "{explanation['timeline']} via your banking app or SMS"  
+3. **Action Required**: "{explanation['action']}"
+4. **Amount**: "Total amount will be {amount_with_fee} including R10 processing fee"
+</aging_specific_explanation>
+
+<process_emphasis>
+{process_emphasis}
+</process_emphasis>
+
+<urgency_messaging>
+{aging_context['approach']}
+</urgency_messaging>
+
+<critical_points>
+- Bank authentication is required by law
+- Client must approve the request
+- Processing fee is standard (R10)
+- {explanation['urgency']}
+</critical_points>
 
 <style>
-- MAXIMUM 20 words per response
-- Clear, step-by-step guidance
-- Professional confidence
-- Ensure client understands process
+- {aging_context['tone']}
+- Clear, step-by-step guidance appropriate to urgency
+- Professional confidence matching account severity
+- Ensure understanding without overwhelming
+- {urgency_level.lower()} priority messaging
 </style>"""
+
+    # Enhance with script content
+    return ScriptManager.get_script_enhanced_prompt(
+        base_prompt=base_prompt,
+        script_type=script_type,
+        step=ScriptCallStep.DEBICHECK_SETUP,
+        client_data=client_data,
+        state=state
+    )
 
 def create_debicheck_setup_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = "ratio_1_inflow",
+    script_type: str = None,  # Auto-determined from aging
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a DebiCheck setup agent."""
+    """Create a DebiCheck setup agent with aging-aware scripts."""
     
     agent_tools = [get_client_debit_mandates, add_client_note] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to prepare DebiCheck setup context."""
-        
         # Get outstanding amount and calculate total with fee
         account_aging = client_data.get("account_aging", {})
         outstanding_amount = calculate_outstanding_amount(account_aging)
         mandate_fee = 10.0
         total_amount = outstanding_amount + mandate_fee
         
+        # Determine script type and urgency
+        script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+        aging_context = ScriptManager.get_aging_context(script_type)
+        
         return Command(
             update={
                 "amount_with_fee": format_currency(total_amount),
                 "mandate_fee": mandate_fee,
                 "outstanding_float": outstanding_amount,
+                "aging_category": aging_context['category'],
+                "urgency_level": aging_context['urgency'].lower(),
                 "process_explanation": "Your bank will send an authentication request",
                 "current_step": CallStep.DEBICHECK_SETUP.value
             },

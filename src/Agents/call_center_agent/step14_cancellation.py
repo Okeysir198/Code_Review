@@ -1,6 +1,10 @@
+# ===============================================================================
+# STEP 14: CANCELLATION AGENT - Enhanced with Aging-Aware Prompts
+# ===============================================================================
+
 # src/Agents/call_center_agent/step14_cancellation.py
 """
-Cancellation Agent - Self-contained with own prompt
+Cancellation Agent - Enhanced with aging-aware script integration
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -14,50 +18,114 @@ from datetime import datetime
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.data.client_data_fetcher import calculate_outstanding_amount, format_currency
+from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-# Import relevant database tools
 from src.Database.CartrackSQLDatabase import (
     add_client_note,
     get_client_account_aging
 )
 
 def get_cancellation_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-    """Generate cancellation specific prompt."""
+    """Generate aging-aware cancellation prompt."""
+    
+    # Determine script type from aging
+    account_aging = client_data.get("account_aging", {})
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+    aging_context = ScriptManager.get_aging_context(script_type)
+    
     # Get cancellation details
     cancellation_fee = state.get("cancellation_fee", "R 0.00")
     total_balance = state.get("total_balance", "R 0.00")
     ticket_number = state.get("ticket_number", "CAN12345")
     
-    return f"""<role>
+    # Build aging-specific cancellation approaches
+    cancellation_approaches_by_category = {
+        "First Missed Payment": {
+            "tone": "understanding and professional",
+            "approach": "I understand you want to cancel. Let me explain the process and fees involved.",
+            "emphasis": "cancellation process and standard fees"
+        },
+        "Failed Promise to Pay": {
+            "tone": "professional acknowledgment",
+            "approach": "I understand you want to cancel. All outstanding amounts must be settled first.",
+            "emphasis": "settlement of commitments before cancellation"
+        },
+        "2-3 Months Overdue": {
+            "tone": "professional and direct",
+            "approach": "I understand you want to cancel. All overdue amounts must be cleared before cancellation.",
+            "emphasis": "full settlement required before cancellation"
+        },
+        "Pre-Legal 120+ Days": {
+            "tone": "serious and factual",
+            "approach": "I understand you want to cancel. All legal amounts must be settled to prevent court action.",
+            "emphasis": "legal settlement requirements before cancellation"
+        },
+        "Legal 150+ Days": {
+            "tone": "formal legal authority",
+            "approach": "Cancellation request noted. However, legal proceedings continue until debt is satisfied.",
+            "emphasis": "legal obligations continue regardless of cancellation"
+        }
+    }
+    
+    category = aging_context['category']
+    cancellation_approach = cancellation_approaches_by_category.get(category, cancellation_approaches_by_category["First Missed Payment"])
+    
+    # Base prompt
+    base_prompt = f"""<role>
 You are a professional debt collection specialist from Cartrack.
 </role>
 
+<context>
+- Cancellation Fee: {cancellation_fee}
+- Total Balance: {total_balance}
+- Ticket Number: {ticket_number}
+- Aging Category: {category}
+- Urgency Level: {aging_context['urgency']}
+</context>
+
 <task>
-Process cancellation professionally. MAXIMUM 20 words.
+Process cancellation professionally using aging-appropriate approach and requirements.
 </task>
 
-<approach>
-"I understand you want to cancel. The cancellation fee is {cancellation_fee}. Your total balance is {total_balance}."
-</approach>
+<aging_specific_approach>
+**Initial Response**: "{cancellation_approach['approach']}"
+**Tone**: "{cancellation_approach['tone']}"
+**Emphasis**: "{cancellation_approach['emphasis']}"
+</aging_specific_approach>
 
 <cancellation_process>
-1. Acknowledge request
-2. Explain fees
-3. State total balance
-4. Create ticket reference
-5. Set expectations
+1. Acknowledge request with appropriate tone
+2. Explain fees and total balance requirements
+3. Emphasize settlement requirements for aging category
+4. Create ticket reference: {ticket_number}
+5. Set appropriate expectations
 </cancellation_process>
 
-<follow_up>
+<follow_up_messaging>
 "I'll escalate this to our cancellations team. Reference: {ticket_number}"
-</follow_up>
+"They'll contact you regarding {cancellation_approach['emphasis']}"
+</follow_up_messaging>
+
+<urgency_context>
+{aging_context['approach']}
+</urgency_context>
 
 <style>
-- MAXIMUM 20 words
-- Professional acceptance
-- Clear fee explanation
-- No retention attempts
+- {aging_context['tone']} with {cancellation_approach['tone']}
+- Professional acceptance of request
+- Clear fee and settlement explanation
+- No retention attempts (focus on process)
+- Authority level appropriate to account status
 </style>"""
+
+    # Enhance with script content
+    return ScriptManager.get_script_enhanced_prompt(
+        base_prompt=base_prompt,
+        script_type=script_type,
+        step=ScriptCallStep.CANCELLATION,
+        client_data=client_data,
+        state=state
+    )
 
 def create_cancellation_agent(
     model: BaseChatModel,

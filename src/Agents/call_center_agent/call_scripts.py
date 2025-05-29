@@ -189,7 +189,7 @@ class RecentlySuspended120PlusScript(PreLegal120PlusScript):
     }
 
 class ScriptManager:
-    """Factory for script classes and content retrieval."""
+    """Factory for script classes and content retrieval with aging detection."""
     
     _SCRIPT_MAP = {
         ScriptType.RATIO_1_INFLOW: Ratio1InflowScript,
@@ -203,6 +203,215 @@ class ScriptManager:
         ScriptType.PRE_LEGAL_150_PLUS: PreLegal150PlusScript,
         ScriptType.RECENTLY_SUSPENDED_120_PLUS: RecentlySuspended120PlusScript,
     }
+    
+    @classmethod
+    def determine_script_type_from_aging(cls, account_aging: Dict[str, Any], client_data: Dict[str, Any] = None) -> ScriptType:
+        """
+        Determine appropriate script type based on account aging and client history.
+        
+        Args:
+            account_aging: Dict containing aging buckets (x0, x30, x60, x90, x120, xbalance)
+            client_data: Optional client data for additional context
+            
+        Returns:
+            ScriptType enum value
+        """
+        if not account_aging:
+            logger.warning("No account aging data provided, defaulting to RATIO_1_INFLOW")
+            return ScriptType.RATIO_1_INFLOW
+            
+        try:
+            # Extract aging amounts
+            current = float(account_aging.get("x0", 0))      # Current (0 days)
+            x30 = float(account_aging.get("x30", 0))         # 1-30 days overdue  
+            x60 = float(account_aging.get("x60", 0))         # 31-60 days overdue
+            x90 = float(account_aging.get("x90", 0))         # 61-90 days overdue
+            x120 = float(account_aging.get("x120", 0))       # 91+ days overdue
+            total_balance = float(account_aging.get("xbalance", 0))
+            
+            # Calculate total overdue amount
+            total_overdue = x30 + x60 + x90 + x120
+            
+            # Get additional context if available
+            has_failed_ptp = False
+            is_new_installation = False
+            
+            if client_data:
+                # Check for failed payment promises
+                payment_history = client_data.get("payment_history", [])
+                has_failed_ptp = any(p.get("arrangement_state") == "FAILED" for p in payment_history)
+                
+                # Check for new installation status
+                contracts = client_data.get("contracts", [])
+                is_new_installation = any(c.get("contract_status") == "NEW" for c in contracts)
+                
+                # Check account overview for additional context
+                account_overview = client_data.get("account_overview", {})
+                account_status = account_overview.get("account_status", "") if account_overview else ""
+            
+            # Determine script type based on aging priority
+            if x120 > 0:  # 120+ days overdue - Legal territory
+                if x120 >= 1500:  # Significant amount - attorney involvement
+                    logger.info(f"Selected PRE_LEGAL_150_PLUS: x120={x120}")
+                    return ScriptType.PRE_LEGAL_150_PLUS
+                else:
+                    logger.info(f"Selected PRE_LEGAL_120_PLUS: x120={x120}")
+                    return ScriptType.PRE_LEGAL_120_PLUS
+                    
+            elif x90 > 0 or x60 > 0:  # 60-90 days overdue (Ratio 2-3)
+                if has_failed_ptp:
+                    logger.info(f"Selected RATIO_2_3_FAILED_PTP: x60={x60}, x90={x90}, failed_ptp=True")
+                    return ScriptType.RATIO_2_3_FAILED_PTP
+                else:
+                    logger.info(f"Selected RATIO_2_3_INFLOW: x60={x60}, x90={x90}")
+                    return ScriptType.RATIO_2_3_INFLOW
+                    
+            elif x30 > 0:  # 30 days overdue (Ratio 1)
+                if is_new_installation:
+                    logger.info(f"Selected RATIO_1_PRO_RATA: x30={x30}, new_installation=True")
+                    return ScriptType.RATIO_1_PRO_RATA
+                elif has_failed_ptp:
+                    logger.info(f"Selected RATIO_1_FAILED_PTP: x30={x30}, failed_ptp=True")
+                    return ScriptType.RATIO_1_FAILED_PTP
+                else:
+                    logger.info(f"Selected RATIO_1_INFLOW: x30={x30}")
+                    return ScriptType.RATIO_1_INFLOW
+                    
+            else:
+                # Current account or edge case - default to ratio 1 inflow
+                logger.info(f"Selected RATIO_1_INFLOW (default): total_overdue={total_overdue}")
+                return ScriptType.RATIO_1_INFLOW
+                
+        except (ValueError, TypeError, KeyError) as e:
+            logger.error(f"Error determining script type from aging: {e}")
+            logger.info("Defaulting to RATIO_1_INFLOW due to error")
+            return ScriptType.RATIO_1_INFLOW
+    
+    @classmethod
+    def get_aging_context(cls, script_type: ScriptType) -> Dict[str, str]:
+        """Get aging-specific context for prompts."""
+        
+        aging_contexts = {
+            ScriptType.RATIO_1_INFLOW: {
+                "category": "First Missed Payment",
+                "urgency": "Medium",
+                "approach": "Professional but understanding. Focus on immediate resolution to prevent escalation.",
+                "consequences": "Service suspension, app stops working, lose vehicle positioning and notifications.",
+                "tone": "Helpful and solution-focused"
+            },
+            
+            ScriptType.RATIO_1_FAILED_PTP: {
+                "category": "Failed Promise to Pay",
+                "urgency": "Medium-High", 
+                "approach": "Address the broken promise directly. Focus on reliability and immediate action.",
+                "consequences": "Service remains suspended. Previous commitment wasn't honored, need immediate resolution.",
+                "tone": "Firmer, accountability-focused"
+            },
+            
+            ScriptType.RATIO_1_PRO_RATA: {
+                "category": "New Installation Pro-Rata",
+                "urgency": "Medium",
+                "approach": "Educational approach. Explain pro-rata billing and activate services upon payment.",
+                "consequences": "Services won't activate until payment received. Vehicle remains unprotected.",
+                "tone": "Educational and supportive"
+            },
+            
+            ScriptType.RATIO_2_3_INFLOW: {
+                "category": "2-3 Months Overdue",
+                "urgency": "High",
+                "approach": "Firm but solution-focused. Emphasize significant consequences and recovery fees.",
+                "consequences": "Services suspended, potential R25,000 recovery fee if vehicle stolen, credit listing risk.",
+                "tone": "Serious and urgent"
+            },
+            
+            ScriptType.RATIO_2_3_FAILED_PTP: {
+                "category": "2-3 Months Failed PTP",
+                "urgency": "High",
+                "approach": "Address pattern of non-payment. Create urgency about escalation to legal action.",
+                "consequences": "Account escalation imminent, legal action consideration, significant financial impact.",
+                "tone": "Firm and consequence-focused"
+            },
+            
+            ScriptType.PRE_LEGAL_120_PLUS: {
+                "category": "Pre-Legal 120+ Days",
+                "urgency": "Very High",
+                "approach": "Final opportunity messaging. Offer settlement discount to prevent legal action.",
+                "consequences": "Credit default listing (R1800 to clear), legal action, attorney fees, court costs.",
+                "tone": "Serious final opportunity"
+            },
+            
+            ScriptType.PRE_LEGAL_150_PLUS: {
+                "category": "Legal 150+ Days",
+                "urgency": "Critical",
+                "approach": "Legal representative tone. Formal debt acknowledgment and payment demand.",
+                "consequences": "Notice of intent to summons, 10-day payment demand, sheriff service, court proceedings.",
+                "tone": "Formal legal authority"
+            }
+        }
+        
+        return aging_contexts.get(script_type, aging_contexts[ScriptType.RATIO_1_INFLOW])
+    
+    @classmethod
+    def get_script_enhanced_prompt(
+        cls,
+        base_prompt: str,
+        script_type: ScriptType,
+        step: CallStep,
+        client_data: Dict[str, Any],
+        state: Dict[str, Any]
+    ) -> str:
+        """
+        Enhance any prompt with appropriate script content based on aging type.
+        
+        Args:
+            base_prompt: The base prompt to enhance
+            script_type: ScriptType enum value
+            step: CallStep enum value
+            client_data: Client data dictionary
+            state: Current state dictionary
+            
+        Returns:
+            Enhanced prompt string
+        """
+        # Get script-specific content
+        script_content = cls.get_script_content(script_type, step)
+        objection_responses = cls.get_objection_response(script_type, "general")
+        emotional_responses = cls.get_emotional_response(script_type, "neutral")
+        
+        # Get aging-specific context
+        aging_context = cls.get_aging_context(script_type)
+        
+        # Build enhanced prompt
+        enhanced_prompt = f"""{base_prompt}
+
+<script_context>
+Script Type: {script_type.value}
+Aging Category: {aging_context['category']}
+Urgency Level: {aging_context['urgency']}
+Recommended Tone: {aging_context['tone']}
+</script_context>
+
+<script_content>
+{script_content}
+</script_content>
+
+<aging_specific_approach>
+{aging_context['approach']}
+</aging_specific_approach>
+
+<consequences_framework>
+{aging_context['consequences']}
+</consequences_framework>
+
+<objection_handling>
+{objection_responses}
+</objection_handling>
+
+<emotional_intelligence>
+{emotional_responses}
+</emotional_intelligence>"""
+
+        return enhanced_prompt
     
     @classmethod
     def get_script_class(cls, script_type: ScriptType) -> BaseCallScript:
@@ -292,3 +501,48 @@ def get_available_scripts() -> Dict[str, str]:
         ScriptType.PRE_LEGAL_150_PLUS.value: "Legal 150+ days (attorney)",
         ScriptType.RECENTLY_SUSPENDED_120_PLUS.value: "120+ days campaign discount"
     }
+# Convenience functions for easy integration
+def determine_script_type_from_aging(account_aging: Dict[str, Any], client_data: Dict[str, Any] = None) -> str:
+    """
+    Convenience function to determine script type and return as string.
+    
+    Args:
+        account_aging: Account aging data
+        client_data: Optional client data for context
+        
+    Returns:
+        Script type as string value
+    """
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+    return script_type.value
+
+def get_aging_aware_script_content(
+    base_prompt: str,
+    account_aging: Dict[str, Any],
+    step: str,
+    client_data: Dict[str, Any] = None,
+    state: Dict[str, Any] = None
+) -> str:
+    """
+    Convenience function to get aging-aware script content.
+    
+    Args:
+        base_prompt: Base prompt to enhance
+        account_aging: Account aging data
+        step: Call step as string
+        client_data: Optional client data
+        state: Optional state data
+        
+    Returns:
+        Enhanced prompt with script content
+    """
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data or {})
+    call_step = CallStep(step)
+    
+    return ScriptManager.get_script_enhanced_prompt(
+        base_prompt=base_prompt,
+        script_type=script_type,
+        step=call_step,
+        client_data=client_data or {},
+        state=state or {}
+    )

@@ -1,10 +1,13 @@
+# ===============================================================================
+# STEP 01: NAME VERIFICATION AGENT - Updated with Aging-Aware Prompts
+# ===============================================================================
+
 # src/Agents/call_center_agent/step01_name_verification.py
 """
-Name Verification Agent - Self-contained with own prompt
+Name Verification Agent - Enhanced with aging-aware script integration
 """
-from typing import Dict, Any, Optional, List, Literal
 import logging
-
+from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
@@ -15,21 +18,27 @@ from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value
 from src.Agents.call_center_agent.tools.verify_client_name import verify_client_name
+from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
 logger = logging.getLogger(__name__)
 
 def get_name_verification_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-    """Generate name verification specific prompt."""
-    # Extract client info
+    """Generate aging-aware name verification prompt."""
+    
+    # Determine script type from aging
+    account_aging = client_data.get("account_aging", {})
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+    aging_context = ScriptManager.get_aging_context(script_type)
+    
+    # Extract client and state info
     client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
     client_title = get_safe_value(client_data, "profile.client_info.title", "Mr/Ms")
-    
-    # Extract state info
     status = state.get("name_verification_status", "INSUFFICIENT_INFO")
     attempts = state.get("name_verification_attempts", 1)
     max_attempts = 5
     
-    return f"""<role>
+    # Base prompt
+    base_prompt = f"""<role>
 You are a professional debt collection specialist at Cartrack's Accounts Department.
 </role>
 
@@ -37,57 +46,67 @@ You are a professional debt collection specialist at Cartrack's Accounts Departm
 - Verification Status: {status}
 - Attempt: {attempts}/{max_attempts}
 - Target Client: {client_full_name}
+- Urgency Level: {aging_context['urgency']}
+- Account Category: {aging_context['category']}
 </current_context>
 
 <task>
-Confirm client identity through name verification. MAXIMUM 15 words per response.
+Confirm client identity through name verification. Adapt tone to urgency level.
 </task>
 
 <response_strategies>
-**INSUFFICIENT_INFO** (Progressive approach):
-- Attempt 1-2: "Hi, just to confirm I'm speaking with {client_full_name}?"
-- Attempt 3+: "For security purposes, I need to confirm this is {client_full_name} speaking"
+**INSUFFICIENT_INFO** (Progressive approach based on urgency):
+- Standard Urgency: "Hi, just to confirm I'm speaking with {client_full_name}?"
+- High Urgency: "This is urgent regarding your Cartrack account. Is this {client_full_name}?"
+- Legal Urgency: "This is a legal matter regarding your account. I need to confirm this is {client_full_name} speaking"
 
 **VERIFIED**: "Thank you for confirming. I'll need to verify security details before discussing your account"
 
-**THIRD_PARTY**: "Please have {client_full_name} call us at 011 250 3000 regarding their Cartrack account"
+**THIRD_PARTY**: "Please have {client_full_name} call us urgently at 011 250 3000 regarding their Cartrack outstanding account matter"
 
-**UNAVAILABLE**: "I understand. Please have {client_full_name} call 011 250 3000"
+**UNAVAILABLE**: "I understand. Please have {client_full_name} call 011 250 3000 urgently regarding your Cartrack outstanding account matter"
 
 **WRONG_PERSON**: "I apologize for the confusion. I have the wrong number. Goodbye"
 
 **VERIFICATION_FAILED**: "For security, I cannot proceed. Please call Cartrack directly at 011 250 3000"
 </response_strategies>
 
+<urgency_adaptation>
+{aging_context['approach']}
+</urgency_adaptation>
+
 <style>
-- MAXIMUM 15 words per response
-- Professional persistence
+- Adapt formality to urgency level
+- {aging_context['tone']}
 - Build trust through competence
-- Match client's tone initially
+- Match urgency to account status
 </style>"""
+
+    # Enhance with script content
+    return ScriptManager.get_script_enhanced_prompt(
+        base_prompt=base_prompt,
+        script_type=script_type,
+        step=ScriptCallStep.NAME_VERIFICATION,
+        client_data=client_data,
+        state=state
+    )
 
 def create_name_verification_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = "ratio_1_inflow",
+    script_type: str = None,  # Auto-determined from aging
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a name verification agent."""
+    """Create a name verification agent with aging-aware scripts."""
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to analyze conversation and update verification status."""
-        
-        # Extract client info
         client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
-        
-        # Increment attempts
         attempts = state.get("name_verification_attempts", 0) + 1
         max_attempts = config.get("verification", {}).get("max_name_verification_attempts", 5)
         
-        # Perform verification using conversation analysis
         verification_status = VerificationStatus.INSUFFICIENT_INFO.value
         
         try:
@@ -105,7 +124,6 @@ def create_name_verification_agent(
             if verbose:
                 logger.error(f"Name verification error: {e}")
         
-        # Handle max attempts reached
         if attempts >= max_attempts and verification_status == VerificationStatus.INSUFFICIENT_INFO.value:
             verification_status = VerificationStatus.VERIFICATION_FAILED.value
         
@@ -120,7 +138,6 @@ def create_name_verification_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for name verification step."""
         prompt_content = get_name_verification_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     

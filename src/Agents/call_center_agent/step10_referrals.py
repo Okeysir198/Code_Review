@@ -1,6 +1,10 @@
+# ===============================================================================
+# STEP 10: REFERRALS AGENT - Enhanced with Aging-Aware Prompts
+# ===============================================================================
+
 # src/Agents/call_center_agent/step10_referrals.py
 """
-Referrals Agent - Self-contained with own prompt
+Referrals Agent - Enhanced with aging-aware script integration
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -11,61 +15,130 @@ from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
+from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-# Import relevant database tools
 from src.Database.CartrackSQLDatabase import add_client_note
 
 def get_referrals_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-    """Generate referrals specific prompt."""
+    """Generate aging-aware referrals prompt."""
     
-    return f"""<role>
+    # Determine script type from aging
+    account_aging = client_data.get("account_aging", {})
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+    aging_context = ScriptManager.get_aging_context(script_type)
+    
+    # Build aging-specific referral approaches
+    referral_approaches_by_category = {
+        "First Missed Payment": {
+            "approach": "Friendly mention of referral program",
+            "message": "Do you know anyone interested in Cartrack? Successful referrals earn you 2 months free subscription."
+        },
+        "Failed Promise to Pay": {
+            "approach": "Brief mention after payment arrangement",
+            "message": "Once your account is current, remember our referral program offers 2 months free."
+        },
+        "2-3 Months Overdue": {
+            "approach": "Quick mention only if appropriate",
+            "message": "After settling your account, referrals can earn free months."
+        },
+        "Pre-Legal 120+ Days": {
+            "approach": "Minimal mention, focus on resolution",
+            "message": "Future referrals available once account is resolved."
+        },
+        "Legal 150+ Days": {
+            "approach": "Skip referrals, not appropriate",
+            "message": "Focus on account resolution."
+        }
+    }
+    
+    category = aging_context['category']
+    referral_approach = referral_approaches_by_category.get(category, referral_approaches_by_category["First Missed Payment"])
+    
+    # Determine if referrals are appropriate for this urgency level
+    should_offer_referrals = urgency_level not in ['Very High', 'Critical']
+    urgency_level = aging_context['urgency']
+    
+    # Base prompt
+    base_prompt = f"""<role>
 You are a professional debt collection specialist from Cartrack.
 </role>
 
+<context>
+- Aging Category: {category}
+- Urgency Level: {urgency_level}
+- Referrals Appropriate: {should_offer_referrals}
+</context>
+
 <task>
-Briefly mention referral program. MAXIMUM 15 words.
+{"Briefly mention referral program if appropriate for account status" if should_offer_referrals else "Skip referrals due to account urgency"}
 </task>
 
-<approach>
-"Do you know anyone interested in Cartrack? Successful referrals earn you 2 months free subscription."
-</approach>
+<aging_specific_approach>
+**Strategy**: "{referral_approach['approach']}"
+**Message**: "{referral_approach['message']}"
+</aging_specific_approach>
 
-<benefits>
+<appropriateness_guide>
+- Low/Medium urgency: Full referral program mention
+- High urgency: Brief mention after payment focus
+- Very High/Critical: Skip referrals entirely
+</appropriateness_guide>
+
+<benefits_if_appropriate>
 - 2 months free subscription
 - Help friends with vehicle security
 - Easy referral process
-</benefits>
+</benefits_if_appropriate>
 
 <style>
-- MAXIMUM 15 words
-- Present as benefit to client
+- {"Brief and positive" if should_offer_referrals else "Skip this step"}
+- Present as benefit to client only if appropriate
 - No pressure if not interested
-- Quick mention only
+- {"Quick mention only" if should_offer_referrals else "Focus on account resolution"}
 </style>"""
+
+    # Enhance with script content
+    return ScriptManager.get_script_enhanced_prompt(
+        base_prompt=base_prompt,
+        script_type=script_type,
+        step=ScriptCallStep.REFERRALS,
+        client_data=client_data,
+        state=state
+    )
 
 def create_referrals_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = "ratio_1_inflow",
+    script_type: str = None,  # Auto-determined from aging
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a referrals agent for debt collection calls."""
+    """Create a referrals agent with aging-aware scripts."""
     
     agent_tools = [add_client_note] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to prepare referral information only."""
+        # Determine script type and urgency
+        account_aging = client_data.get("account_aging", {})
+        script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+        aging_context = ScriptManager.get_aging_context(script_type)
+        
+        # Determine if referrals are appropriate
+        should_offer_referrals = aging_context['urgency'] not in ['Very High', 'Critical']
         
         return Command(
-            update={"current_step": CallStep.REFERRALS.value},
+            update={
+                "aging_category": aging_context['category'],
+                "urgency_level": aging_context['urgency'].lower(),
+                "should_offer_referrals": should_offer_referrals,
+                "current_step": CallStep.REFERRALS.value
+            },
             goto="agent"
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for referrals step."""
         prompt_content = get_referrals_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state['messages']
     

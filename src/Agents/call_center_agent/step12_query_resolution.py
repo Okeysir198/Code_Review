@@ -1,6 +1,10 @@
+# ===============================================================================
+# STEP 12: QUERY RESOLUTION AGENT - Enhanced with Aging-Aware Prompts
+# ===============================================================================
+
 # src/Agents/call_center_agent/step12_query_resolution.py
 """
-Query Resolution Agent - Self-contained with own prompt
+Query Resolution Agent - Enhanced with aging-aware script integration
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -12,17 +16,22 @@ from langgraph.types import Command
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
+from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-# Import relevant database tools
 from src.Database.CartrackSQLDatabase import add_client_note
 
 def get_query_resolution_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-    """Generate query resolution specific prompt."""
+    """Generate aging-aware query resolution prompt."""
+    
+    # Determine script type from aging
+    account_aging = client_data.get("account_aging", {})
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+    aging_context = ScriptManager.get_aging_context(script_type)
+    
     # Extract client info
     client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
     
     # Calculate outstanding amount
-    account_aging = client_data.get("account_aging", {})
     outstanding_float = calculate_outstanding_amount(account_aging)
     outstanding_amount = format_currency(outstanding_float)
     
@@ -30,61 +39,137 @@ def get_query_resolution_prompt(client_data: Dict[str, Any], state: Dict[str, An
     return_to_step = state.get("return_to_step", "closing")
     redirect_message = state.get("redirect_message", "Anything else?")
     
-    return f"""<role>
+    # Build aging-specific redirect strategies
+    redirect_strategies_by_category = {
+        "First Missed Payment": {
+            "payment_redirect": f"Now, can we arrange {outstanding_amount} today?",
+            "service_question": f"That's how it works. Can we debit {outstanding_amount} to restore services?",
+            "tone": "helpful and solution-focused"
+        },
+        "Failed Promise to Pay": {
+            "payment_redirect": f"Let's honor your commitment with {outstanding_amount} now",
+            "service_question": f"Services restore once you pay the {outstanding_amount} as agreed",
+            "tone": "accountability-focused"
+        },
+        "2-3 Months Overdue": {
+            "payment_redirect": f"We need {outstanding_amount} immediately to prevent escalation",
+            "service_question": f"Services suspended until {outstanding_amount} is paid",
+            "tone": "urgent and direct"
+        },
+        "Pre-Legal 120+ Days": {
+            "payment_redirect": f"{outstanding_amount} required now to prevent court action",
+            "service_question": f"Services and legal issues resolved with {outstanding_amount} payment",
+            "tone": "serious and final opportunity"
+        },
+        "Legal 150+ Days": {
+            "payment_redirect": f"Legal demand for {outstanding_amount} - immediate payment required",
+            "service_question": f"Court proceedings stop only with {outstanding_amount} payment",
+            "tone": "legal authority and urgency"
+        }
+    }
+    
+    category = aging_context['category']
+    redirect_strategy = redirect_strategies_by_category.get(category, redirect_strategies_by_category["First Missed Payment"])
+    
+    # Build urgency-appropriate response lengths and examples
+    response_examples_by_urgency = {
+        "Medium": {
+            "cartrack_question": f"Vehicle tracking and security. Now, can we arrange {outstanding_amount} today?",
+            "payment_question": f"Bank declined it. Can we try a different method for {outstanding_amount}?",
+            "max_words": "15 words maximum"
+        },
+        "High": {
+            "cartrack_question": f"Tracking system. {outstanding_amount} needed urgently to restore services.",
+            "payment_question": f"Payment failed. {outstanding_amount} required immediately.",
+            "max_words": "12 words maximum"
+        },
+        "Very High": {
+            "cartrack_question": f"Vehicle security. {outstanding_amount} needed now to prevent escalation.",
+            "payment_question": f"Payment issue. {outstanding_amount} required to stop legal action.",
+            "max_words": "10 words maximum"
+        },
+        "Critical": {
+            "cartrack_question": f"Security system. Pay {outstanding_amount} now to stop court proceedings.",
+            "payment_question": f"Payment failed. {outstanding_amount} required immediately for legal compliance.",
+            "max_words": "8 words maximum"
+        }
+    }
+    
+    urgency_level = aging_context['urgency']
+    response_examples = response_examples_by_urgency.get(urgency_level, response_examples_by_urgency["Medium"])
+    
+    # Base prompt
+    base_prompt = f"""<role>
 You are a professional debt collection specialist from Cartrack.
 </role>
 
+<context>
+- Client: {client_full_name}
+- Outstanding: {outstanding_amount}
+- Aging Category: {category}
+- Urgency Level: {urgency_level}
+- Return to: {return_to_step}
+</context>
+
 <task>
-Answer question BRIEFLY (under 15 words) then redirect to payment.
+Answer question BRIEFLY then redirect to payment using aging-appropriate urgency.
 </task>
 
-<format>
-Brief answer + redirect to payment goal
-</format>
-
-<examples>
+<aging_specific_examples>
 Q: "How does Cartrack work?"
-A: "Vehicle tracking and security. Now, can we arrange {outstanding_amount} today?"
-
-Q: "What happens if I don't pay?"
-A: "Services stop working. Let's arrange payment now to avoid that."
+A: "{response_examples['cartrack_question']}"
 
 Q: "Why wasn't my payment taken?"
-A: "Bank declined it. Can we try a different method for {outstanding_amount}?"
+A: "{response_examples['payment_question']}"
+</aging_specific_examples>
 
-Q: "Who are you again?"
-A: "Agent from Cartrack. Are you {client_full_name}?"
-</examples>
+<redirect_strategy>
+**Payment Focus**: "{redirect_strategy['payment_redirect']}"
+**Service Questions**: "{redirect_strategy['service_question']}"
+**Tone**: "{redirect_strategy['tone']}"
+</redirect_strategy>
 
 <redirect_target>
 Return to: {return_to_step}
 Redirect message: "{redirect_message}"
 </redirect_target>
 
+<urgency_adaptation>
+{aging_context['approach']}
+</urgency_adaptation>
+
 <style>
-- MAXIMUM 15 words total
-- Stay focused on payment goal
+- {response_examples['max_words']}
+- {aging_context['tone']}
+- Stay focused on payment goal with appropriate urgency
 - Natural, conversational tone
 - Use exact redirect message
 </style>"""
 
+    # Enhance with script content
+    return ScriptManager.get_script_enhanced_prompt(
+        base_prompt=base_prompt,
+        script_type=script_type,
+        step=ScriptCallStep.QUERY_RESOLUTION,
+        client_data=client_data,
+        state=state
+    )
+
 def create_query_resolution_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = "ratio_1_inflow",
+    script_type: str = None,  # Auto-determined from aging
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a query resolution agent with brief answers and smart redirects."""
+    """Create a query resolution agent with aging-aware scripts."""
     
     agent_tools = [add_client_note] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to analyze query and determine appropriate redirect strategy."""
-        
-        # Get the return step (where we should redirect to)
+        # Get the return step
         return_to_step = state.get("return_to_step", CallStep.CLOSING.value)
         
         # Analyze the client's question to categorize it
@@ -100,7 +185,7 @@ def create_query_resolution_agent(
                     last_client_message = msg.get("content", "").lower()
                     break
         
-        # Categorize the query type for appropriate response
+        # Categorize the query type
         query_type = "general"
         query_keywords = {
             "service_question": ["cartrack", "tracking", "work", "service", "how does", "what does"],
@@ -115,12 +200,16 @@ def create_query_resolution_agent(
                 query_type = category
                 break
         
-        # Check verification status to determine redirect approach
+        # Check verification status
         name_verified = state.get("name_verification_status") == VerificationStatus.VERIFIED.value
         details_verified = state.get("details_verification_status") == VerificationStatus.VERIFIED.value
         is_fully_verified = name_verified and details_verified
         
-        # Determine redirect strategy based on verification and return step
+        # Determine redirect strategy based on verification and urgency
+        account_aging = client_data.get("account_aging", {})
+        script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+        aging_context = ScriptManager.get_aging_context(script_type)
+        
         if not name_verified:
             redirect_strategy = "verify_name"
             redirect_target = CallStep.NAME_VERIFICATION.value
@@ -139,35 +228,23 @@ def create_query_resolution_agent(
             redirect_target = return_to_step
             redirect_message = "Anything else I can help with?"
         
-        # Create response template based on query type
-        response_templates = {
-            "service_question": "Vehicle tracking and security.",
-            "payment_question": "Payment methods include debit and online portal.",
-            "account_question": f"Your balance is {state.get('outstanding_amount', 'R 0.00')}.",
-            "technical_question": "Technical support: 011 250 3000.",
-            "policy_question": "Policy details available on request.",
-            "general": "I understand."
-        }
-        
-        brief_answer = response_templates.get(query_type, "I understand.")
-        
         return Command(
             update={
                 "query_type": query_type,
                 "redirect_strategy": redirect_strategy,
                 "redirect_target": redirect_target,
                 "redirect_message": redirect_message,
-                "brief_answer": brief_answer,
                 "is_fully_verified": is_fully_verified,
                 "last_client_question": last_client_message,
                 "return_to_step": return_to_step,
+                "aging_category": aging_context['category'],
+                "urgency_level": aging_context['urgency'].lower(),
                 "current_step": CallStep.QUERY_RESOLUTION.value
             },
             goto="agent"
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for query resolution with smart redirect."""
         prompt_content = get_query_resolution_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     

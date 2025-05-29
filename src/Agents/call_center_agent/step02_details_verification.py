@@ -1,6 +1,10 @@
+# ===============================================================================
+# STEP 02: DETAILS VERIFICATION AGENT - Updated with Aging-Aware Prompts
+# ===============================================================================
+
 # src/Agents/call_center_agent/step02_details_verification.py
 """
-Details Verification Agent - Self-contained with own prompt
+Details Verification Agent - Enhanced with aging-aware script integration
 """
 import random
 import logging
@@ -15,11 +19,18 @@ from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value
 from src.Agents.call_center_agent.tools.verify_client_details import verify_client_details
+from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
 logger = logging.getLogger(__name__)
 
 def get_details_verification_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-    """Generate details verification specific prompt."""
+    """Generate aging-aware details verification prompt."""
+    
+    # Determine script type from aging
+    account_aging = client_data.get("account_aging", {})
+    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
+    aging_context = ScriptManager.get_aging_context(script_type)
+    
     # Extract verification info
     field_to_verify = state.get("field_to_verify", "ID number")
     status = state.get("details_verification_status", "INSUFFICIENT_INFO")
@@ -27,7 +38,8 @@ def get_details_verification_prompt(client_data: Dict[str, Any], state: Dict[str
     max_attempts = 5
     matched_fields = state.get("matched_fields", [])
     
-    return f"""<role>
+    # Base prompt
+    base_prompt = f"""<role>
 You are a professional debt collection specialist at Cartrack's Accounts Department.
 </role>
 
@@ -36,10 +48,12 @@ You are a professional debt collection specialist at Cartrack's Accounts Departm
 - Attempt: {attempts}/{max_attempts}
 - Requesting: {field_to_verify}
 - Already Verified: {matched_fields}
+- Urgency Level: {aging_context['urgency']}
+- Account Category: {aging_context['category']}
 </verification_context>
 
 <task>
-Complete identity verification for data protection compliance. Request {field_to_verify}.
+Complete identity verification for data protection compliance. Adapt urgency to account status.
 </task>
 
 <verification_requirements>
@@ -47,35 +61,60 @@ Complete identity verification for data protection compliance. Request {field_to
 **Option B**: THREE items from available fields
 </verification_requirements>
 
-<approach>
-**Security Notice**: "This call is recorded for quality and security purposes"
-**Current Request**: "Please provide your {field_to_verify}"
-**If Resistant**: "This protects your account information"
-**Success**: "Great, that matches our records"
-</approach>
+<approach_by_urgency>
+**Standard/Medium Urgency**: 
+- Security Notice: "This call is recorded for quality and security purposes"
+- Request: "Please provide your {field_to_verify}"
+- If Resistant: "This protects your account information"
+
+**High Urgency**: 
+- Security Notice: "This call is recorded. Due to the urgency of your account status"
+- Request: "I need your {field_to_verify} immediately to proceed"
+- If Resistant: "Security verification is required for overdue accounts"
+
+**Legal/Critical Urgency**:
+- Security Notice: "This is a legal matter. I must verify your identity"
+- Request: "Provide your {field_to_verify} now to proceed with this matter"
+- If Resistant: "Legal proceedings require proper identification"
+</approach_by_urgency>
 
 <critical_rules>
 - ONE field at a time: currently {field_to_verify}
 - NO account details until FULLY verified
-- Be patient but persistent - security is non-negotiable
+- Adapt persistence to urgency level
+- Security is non-negotiable regardless of urgency
 </critical_rules>
 
+<urgency_guidance>
+{aging_context['approach']}
+</urgency_guidance>
+
 <style>
-- Professional and secure
+- {aging_context['tone']}
+- Adapt formality to urgency level
 - Clear, specific requests
 - Acknowledge each successful verification
 </style>"""
 
+    # Enhance with script content
+    return ScriptManager.get_script_enhanced_prompt(
+        base_prompt=base_prompt,
+        script_type=script_type,
+        step=ScriptCallStep.DETAILS_VERIFICATION,
+        client_data=client_data,
+        state=state
+    )
+
 def create_details_verification_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = "ratio_1_inflow",
+    script_type: str = None,  # Auto-determined from aging
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a details verification agent for security verification."""
+    """Create a details verification agent with aging-aware scripts."""
     
     # Verification field priority - most secure to least secure
     FIELD_PRIORITY = [
@@ -140,18 +179,13 @@ def create_details_verification_agent(
         return "id_number"
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to analyze verification progress and update status."""
-        
-        # Increment attempt counter
         attempts = state.get("details_verification_attempts", 0) + 1
         max_attempts = config.get("verification", {}).get("max_details_verification_attempts", 5)
         
-        # Get matched fields and available fields
         matched_fields = state.get("matched_fields", [])
         available_fields = _get_available_fields(client_data)
         field_to_verify = _select_next_field(available_fields, matched_fields)
         
-        # Perform verification using the tool
         verification_status = VerificationStatus.INSUFFICIENT_INFO.value
         all_matched = matched_fields
         
@@ -163,7 +197,6 @@ def create_details_verification_agent(
                 "max_failed_attempts": max_attempts
             })
             
-            # Update matched fields
             new_matched = verification_result.get("matched_fields", [])
             all_matched = list(set(matched_fields + new_matched))
             verification_status = verification_result.get("classification", VerificationStatus.INSUFFICIENT_INFO.value)
@@ -175,11 +208,9 @@ def create_details_verification_agent(
             if verbose:
                 logger.error(f"Details verification error: {e}")
         
-        # Handle max attempts reached
         if attempts >= max_attempts and verification_status == VerificationStatus.INSUFFICIENT_INFO.value:
             verification_status = VerificationStatus.VERIFICATION_FAILED.value
         
-        # Map field to human-readable format for prompt
         field_display_names = {
             "id_number": "ID number",
             "passport_number": "passport number",
@@ -204,7 +235,6 @@ def create_details_verification_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate dynamic prompt for details verification step."""
         prompt_content = get_details_verification_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     

@@ -1,10 +1,12 @@
 # src/Agents/call_center_agent/data/client_data_fetcher.py
 """
-Simple client data fetching and outstanding amount calculation
+Lean client data fetching with concurrent loading and minimal caching
 """
 import logging
+import asyncio
 from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import database tools
 from src.Database.CartrackSQLDatabase import (
@@ -13,126 +15,146 @@ from src.Database.CartrackSQLDatabase import (
     get_client_account_aging,
     get_client_banking_details,
     get_client_subscription_amount,
-    get_client_payment_history,
-    get_client_failed_payments,
-    get_client_last_successful_payment,
-    get_client_contracts,
-    get_client_billing_analysis,
-    get_client_debit_mandates
 )
 
 logger = logging.getLogger(__name__)
 
-# Simple cache
+# Minimal cache with shorter duration
 _cache = {}
-_cache_duration = timedelta(hours=1)
+_cache_duration = timedelta(minutes=15)  # Reduced from 1 hour
 
 def get_client_data(user_id: str, force_reload: bool = False) -> Dict[str, Any]:
-    """Get client data with simple caching."""
-    cache_key = user_id
-    now = datetime.now()
+    """Get client data with concurrent fetching and minimal caching."""
     
-    # Check cache
-    if not force_reload and cache_key in _cache:
-        cached_entry = _cache[cache_key]
-        if now - cached_entry["timestamp"] < _cache_duration:
-            logger.info(f"Using cached data for user_id: {user_id}")
-            return cached_entry["data"]
+    # Check cache first (if not forcing reload)
+    if not force_reload:
+        cached_data = _get_cached_data(user_id)
+        if cached_data:
+            return cached_data
     
-    # Fetch fresh data
-    logger.info(f"Fetching fresh data for user_id: {user_id}")
-    try:
-        data = _fetch_client_data(user_id)
-        _cache[cache_key] = {"data": data, "timestamp": now}
-        return data
-    except Exception as e:
-        logger.error(f"Error fetching client data for {user_id}: {e}")
-        return _get_fallback_data(user_id)
+    # Fetch fresh data concurrently
+    return _fetch_concurrent_data(user_id)
 
-def _fetch_client_data(user_id: str) -> Dict[str, Any]:
-    """Fetch data from database."""
-    try:
-        # Load core client information
-        profile = get_client_profile.invoke(user_id)
-        if not profile:
-            raise ValueError(f"Client profile not found for user_id: {user_id}")
+def _get_cached_data(user_id: str) -> Optional[Dict[str, Any]]:
+    """Check cache for valid data."""
+    if user_id not in _cache:
+        return None
         
-        # Load account and financial data
-        account_overview = get_client_account_overview.invoke(user_id)
-        account_aging = get_client_account_aging.invoke(user_id)
-        banking_details = get_client_banking_details.invoke(user_id)
-        subscription_data = get_client_subscription_amount.invoke(user_id)
-        
-        # Consolidate data
-        client_data = {
-            "user_id": user_id,
-            "profile": profile,
-            "account_overview": account_overview,
-            "account_aging": account_aging[0] if account_aging else {},
-            "banking_details": banking_details[0] if banking_details else {},
-            "subscription": subscription_data,
-            "loaded_at": datetime.now()
+    cached_entry = _cache[user_id]
+    if datetime.now() - cached_entry["timestamp"] < _cache_duration:
+        logger.debug(f"Cache hit for user_id: {user_id}")
+        return cached_entry["data"]
+    
+    # Remove stale cache entry
+    del _cache[user_id]
+    return None
+
+def _fetch_concurrent_data(user_id: str) -> Dict[str, Any]:
+    """Fetch all required data concurrently for maximum speed."""
+    
+    # Define data fetching tasks
+    fetch_tasks = {
+        'profile': lambda: get_client_profile.invoke(user_id),
+        'account_overview': lambda: get_client_account_overview.invoke(user_id),
+        'account_aging': lambda: get_client_account_aging.invoke(user_id),
+        'banking_details': lambda: get_client_banking_details.invoke(user_id),
+        'subscription': lambda: get_client_subscription_amount.invoke(user_id),
+    }
+    
+    results = {}
+    failed_tasks = []
+    
+    # Execute all tasks concurrently
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        # Submit all tasks
+        future_to_name = {
+            executor.submit(task): name 
+            for name, task in fetch_tasks.items()
         }
         
-        logger.info(f"Successfully loaded data for user_id: {user_id}")
-        return client_data
-        
-    except Exception as e:
-        logger.error(f"Error loading client data for {user_id}: {str(e)}")
-        raise
-
-def _get_fallback_data(user_id: str) -> Dict[str, Any]:
-    """Fallback data when database fails."""
-    return {
+        # Collect results as they complete
+        for future in as_completed(future_to_name):
+            task_name = future_to_name[future]
+            try:
+                result = future.result(timeout=10)  # 10 second timeout per task
+                results[task_name] = result
+                logger.debug(f"✓ {task_name} loaded for user {user_id}")
+            except Exception as e:
+                failed_tasks.append(task_name)
+                results[task_name] = None
+                logger.warning(f"✗ {task_name} failed for user {user_id}: {e}")
+    
+    # Validate critical data
+    if not results.get('profile'):
+        raise ValueError(f"Critical data missing: client profile not found for user_id: {user_id}")
+    
+    # Build consolidated data structure
+    client_data = {
         "user_id": user_id,
-        "profile": {
-            "client_info": {
-                "client_full_name": "Client",
-                "first_name": "Client",
-                "title": "Mr/Ms"
-            }
-        },
-        "account_overview": {"account_status": "Overdue"},
-        "account_aging": {"xbalance": "0.00", "x0": "0.00"},
-        "banking_details": {},
-        "subscription": {"subscription_amount": "199.00"},
+        "profile": results['profile'],
+        "account_overview": results['account_overview'],
+        "account_aging": _extract_first_item(results['account_aging']),
+        "banking_details": _extract_first_item(results['banking_details']),
+        "subscription": results['subscription'] or {},
         "loaded_at": datetime.now(),
-        "fallback_used": True
+        "failed_tasks": failed_tasks if failed_tasks else None
     }
+    
+    # Cache the result
+    _cache[user_id] = {
+        "data": client_data,
+        "timestamp": datetime.now()
+    }
+    
+    logger.info(f"Data loaded for user {user_id} - {len(failed_tasks)} failures")
+    return client_data
+
+def _extract_first_item(data_list):
+    """Extract first item from list or return empty dict."""
+    if isinstance(data_list, list) and len(data_list) > 0:
+        return data_list[0]
+    return {}
 
 def calculate_outstanding_amount(account_aging: Dict[str, Any]) -> float:
-    """
-    Calculate outstanding amount = total balance - current (non-overdue) balance.
-    This is the OVERDUE amount the client needs to pay.
-    """
+    """Calculate overdue amount (total - current)."""
     try:
-        total_balance = float(account_aging.get("xbalance", 0))
-        current_balance = float(account_aging.get("x0", 0))
-        outstanding = total_balance - current_balance
-        return max(outstanding, 0.0)  # Never negative
+        total = float(account_aging.get("xbalance", 0))
+        current = float(account_aging.get("x0", 0))
+        return max(total - current, 0.0)
     except (ValueError, TypeError):
         return 0.0
 
 def format_currency(amount: float) -> str:
-    """Format amount as currency."""
+    """Format amount as currency string."""
     return f"R {amount:.2f}"
 
 def get_safe_value(data: Dict[str, Any], path: str, default: Any = "") -> Any:
-    """Safely extract nested values with dot notation."""
+    """Extract nested values using dot notation."""
     try:
-        keys = path.split('.')
-        value = data
-        for key in keys:
-            value = value[key] if isinstance(value, dict) else getattr(value, key, None)
-        return value if value is not None else default
+        current = data
+        for key in path.split('.'):
+            current = current[key] if isinstance(current, dict) else getattr(current, key)
+        return current if current is not None else default
     except (KeyError, TypeError, AttributeError):
         return default
 
-def clear_cache(user_id: Optional[str] = None):
-    """Clear cached client data."""
+def clear_cache(user_id: Optional[str] = None) -> None:
+    """Clear cached data."""
     if user_id:
         _cache.pop(user_id, None)
-        logger.info(f"Cleared cache for user {user_id}")
     else:
         _cache.clear()
-        logger.info("Cleared all cache")
+
+def get_cache_stats() -> Dict[str, Any]:
+    """Get cache statistics for monitoring."""
+    now = datetime.now()
+    valid_entries = sum(
+        1 for entry in _cache.values() 
+        if now - entry["timestamp"] < _cache_duration
+    )
+    
+    return {
+        "total_entries": len(_cache),
+        "valid_entries": valid_entries,
+        "cache_hit_ratio": valid_entries / max(len(_cache), 1)
+    }

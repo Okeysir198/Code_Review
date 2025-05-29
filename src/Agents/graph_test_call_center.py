@@ -46,7 +46,6 @@ logger.info("✅ Debtor simulator agent created successfully")
 graph_call_center_agent1 = create_call_center_agent(
     model=llm,
     client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
     config=config
 )
 logger.info("✅ Complete call center agent with optimized router created successfully")
