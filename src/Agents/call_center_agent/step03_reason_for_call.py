@@ -1,7 +1,6 @@
-# ./src/Agents/call_center_agent/step03_reason_for_call.py
+# src/Agents/call_center_agent/step03_reason_for_call.py
 """
-Reason for Call Agent - Optimized with pre-processing only.
-Explains account status and outstanding amounts directly.
+Reason for Call Agent - Self-contained with own prompt
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -11,9 +10,8 @@ from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
-from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters, calculate_outstanding_amount
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
+from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
 
 # Import relevant database tools
 from src.Database.CartrackSQLDatabase import (
@@ -22,6 +20,50 @@ from src.Database.CartrackSQLDatabase import (
     add_client_note
 )
 
+def get_reason_for_call_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+    """Generate reason for call specific prompt."""
+    # Extract client info
+    client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
+    
+    # Calculate outstanding amount
+    account_aging = client_data.get("account_aging", {})
+    outstanding_float = calculate_outstanding_amount(account_aging)
+    outstanding_amount = format_currency(outstanding_float)
+    
+    # Get account status
+    account_overview = client_data.get("account_overview", {})
+    account_status = account_overview.get("account_status", "Overdue") if account_overview else "Overdue"
+    
+    return f"""<role>
+You are a professional debt collection specialist at Cartrack's Accounts Department.
+</role>
+
+<client_context>
+- Client VERIFIED: {client_full_name}
+- Outstanding Amount: {outstanding_amount}
+- Account Status: {account_status}
+</client_context>
+
+<task>
+Clearly communicate account status and required payment. MAXIMUM 20 words.
+</task>
+
+<optimized_approach>
+"We didn't receive your subscription payment. Your account is overdue by {outstanding_amount}. Can we debit this today?"
+</optimized_approach>
+
+<communication_strategy>
+1. **State status directly**: Clear, factual account status
+2. **Specify amount**: Exact outstanding amount
+3. **Ask for immediate action**: Direct payment request
+</communication_strategy>
+
+<style>
+- MAXIMUM 20 words
+- Factual, not apologetic
+- State amount clearly without hesitation
+- Create urgency without aggression
+</style>"""
 
 def create_reason_for_call_agent(
     model: BaseChatModel,
@@ -32,7 +74,7 @@ def create_reason_for_call_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a reason for call agent for debt collection calls."""
+    """Create a reason for call agent."""
     
     agent_tools = [
         get_client_account_aging,
@@ -47,33 +89,25 @@ def create_reason_for_call_agent(
         account_aging = client_data.get("account_aging", {})
         account_overview = client_data.get("account_overview", {})
         
-        # Calculate outstanding amount (overdue amount, not total balance)
+        # Calculate outstanding amount
         outstanding_amount = calculate_outstanding_amount(account_aging)
-        outstanding_formatted = f"R {outstanding_amount:.2f}" if outstanding_amount > 0 else "R 0.00"
+        outstanding_formatted = format_currency(outstanding_amount)
         
         # Determine account status
         account_status = account_overview.get("account_status", "Overdue") if account_overview else "Overdue"
         
-        # Create urgency level based on amount and days overdue
+        # Create urgency level based on amount
         urgency_level = "standard"
         if outstanding_amount > 1000:
             urgency_level = "high"
         elif outstanding_amount > 500:
             urgency_level = "medium"
         
-        # Prepare reason message components
-        reason_components = {
-            "status_statement": f"Your account is {account_status.lower()}",
-            "amount_statement": f"{outstanding_formatted} is required",
-            "urgency_statement": "Immediate payment needed" if urgency_level == "high" else "Payment needed today"
-        }
-        
         return Command(
             update={
                 "outstanding_amount": outstanding_formatted,
                 "account_status": account_status,
                 "urgency_level": urgency_level,
-                "reason_components": reason_components,
                 "outstanding_float": outstanding_amount,
                 "current_step": CallStep.REASON_FOR_CALL.value
             },
@@ -82,15 +116,7 @@ def create_reason_for_call_agent(
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for reason for call step."""
-        parameters = prepare_parameters(
-            client_data=client_data,
-            current_step=CallStep.REASON_FOR_CALL.value,
-            state=state.to_dict() if hasattr(state, 'to_dict') else state,
-            script_type=script_type,
-            agent_name=agent_name
-        )
-        
-        prompt_content = get_step_prompt(CallStep.REASON_FOR_CALL.value, parameters)
+        prompt_content = get_reason_for_call_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

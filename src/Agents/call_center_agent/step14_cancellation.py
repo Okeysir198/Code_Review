@@ -1,7 +1,6 @@
-# ./src/Agents/call_center_agent/step14_cancellation.py
+# src/Agents/call_center_agent/step14_cancellation.py
 """
-Cancellation Agent - Handles cancellation requests professionally.
-SIMPLIFIED: Keep fee logic, no query detection.
+Cancellation Agent - Self-contained with own prompt
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -13,9 +12,8 @@ import uuid
 from datetime import datetime
 
 from src.Agents.core.basic_agent import create_basic_agent
-from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
+from src.Agents.call_center_agent.data.client_data_fetcher import calculate_outstanding_amount, format_currency
 
 # Import relevant database tools
 from src.Database.CartrackSQLDatabase import (
@@ -23,6 +21,43 @@ from src.Database.CartrackSQLDatabase import (
     get_client_account_aging
 )
 
+def get_cancellation_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+    """Generate cancellation specific prompt."""
+    # Get cancellation details
+    cancellation_fee = state.get("cancellation_fee", "R 0.00")
+    total_balance = state.get("total_balance", "R 0.00")
+    ticket_number = state.get("ticket_number", "CAN12345")
+    
+    return f"""<role>
+You are a professional debt collection specialist from Cartrack.
+</role>
+
+<task>
+Process cancellation professionally. MAXIMUM 20 words.
+</task>
+
+<approach>
+"I understand you want to cancel. The cancellation fee is {cancellation_fee}. Your total balance is {total_balance}."
+</approach>
+
+<cancellation_process>
+1. Acknowledge request
+2. Explain fees
+3. State total balance
+4. Create ticket reference
+5. Set expectations
+</cancellation_process>
+
+<follow_up>
+"I'll escalate this to our cancellations team. Reference: {ticket_number}"
+</follow_up>
+
+<style>
+- MAXIMUM 20 words
+- Professional acceptance
+- Clear fee explanation
+- No retention attempts
+</style>"""
 
 def create_cancellation_agent(
     model: BaseChatModel,
@@ -40,19 +75,9 @@ def create_cancellation_agent(
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to calculate cancellation fees and create ticket."""
         
-        import uuid
-        from datetime import datetime
-        
         # Calculate cancellation fee and total balance
         account_aging = client_data.get("account_aging", {})
-        outstanding_balance = 0.0
-        
-        if account_aging:
-            balance = account_aging.get("xbalance", "0")
-            try:
-                outstanding_balance = float(balance) if balance else 0.0
-            except (ValueError, TypeError):
-                outstanding_balance = 0.0
+        outstanding_balance = calculate_outstanding_amount(account_aging)
         
         # Standard cancellation fee (adjust based on business rules)
         cancellation_fee = 0.0  # Set based on your business rules
@@ -67,7 +92,7 @@ def create_cancellation_agent(
             try:
                 add_client_note.invoke({
                     "user_id": user_id,
-                    "note_text": f"Cancellation requested. Ticket: {ticket_number}, Total balance: R{total_balance:.2f}"
+                    "note_text": f"Cancellation requested. Ticket: {ticket_number}, Total balance: {format_currency(total_balance)}"
                 })
             except Exception as e:
                 if verbose:
@@ -75,8 +100,8 @@ def create_cancellation_agent(
         
         return Command(
             update={
-                "cancellation_fee": f"R {cancellation_fee:.2f}",
-                "total_balance": f"R {total_balance:.2f}",
+                "cancellation_fee": format_currency(cancellation_fee),
+                "total_balance": format_currency(total_balance),
                 "ticket_number": ticket_number,
                 "cancellation_requested": True,
                 "current_step": CallStep.CANCELLATION.value
@@ -85,14 +110,7 @@ def create_cancellation_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        parameters = prepare_parameters(
-            client_data=client_data,
-            current_step=CallStep.CANCELLATION.value,
-            state=state.to_dict() if hasattr(state, 'to_dict') else state,
-            script_type=script_type,
-            agent_name=agent_name
-        )
-        prompt_content = get_step_prompt(CallStep.CANCELLATION.value, parameters)
+        prompt_content = get_cancellation_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

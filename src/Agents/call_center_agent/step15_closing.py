@@ -1,35 +1,17 @@
-# ./src/Agents/call_center_agent/closing.py
+# src/Agents/call_center_agent/step15_closing.py
 """
-Closing Agent - Finalizes the call with summary and disposition.
+Closing Agent - Self-contained with own prompt
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
-from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
-from enum import Enum
 
 from src.Agents.core.basic_agent import create_basic_agent
-from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
-
-class CallOutcome(Enum):
-    """Possible call outcomes"""
-    PAYMENT_SECURED = "payment_secured"
-    PTP_ARRANGED = "ptp_arranged"
-    PARTIAL_PAYMENT = "partial_payment"
-    CALLBACK_SCHEDULED = "callback_scheduled"
-    ESCALATED = "escalated"
-    CANCELLED = "cancelled"
-    UNCONTACTABLE = "uncontactable"
-    REFUSAL = "refusal"
-    DISPUTE = "dispute"
-    WRONG_PERSON = "wrong_person"
-    INCOMPLETE = "incomplete"
-
+from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
 
 # Import relevant database tools
 from src.Database.CartrackSQLDatabase import (
@@ -39,6 +21,36 @@ from src.Database.CartrackSQLDatabase import (
     update_payment_arrangements
 )
 
+def get_closing_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+    """Generate closing specific prompt."""
+    # Extract client info
+    client_name = get_safe_value(client_data, "profile.client_info.first_name", "Client")
+    
+    # Get call outcome
+    call_outcome = state.get("call_outcome", "incomplete")
+    outstanding_amount = state.get("outstanding_amount", "R 0.00")
+    
+    return f"""<role>
+You are a professional debt collection specialist from Cartrack.
+</role>
+
+<task>
+End call professionally with summary. MAXIMUM 20 words.
+</task>
+
+<summary_options>
+**Payment Secured**: "Perfect. We've arranged payment of {outstanding_amount}"
+**Escalation**: "I've escalated to supervisor with reference {state.get('ticket_number', 'TKT12345')}"
+**Cancellation**: "Cancellation request logged with reference {state.get('ticket_number', 'TKT12345')}"
+**Incomplete**: "Thank you for your time today, {client_name}. Please call us back at 011 250 3000"
+</summary_options>
+
+<style>
+- MAXIMUM 20 words
+- Professional and courteous
+- Clear outcome summary
+- Thank the client
+</style>"""
 
 def create_closing_agent(
     model: BaseChatModel,
@@ -97,14 +109,7 @@ def create_closing_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        parameters = prepare_parameters(
-            client_data=client_data,
-            current_step=CallStep.CLOSING.value,
-            state=state.to_dict() if hasattr(state, 'to_dict') else state,
-            script_type=script_type,
-            agent_name=agent_name
-        )
-        prompt_content = get_step_prompt(CallStep.CLOSING.value, parameters)
+        prompt_content = get_closing_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

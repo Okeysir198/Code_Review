@@ -1,6 +1,6 @@
-# ./src/Agents/call_center_agent/step06_debicheck_setup.py
+# src/Agents/call_center_agent/step06_debicheck_setup.py
 """
-DebiCheck Setup Agent - Optimized with pre-processing only.
+DebiCheck Setup Agent - Self-contained with own prompt
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -10,12 +10,40 @@ from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
-from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters, calculate_outstanding_amount
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
+from src.Agents.call_center_agent.data.client_data_fetcher import calculate_outstanding_amount, format_currency
 
 from src.Database.CartrackSQLDatabase import get_client_debit_mandates, add_client_note
 
+def get_debicheck_setup_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+    """Generate DebiCheck setup specific prompt."""
+    # Calculate amounts
+    account_aging = client_data.get("account_aging", {})
+    outstanding_float = calculate_outstanding_amount(account_aging)
+    total_with_fee = outstanding_float + 10
+    amount_with_fee = format_currency(total_with_fee)
+    
+    return f"""<role>
+You are a professional debt collection specialist from Cartrack.
+</role>
+
+<task>
+Explain DebiCheck process and next steps. MAXIMUM 20 words per response.
+</task>
+
+<process_explanation>
+1. "Your bank will send an authentication request"
+2. "You'll receive this via your banking app or SMS"  
+3. "You must approve this request to authorize payment"
+4. "Total amount will be {amount_with_fee} including R10 processing fee"
+</process_explanation>
+
+<style>
+- MAXIMUM 20 words per response
+- Clear, step-by-step guidance
+- Professional confidence
+- Ensure client understands process
+</style>"""
 
 def create_debicheck_setup_agent(
     model: BaseChatModel,
@@ -41,7 +69,7 @@ def create_debicheck_setup_agent(
         
         return Command(
             update={
-                "amount_with_fee": f"R {total_amount:.2f}",
+                "amount_with_fee": format_currency(total_amount),
                 "mandate_fee": mandate_fee,
                 "outstanding_float": outstanding_amount,
                 "process_explanation": "Your bank will send an authentication request",
@@ -51,14 +79,7 @@ def create_debicheck_setup_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        parameters = prepare_parameters(
-            client_data=client_data,
-            current_step=CallStep.DEBICHECK_SETUP.value,
-            state=state.to_dict() if hasattr(state, 'to_dict') else state,
-            script_type=script_type,
-            agent_name=agent_name
-        )
-        prompt_content = get_step_prompt(CallStep.DEBICHECK_SETUP.value, parameters)
+        prompt_content = get_debicheck_setup_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

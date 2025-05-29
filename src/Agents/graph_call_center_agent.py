@@ -1,5 +1,5 @@
 """
-Optimized Call Center Agent Workflow - Enhanced Router with Step-Aware Classification
+Optimized Call Center Agent Workflow - Updated for refactored architecture
 Router intelligently detects step relevance, completion, and handles routing decisions
 """
 import logging
@@ -14,9 +14,8 @@ from langchain_ollama import ChatOllama
 
 # Import existing components
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
-from src.Agents.call_center_agent.prompts import parse_router_decision
 
-# Import all specialized sub-agents
+# Import all specialized sub-agents (updated imports)
 from src.Agents.call_center_agent.step00_introduction import create_introduction_agent
 from src.Agents.call_center_agent.step01_name_verification import create_name_verification_agent
 from src.Agents.call_center_agent.step02_details_verification import create_details_verification_agent

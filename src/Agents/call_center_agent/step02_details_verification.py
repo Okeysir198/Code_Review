@@ -1,7 +1,6 @@
-# ./src/Agents/call_center_agent/step02_details_verification.py
+# src/Agents/call_center_agent/step02_details_verification.py
 """
-Details Verification Agent - Optimized with pre-processing only.
-Verifies client security details for account access.
+Details Verification Agent - Self-contained with own prompt
 """
 import random
 import logging
@@ -13,18 +12,64 @@ from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
-from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
-from src.Agents.call_center_agent.call_scripts import ScriptType
+from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value
 from src.Agents.call_center_agent.tools.verify_client_details import verify_client_details
 
 logger = logging.getLogger(__name__)
 
+def get_details_verification_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+    """Generate details verification specific prompt."""
+    # Extract verification info
+    field_to_verify = state.get("field_to_verify", "ID number")
+    status = state.get("details_verification_status", "INSUFFICIENT_INFO")
+    attempts = state.get("details_verification_attempts", 1)
+    max_attempts = 5
+    matched_fields = state.get("matched_fields", [])
+    
+    return f"""<role>
+You are a professional debt collection specialist at Cartrack's Accounts Department.
+</role>
+
+<verification_context>
+- Status: {status}
+- Attempt: {attempts}/{max_attempts}
+- Requesting: {field_to_verify}
+- Already Verified: {matched_fields}
+</verification_context>
+
+<task>
+Complete identity verification for data protection compliance. Request {field_to_verify}.
+</task>
+
+<verification_requirements>
+**Option A**: Full ID number (sufficient alone)
+**Option B**: THREE items from available fields
+</verification_requirements>
+
+<approach>
+**Security Notice**: "This call is recorded for quality and security purposes"
+**Current Request**: "Please provide your {field_to_verify}"
+**If Resistant**: "This protects your account information"
+**Success**: "Great, that matches our records"
+</approach>
+
+<critical_rules>
+- ONE field at a time: currently {field_to_verify}
+- NO account details until FULLY verified
+- Be patient but persistent - security is non-negotiable
+</critical_rules>
+
+<style>
+- Professional and secure
+- Clear, specific requests
+- Acknowledge each successful verification
+</style>"""
+
 def create_details_verification_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = ScriptType.RATIO_1_INFLOW.value,
+    script_type: str = "ratio_1_inflow",
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
     verbose: bool = False,
@@ -75,30 +120,24 @@ def create_details_verification_agent(
         return verification_info
     
     def _select_next_field(available_fields: Dict[str, str], matched_fields: List[str]) -> str:
-        """Select next field to verify based on priority or randomly from remaining."""
+        """Select next field to verify based on priority."""
         remaining_fields = [f for f in FIELD_PRIORITY if f in available_fields and f not in matched_fields]
 
         if not remaining_fields:
-            return "id_number" # Default if no fields are remaining or available
+            return "id_number"
 
-        # Option 1: Random selection from all remaining fields
-        # random.shuffle(remaining_fields)
-        # return remaining_fields[0]
-
-        # Option 2: Prioritize certain fields, then randomly select from the rest
-        # This keeps 'id_number' and 'passport_number' as highest priority,
-        # then shuffles the rest of the available, unmatched fields.
-        high_priority_fields = [f for f in FIELD_PRIORITY[:2] if f in remaining_fields] # id_number, passport_number
+        # Prioritize certain fields, then randomly select from the rest
+        high_priority_fields = [f for f in FIELD_PRIORITY[:2] if f in remaining_fields]
         if high_priority_fields:
-            return high_priority_fields[0] # Still pick the first of these if available
+            return high_priority_fields[0]
 
-        # If high priority fields are not available or already matched, shuffle the rest
+        # If high priority fields are not available, shuffle the rest
         other_remaining_fields = [f for f in remaining_fields if f not in FIELD_PRIORITY[:2]]
         if other_remaining_fields:
             random.shuffle(other_remaining_fields)
             return other_remaining_fields[0]
         
-        return "id_number" # Fallback, though ideally caught by initial check
+        return "id_number"
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to analyze verification progress and update status."""
@@ -166,15 +205,7 @@ def create_details_verification_agent(
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for details verification step."""
-        parameters = prepare_parameters(
-            client_data=client_data,
-            current_step=CallStep.DETAILS_VERIFICATION.value,
-            state=state.to_dict() if hasattr(state, 'to_dict') else state,
-            script_type=script_type,
-            agent_name=agent_name
-        )
-        
-        prompt_content = get_step_prompt(CallStep.DETAILS_VERIFICATION.value, parameters)
+        prompt_content = get_details_verification_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

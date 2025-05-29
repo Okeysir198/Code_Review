@@ -1,6 +1,6 @@
-# ./src/Agents/call_center_agent/step07_payment_portal.py
+# src/Agents/call_center_agent/step07_payment_portal.py
 """
-Payment Portal Agent - Optimized with pre-processing only.
+Payment Portal Agent - Self-contained with own prompt
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -10,12 +10,43 @@ from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
-from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters, calculate_outstanding_amount
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
+from src.Agents.call_center_agent.data.client_data_fetcher import calculate_outstanding_amount, format_currency
 
 from src.Database.CartrackSQLDatabase import generate_sms_payment_url, add_client_note
 
+def get_payment_portal_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+    """Generate payment portal specific prompt."""
+    # Calculate outstanding amount
+    account_aging = client_data.get("account_aging", {})
+    outstanding_float = calculate_outstanding_amount(account_aging)
+    outstanding_amount = format_currency(outstanding_float)
+    
+    return f"""<role>
+You are a professional debt collection specialist from Cartrack.
+</role>
+
+<task>
+Guide client through payment portal. MAXIMUM 20 words per response.
+</task>
+
+<guidance>
+"I'll send you a secure payment link. You can pay {outstanding_amount} while we're on the call"
+</guidance>
+
+<instructions>
+1. "Click the link I'm sending"
+2. "Confirm the amount as {outstanding_amount}"
+3. "Choose your payment method"
+4. "I'll stay on the line to help"
+</instructions>
+
+<style>
+- MAXIMUM 20 words per response
+- Stay connected during process
+- Immediate problem solving
+- Professional guidance
+</style>"""
 
 def create_payment_portal_agent(
     model: BaseChatModel,
@@ -69,14 +100,7 @@ def create_payment_portal_agent(
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        parameters = prepare_parameters(
-            client_data=client_data,
-            current_step=CallStep.PAYMENT_PORTAL.value,
-            state=state.to_dict() if hasattr(state, 'to_dict') else state,
-            script_type=script_type,
-            agent_name=agent_name
-        )
-        prompt_content = get_step_prompt(CallStep.PAYMENT_PORTAL.value, parameters)
+        prompt_content = get_payment_portal_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(

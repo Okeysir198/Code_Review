@@ -1,7 +1,6 @@
-# ./src/Agents/call_center_agent/step12_query_resolution.py
+# src/Agents/call_center_agent/step12_query_resolution.py
 """
-Query Resolution Agent - Optimized with pre-processing only.
-Brief answers with smart redirect to payment goal.
+Query Resolution Agent - Self-contained with own prompt
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -11,13 +10,63 @@ from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
-from src.Agents.call_center_agent.prompts import get_step_prompt
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, VerificationStatus
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters
+from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
 
 # Import relevant database tools
 from src.Database.CartrackSQLDatabase import add_client_note
 
+def get_query_resolution_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+    """Generate query resolution specific prompt."""
+    # Extract client info
+    client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
+    
+    # Calculate outstanding amount
+    account_aging = client_data.get("account_aging", {})
+    outstanding_float = calculate_outstanding_amount(account_aging)
+    outstanding_amount = format_currency(outstanding_float)
+    
+    # Get redirect info
+    return_to_step = state.get("return_to_step", "closing")
+    redirect_message = state.get("redirect_message", "Anything else?")
+    
+    return f"""<role>
+You are a professional debt collection specialist from Cartrack.
+</role>
+
+<task>
+Answer question BRIEFLY (under 15 words) then redirect to payment.
+</task>
+
+<format>
+Brief answer + redirect to payment goal
+</format>
+
+<examples>
+Q: "How does Cartrack work?"
+A: "Vehicle tracking and security. Now, can we arrange {outstanding_amount} today?"
+
+Q: "What happens if I don't pay?"
+A: "Services stop working. Let's arrange payment now to avoid that."
+
+Q: "Why wasn't my payment taken?"
+A: "Bank declined it. Can we try a different method for {outstanding_amount}?"
+
+Q: "Who are you again?"
+A: "Agent from Cartrack. Are you {client_full_name}?"
+</examples>
+
+<redirect_target>
+Return to: {return_to_step}
+Redirect message: "{redirect_message}"
+</redirect_target>
+
+<style>
+- MAXIMUM 15 words total
+- Stay focused on payment goal
+- Natural, conversational tone
+- Use exact redirect message
+</style>"""
 
 def create_query_resolution_agent(
     model: BaseChatModel,
@@ -75,7 +124,7 @@ def create_query_resolution_agent(
         if not name_verified:
             redirect_strategy = "verify_name"
             redirect_target = CallStep.NAME_VERIFICATION.value
-            redirect_message = f"Are you {client_data.get('profile', {}).get('client_info', {}).get('client_full_name', 'Client')}?"
+            redirect_message = f"Are you {get_safe_value(client_data, 'profile.client_info.client_full_name', 'Client')}?"
         elif not details_verified:
             redirect_strategy = "verify_details"
             redirect_target = CallStep.DETAILS_VERIFICATION.value
@@ -119,47 +168,8 @@ def create_query_resolution_agent(
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for query resolution with smart redirect."""
-        
-        # Extract key information from pre-processing
-        query_type = state.get("query_type", "general")
-        redirect_strategy = state.get("redirect_strategy", "continue_call")
-        brief_answer = state.get("brief_answer", "I understand.")
-        redirect_message = state.get("redirect_message", "Anything else?")
-        
-        # Create custom prompt based on redirect strategy
-        custom_prompt = f"""<role>You're {client_data.get('profile', {}).get('client_info', {}).get('client_full_name', 'AI Agent')} from Cartrack.</role>
-
-<task>Answer their {query_type} question briefly (under 10 words) then redirect smartly.</task>
-
-<response_pattern>
-Brief Answer: "{brief_answer}"
-Redirect: "{redirect_message}"
-</response_pattern>
-
-<examples>
-Client: "How does Cartrack work?"
-You: "Vehicle tracking and security. Now, can we arrange R399 today?"
-
-Client: "What's my balance?"
-You: "R399 overdue. Can we debit this immediately?"
-
-Client: "Why wasn't my payment taken?"
-You: "Bank declined it. Can we try a different method for R399?"
-
-Client: "Who are you again?"
-You: "AI Agent from Cartrack. Are you {client_data.get('profile', {}).get('client_info', {}).get('client_full_name', 'Client')}?"
-</examples>
-
-<critical_instructions>
-- MAXIMUM 15 words total
-- Answer briefly + redirect immediately
-- Stay focused on payment goal
-- Use exact redirect message: "{redirect_message}"
-</critical_instructions>
-
-<style>Sound natural, confident, and solution-focused. No unnecessary pleasantries.</style>"""
-        
-        return [SystemMessage(content=custom_prompt)] + state.get('messages', [])
+        prompt_content = get_query_resolution_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
+        return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
         model=model,

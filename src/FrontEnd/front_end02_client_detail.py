@@ -12,7 +12,7 @@ from src.Database import CartrackSQLDatabase
 from app_config import CONFIG
 from src.VoiceHandler import VoiceInteractionHandler
 from src.Agents import react_agent_graph
-from src.Agents.call_center_agent.data_parameter_builder import get_client_data
+from src.Agents.call_center_agent.data.client_data_fetcher import get_client_data
 
 from .front_end03_voice_chat import create_voice_chat_block
 from .front_end04_profile_display import display_client_profile

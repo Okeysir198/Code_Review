@@ -1,7 +1,6 @@
-# ./src/Agents/call_center_agent/step05_promise_to_pay.py
+# src/Agents/call_center_agent/step05_promise_to_pay.py
 """
-Promise to Pay Agent - Optimized with pre-processing only.
-Secures payment arrangements with progressive options.
+Promise to Pay Agent - Self-contained with own prompt
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -11,9 +10,8 @@ from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
-from src.Agents.call_center_agent.prompts import get_step_prompt
-from src.Agents.call_center_agent.data_parameter_builder import prepare_parameters, ConversationAnalyzer, calculate_outstanding_amount
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
+from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
 
 # Import relevant database tools
 from src.Database.CartrackSQLDatabase import (
@@ -21,6 +19,53 @@ from src.Database.CartrackSQLDatabase import (
     add_client_note
 )
 
+def get_promise_to_pay_prompt(client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
+    """Generate promise to pay specific prompt."""
+    # Extract client info
+    client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
+    client_name = get_safe_value(client_data, "profile.client_info.first_name", "Client")
+    
+    # Calculate outstanding amount
+    account_aging = client_data.get("account_aging", {})
+    outstanding_float = calculate_outstanding_amount(account_aging)
+    outstanding_amount = format_currency(outstanding_float)
+    amount_with_fee = format_currency(outstanding_float + 10)
+    
+    # Extract state info
+    payment_willingness = state.get("payment_willingness", "unknown")
+    has_banking_details = len(client_data.get("banking_details", {})) > 0
+    
+    return f"""<role>
+You are a professional debt collection specialist at Cartrack's Accounts Department.
+</role>
+
+<client_context>
+- Client: {client_full_name}
+- Outstanding: {outstanding_amount}
+- Payment Willingness: {payment_willingness}
+- Has Banking Details: {has_banking_details}
+</client_context>
+
+<task>
+Secure payment arrangement. Try immediate debit first, then alternatives. MAXIMUM 20 words.
+</task>
+
+<payment_hierarchy>
+1. "Can we debit {outstanding_amount} from your account today?"
+2. "I'll set up secure bank payment. Total {amount_with_fee} including R10 processing fee"
+3. "I'm sending you a payment link. You can pay while we're talking"
+</payment_hierarchy>
+
+<no_exit_rule>
+Must secure SOME arrangement before ending. Keep offering alternatives.
+</no_exit_rule>
+
+<style>
+- MAXIMUM 20 words per response
+- Assume they'll pay (positive framing)
+- Direct questions requiring yes/no answers
+- Professional persistence
+</style>"""
 
 def create_promise_to_pay_agent(
     model: BaseChatModel,
@@ -31,12 +76,12 @@ def create_promise_to_pay_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a promise to pay agent with progressive payment options."""
+    """Create a promise to pay agent."""
     
     agent_tools = [get_client_banking_details, add_client_note] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        """Pre-process to analyze conversation and prepare payment context."""
+        """Pre-process to prepare payment context."""
         
         # Get banking details availability
         banking_details = client_data.get('banking_details', {})
@@ -46,72 +91,17 @@ def create_promise_to_pay_agent(
         account_aging = client_data.get("account_aging", {})
         outstanding_amount = calculate_outstanding_amount(account_aging)
         
-        # Analyze conversation for payment intelligence
-        conversation_messages = state.get("messages", [])
-        emotional_state = ConversationAnalyzer.detect_emotional_state(conversation_messages)
-        objections_raised = ConversationAnalyzer.detect_real_objections(conversation_messages)
-        
-        # Analyze payment conversation for mentioned amounts and willingness
-        payment_analysis = ConversationAnalyzer.analyze_payment_conversation(conversation_messages, outstanding_amount)
-        payment_willingness = payment_analysis.get("payment_commitment", "unknown")
-        mentioned_amount = payment_analysis.get("mentioned_amount")
-        payment_timeframe = payment_analysis.get("payment_timeframe")
-        payment_method_preference = payment_analysis.get("payment_method_preference")
-        
-        # Determine negotiation strategy based on conversation intelligence
-        if emotional_state == "cooperative" and payment_willingness == "willing":
-            negotiation_strategy = "direct_closure"
+        # Determine recommended approach
+        if has_banking_details:
             recommended_approach = "immediate_debit"
-        elif emotional_state in ["worried", "frustrated"]:
-            negotiation_strategy = "supportive_flexible"
+        else:
             recommended_approach = "payment_portal"
-        elif "no_money" in objections_raised or "cant_afford" in objections_raised:
-            negotiation_strategy = "flexible_amounts"
-            recommended_approach = "partial_payment"
-        else:
-            negotiation_strategy = "progressive_standard"
-            recommended_approach = "immediate_debit" if has_banking_details else "payment_portal"
-        
-        # Calculate payment options based on outstanding amount
-        payment_options = [
-            {"type": "full_payment", "amount": outstanding_amount, "priority": 1},
-            {"type": "partial_80", "amount": outstanding_amount * 0.8, "priority": 2},
-            {"type": "partial_50", "amount": outstanding_amount * 0.5, "priority": 3}
-        ]
-        
-        # Adjust current option based on conversation context
-        if mentioned_amount and mentioned_amount >= outstanding_amount * 0.3:
-            current_option = {"amount": mentioned_amount, "type": "client_suggested"}
-        elif payment_willingness == "unwilling" and outstanding_amount > 300:
-            # Start with partial option for unwilling clients
-            current_option = payment_options[1]  # 80% option
-        else:
-            current_option = payment_options[0]  # Full payment
-        
-        # Determine urgency messaging
-        urgency_level = "standard"
-        if "will_pay_later" in objections_raised:
-            urgency_level = "immediate"
-        elif payment_timeframe == "immediate":
-            urgency_level = "low"
-        elif emotional_state == "cooperative":
-            urgency_level = "confident"
         
         return Command(
             update={
                 "has_banking_details": has_banking_details,
                 "outstanding_float": outstanding_amount,
-                "payment_willingness": payment_willingness,
-                "emotional_state": emotional_state,
-                "objections_raised": objections_raised,
-                "negotiation_strategy": negotiation_strategy,
                 "recommended_approach": recommended_approach,
-                "current_payment_option": current_option,
-                "payment_options": payment_options,
-                "mentioned_amount": mentioned_amount,
-                "payment_timeframe": payment_timeframe,
-                "payment_method_preference": payment_method_preference,
-                "urgency_level": urgency_level,
                 "current_step": CallStep.PROMISE_TO_PAY.value
             },
             goto="agent"
@@ -119,15 +109,7 @@ def create_promise_to_pay_agent(
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate dynamic prompt for promise to pay step."""
-        parameters = prepare_parameters(
-            client_data=client_data,
-            current_step=CallStep.PROMISE_TO_PAY.value,
-            state=state.to_dict() if hasattr(state, 'to_dict') else state,
-            script_type=script_type,
-            agent_name=agent_name
-        )
-        
-        prompt_content = get_step_prompt(CallStep.PROMISE_TO_PAY.value, parameters)
+        prompt_content = get_promise_to_pay_prompt(client_data, state.to_dict() if hasattr(state, 'to_dict') else state)
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
