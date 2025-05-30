@@ -13,17 +13,10 @@ from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
 
-# Import relevant database tools
-from src.Database.CartrackSQLDatabase import (
-    save_call_disposition,
-    get_disposition_types,
-    add_client_note,
-    update_payment_arrangements
-)
-
 def get_closing_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate closing specific prompt."""
     # Extract client info
+    user_id = client_data["profile"]["user_id"]
     client_name = get_safe_value(client_data, "profile.client_info.first_name", "Client")
     
     # Get call outcome
@@ -31,11 +24,12 @@ def get_closing_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict
     outstanding_amount = state.get("outstanding_amount", "R 0.00")
     
     return f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <task>
 End call professionally with summary. MAXIMUM 20 words.
+- Client user_id: {user_id}
 </task>
 
 <summary_options>
@@ -49,7 +43,8 @@ End call professionally with summary. MAXIMUM 20 words.
 - MAXIMUM 20 words
 - Professional and courteous
 - Clear outcome summary
-- Thank the client
+- Thank the client, do not mention "Payment Secured, Escalation, Cancellation, Incomplete"
+- RESPOND MAX in 30 words
 </style>"""
 
 def create_closing_agent(
@@ -62,8 +57,6 @@ def create_closing_agent(
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
     """Create a closing agent."""
-    
-    agent_tools = [save_call_disposition, get_disposition_types, add_client_note, update_payment_arrangements] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to determine call outcome and prepare summary."""
@@ -116,7 +109,7 @@ def create_closing_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

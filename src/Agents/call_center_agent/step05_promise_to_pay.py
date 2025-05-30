@@ -2,6 +2,7 @@
 """
 Promise to Pay Agent - Enhanced with aging-aware script integration
 """
+import datetime
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
@@ -15,14 +16,18 @@ from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
 from src.Database.CartrackSQLDatabase import (
+    get_client_account_overview,
     get_client_banking_details,
-    add_client_note
+    create_payment_arrangement,
+  
 )
+agent_tools = [get_client_banking_details, get_client_account_overview ]
 
 def get_promise_to_pay_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware promise to pay prompt."""
     
     # Determine script type from aging
+    user_id = get_safe_value(client_data, "profile.user_id", "")     
     account_aging = client_data.get("account_aging", {})
     script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
     aging_context = ScriptManager.get_aging_context(script_type)
@@ -85,7 +90,7 @@ def get_promise_to_pay_prompt(client_data: Dict[str, Any], agent_name: str, stat
     
     # Base prompt
     base_prompt = f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <client_context>
@@ -95,10 +100,13 @@ You are {agent_name}, a professional debt collection specialist at Cartrack's Ac
 - Has Banking Details: {has_banking_details}
 - Aging Category: {category}
 - Urgency Level: {urgency_level}
+- Client user_id: {user_id}
 </client_context>
 
 <task>
 Secure payment arrangement using aging-appropriate urgency and persistence.
+Today's Date: {datetime.datetime.now().isoformat()}
+Use the tool `date_helper()` to get the correct date before making payment arrangment
 </task>
 
 <aging_specific_payment_hierarchy>
@@ -133,6 +141,7 @@ Must secure SOME arrangement before ending. Urgency level determines flexibility
 - Direct questions requiring yes/no answers
 - Persistence matching account severity
 - Professional but {urgency_level.lower()} priority
+- RESPOND MAX in 30 words
 </style>"""
 
     # Enhance with script content
@@ -155,7 +164,7 @@ def create_promise_to_pay_agent(
 ) -> CompiledGraph:
     """Create a promise to pay agent with aging-aware scripts."""
     
-    agent_tools = [get_client_banking_details, add_client_note] + (tools or [])
+    tools = agent_tools + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         # Get banking details availability
@@ -198,7 +207,7 @@ def create_promise_to_pay_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

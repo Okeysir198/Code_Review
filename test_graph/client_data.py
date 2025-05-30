@@ -79,7 +79,7 @@ def _get_fallback_client_data(user_id: str) -> Dict[str, Any]:
     }
 
 # Execute and return client_data at module level
-user_id = "83906"  # Example user ID, can be changed as needed
+user_id = "1489698"  # Example user ID, can be changed as needed
 
 client_data = _load_client_data_sync(user_id)
 logger.info(f"✅ Client data loaded at module level for user: {client_data.get('user_id', 'unknown')}")

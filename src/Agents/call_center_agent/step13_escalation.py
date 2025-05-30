@@ -19,15 +19,11 @@ from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-from src.Database.CartrackSQLDatabase import (
-    add_client_note,
-    save_call_disposition
-)
-
 def get_escalation_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware escalation prompt."""
     
     # Determine script type from aging
+    user_id = client_data["profile"]["user_id"]
     account_aging = client_data.get("account_aging", {})
     script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
     aging_context = ScriptManager.get_aging_context(script_type)
@@ -76,7 +72,7 @@ def get_escalation_prompt(client_data: Dict[str, Any], agent_name: str, state: D
     
     # Base prompt
     base_prompt = f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <context>
@@ -85,6 +81,7 @@ You are {agent_name}, a professional debt collection specialist at Cartrack's Ac
 - Ticket Number: {ticket_number}
 - Department: {escalation_approach['department']}
 - Response Time: {escalation_approach['response_time']}
+- Client user_id: {user_id}
 </context>
 
 <task>
@@ -115,6 +112,7 @@ Handle escalation professionally using aging-appropriate authority and timeline.
 - Clear communication of next steps
 - Professional resolution matching account status
 - Authority level appropriate to aging category
+- RESPOND MAX in 30 words
 </style>"""
 
     # Enhance with script content
@@ -137,8 +135,6 @@ def create_escalation_agent(
 ) -> CompiledGraph:
     """Create an escalation agent with aging-aware scripts."""
     
-    agent_tools = [add_client_note, save_call_disposition] + (tools or [])
-    
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         # Determine script type and appropriate escalation level
         account_aging = client_data.get("account_aging", {})
@@ -157,23 +153,23 @@ def create_escalation_agent(
         category = aging_context['category']
         department, response_time = escalation_mapping.get(category, ("Supervisor", "24-48 hours"))
         
-        ticket_number = f"ESC{datetime.now().strftime('%Y%m%d%H%M')}{str(uuid.uuid4())[:4].upper()}"
+        # ticket_number = f"ESC{datetime.now().strftime('%Y%m%d%H%M')}{str(uuid.uuid4())[:4].upper()}"
         
-        # Add escalation note
-        user_id = client_data.get("user_id")
-        if user_id:
-            try:
-                add_client_note.invoke({
-                    "user_id": user_id,
-                    "note_text": f"Call escalated to {department}. Ticket: {ticket_number}. Category: {category}"
-                })
-            except Exception as e:
-                if verbose:
-                    print(f"Error adding escalation note: {e}")
+        # # Add escalation note
+        # user_id = client_data.get("user_id")
+        # if user_id:
+        #     try:
+        #         add_client_note.invoke({
+        #             "user_id": user_id,
+        #             "note_text": f"Call escalated to {department}. Ticket: {ticket_number}. Category: {category}"
+        #         })
+        #     except Exception as e:
+        #         if verbose:
+        #             print(f"Error adding escalation note: {e}")
         
         return Command(
             update={
-                "ticket_number": ticket_number,
+                # "ticket_number": ticket_number,
                 "department": department,
                 "response_time": response_time,
                 "aging_category": category,
@@ -192,7 +188,7 @@ def create_escalation_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

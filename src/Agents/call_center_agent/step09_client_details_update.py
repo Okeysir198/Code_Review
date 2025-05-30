@@ -14,16 +14,11 @@ from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-from src.Database.CartrackSQLDatabase import (
-    update_client_contact_number,
-    update_client_email,
-    add_client_note
-)
-
 def get_client_details_update_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware client details update prompt."""
     
     # Determine script type from aging
+    user_id = get_safe_value(client_data, "profile.user_id", "")     
     account_aging = client_data.get("account_aging", {})
     script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
     aging_context = ScriptManager.get_aging_context(script_type)
@@ -93,7 +88,7 @@ def get_client_details_update_prompt(client_data: Dict[str, Any], agent_name: st
     
     # Base prompt
     base_prompt = f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <context>
@@ -101,6 +96,7 @@ You are {agent_name}, a professional debt collection specialist at Cartrack's Ac
 - Current Email: {current_email}
 - Aging Category: {category}
 - Urgency Level: {urgency_level}
+- Client user_id: {user_id}
 </context>
 
 <task>
@@ -134,6 +130,7 @@ Update client contact information using aging-appropriate justification and urge
 - Appropriate urgency for {urgency_level.lower()} priority account
 - Clear benefit messaging
 - Efficient process
+- RESPOND MAX in 30 words
 </style>"""
 
     # Enhance with script content
@@ -155,8 +152,6 @@ def create_client_details_update_agent(
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
     """Create a client details update agent with aging-aware scripts."""
-    
-    agent_tools = [update_client_contact_number, update_client_email, add_client_note] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         # Extract current contact information
@@ -188,7 +183,7 @@ def create_client_details_update_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

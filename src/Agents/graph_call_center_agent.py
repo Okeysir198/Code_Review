@@ -35,6 +35,117 @@ from src.Agents.call_center_agent.step14_cancellation import create_cancellation
 from src.Agents.call_center_agent.step15_closing import create_closing_agent
 from app_config import CONFIG
 
+# Import all required database tools
+from src.Database.CartrackSQLDatabase import (
+    date_helper,
+    # Account and Payment Information
+    get_client_account_overview,
+    get_client_account_aging,
+    get_client_payment_history,
+    get_client_failed_payments,
+    get_client_banking_details,
+    get_client_subscription_amount,
+    get_client_debit_mandates,
+    
+    # Payment Creation and Processing
+    create_payment_arrangement,
+    create_debicheck_payment,
+    create_payment_arrangement_payment_portal,
+    generate_sms_payment_url,
+    
+    # Client Information Updates
+    update_client_contact_number,
+    update_client_email,
+    add_client_note,
+    
+    # Call Management
+    save_call_disposition,
+    get_disposition_types,
+    update_payment_arrangements
+)
+# ============================================================================
+# TOOL DEFINITIONS - Clean and Organized
+# ============================================================================
+
+# Core Call Flow Tools
+introduction_tools = []  # Introduction needs no tools - just greeting
+
+name_verification_tools = []  # Uses built-in verification logic
+
+details_verification_tools = []  # Uses built-in verification tools
+
+reason_for_call_tools = [
+    # get_client_account_overview,
+    # get_client_account_aging,
+]
+
+negotiation_tools = [
+    # get_client_payment_history,
+    # get_client_failed_payments,
+]
+
+# Payment Processing Tools
+promise_to_pay_tools = [
+    # get_client_account_overview,
+    date_helper,
+    get_client_banking_details,
+    create_payment_arrangement,
+    create_debicheck_payment
+]
+
+debicheck_tools = [
+    get_client_debit_mandates,
+    create_debicheck_payment,
+]
+
+payment_portal_tools = [
+    create_payment_arrangement_payment_portal,
+    generate_sms_payment_url,
+]
+
+# Account Management Tools
+subscription_reminder_tools = [
+    get_client_subscription_amount,
+]
+
+client_details_update_tools = [
+    update_client_contact_number,
+    update_client_email,
+    add_client_note
+]
+
+referrals_tools = [
+    add_client_note  # For logging referral interest
+]
+
+further_assistance_tools = [
+    add_client_note  # For logging additional assistance provided
+]
+
+# Special Handling Tools
+query_resolution_tools = [
+    add_client_note  # For logging query resolution
+]
+
+escalation_tools = [
+    add_client_note,
+    save_call_disposition
+]
+
+cancellation_tools = [
+    get_client_account_aging,
+    add_client_note,
+    save_call_disposition
+]
+
+closing_tools = [
+    save_call_disposition,
+    get_disposition_types,
+    add_client_note,
+    update_payment_arrangements
+]
+
+########################################################################
 logger = logging.getLogger(__name__)
 
 
@@ -43,7 +154,8 @@ def create_call_center_agent(
     client_data: Dict[str, Any],
     script_type: str = None,
     agent_name: str = "AI Agent",
-    config: Optional[Dict[str, Any]] = None
+    config: Optional[Dict[str, Any]] = None,
+    verbose: bool = False
 ) -> CompiledGraph:
     """Create the complete call center agent workflow with optimized router."""
     # Auto-determine script type if not provided
@@ -56,23 +168,197 @@ def create_call_center_agent(
     max_name_attempts = CONFIG.get("verification", {}).get("max_name_verification_attempts", 5)
     max_details_attempts = CONFIG.get("verification", {}).get("max_details_verification_attempts", 5)
 
-    # Create all specialized sub-agents as variables (direct instantiation)
-    introduction_agent = create_introduction_agent(model, client_data, script_type, agent_name, config=config)
-    name_verification_agent = create_name_verification_agent(model, client_data, script_type, agent_name, config=config)
-    details_verification_agent = create_details_verification_agent(model, client_data, script_type, agent_name, config=config)
-    reason_for_call_agent = create_reason_for_call_agent(model, client_data, script_type, agent_name, config=config)
-    negotiation_agent = create_negotiation_agent(model, client_data, script_type, agent_name, config=config)
-    promise_to_pay_agent = create_promise_to_pay_agent(model, client_data, script_type, agent_name, config=config)
-    debicheck_setup_agent = create_debicheck_setup_agent(model, client_data, script_type, agent_name, config=config)
-    payment_portal_agent = create_payment_portal_agent(model, client_data, script_type, agent_name, config=config)
-    subscription_reminder_agent = create_subscription_reminder_agent(model, client_data, script_type, agent_name, config=config)
-    client_details_update_agent = create_client_details_update_agent(model, client_data, script_type, agent_name, config=config)
-    referrals_agent = create_referrals_agent(model, client_data, script_type, agent_name, config=config)
-    further_assistance_agent = create_further_assistance_agent(model, client_data, script_type, agent_name, config=config)
-    query_resolution_agent = create_query_resolution_agent(model, client_data, script_type, agent_name, config=config)
-    escalation_agent = create_escalation_agent(model, client_data, script_type, agent_name, config=config)
-    cancellation_agent = create_cancellation_agent(model, client_data, script_type, agent_name, config=config)
-    closing_agent = create_closing_agent(model, client_data, script_type, agent_name, config=config)
+    # ========================================================================
+    # CORE CALL FLOW AGENTS
+    # ========================================================================
+    
+    introduction_agent = create_introduction_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=introduction_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Introduction agent created")
+    
+    name_verification_agent = create_name_verification_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=name_verification_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Name verification agent created")
+    
+    details_verification_agent = create_details_verification_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=details_verification_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Details verification agent created")
+    
+    reason_for_call_agent = create_reason_for_call_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=reason_for_call_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Reason for call agent created")
+    
+    negotiation_agent = create_negotiation_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=negotiation_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Negotiation agent created")
+    
+    # ========================================================================
+    # PAYMENT PROCESSING AGENTS
+    # ========================================================================
+    
+    promise_to_pay_agent = create_promise_to_pay_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=promise_to_pay_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Promise to pay agent created")
+    
+    debicheck_setup_agent = create_debicheck_setup_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=debicheck_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ DebiCheck setup agent created")
+    
+    payment_portal_agent = create_payment_portal_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=payment_portal_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Payment portal agent created")
+    
+    # ========================================================================
+    # ACCOUNT MANAGEMENT AGENTS
+    # ========================================================================
+    
+    subscription_reminder_agent = create_subscription_reminder_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=subscription_reminder_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Subscription reminder agent created")
+    
+    client_details_update_agent = create_client_details_update_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=client_details_update_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Client details update agent created")
+    
+    referrals_agent = create_referrals_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=referrals_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Referrals agent created")
+    
+    further_assistance_agent = create_further_assistance_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=further_assistance_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Further assistance agent created")
+    
+    # ========================================================================
+    # SPECIAL HANDLING AGENTS
+    # ========================================================================
+    
+    query_resolution_agent = create_query_resolution_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=query_resolution_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Query resolution agent created")
+    
+    escalation_agent = create_escalation_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=escalation_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Escalation agent created")
+    
+    cancellation_agent = create_cancellation_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=cancellation_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Cancellation agent created")
+    
+    closing_agent = create_closing_agent(
+        model=model,
+        client_data=client_data,
+        script_type=script_type,
+        agent_name=agent_name,
+        tools=closing_tools,
+        verbose=verbose,
+        config=config
+    )
+    logger.info("✅ Closing agent created")
 
     # OPTIMIZED ROUTER LLM PROMPT - Step-Aware Classification
     def _get_optimized_router_prompt(state):
@@ -294,6 +580,9 @@ def create_call_center_agent(
         if len(state.get("messages", [])) < 2:
             return {"current_step": CallStep.INTRODUCTION.value}
         
+        if state.get("is_call_ended"):
+            return {"current_step": CallStep.CLOSING.value}
+        
         current_step = state.get("current_step", CallStep.INTRODUCTION.value)
         
         # 1. Business rule overrides (highest priority)
@@ -360,7 +649,7 @@ def create_call_center_agent(
         current_step = state.get("current_step", CallStep.INTRODUCTION.value)
         
         if state.get("is_call_ended"):
-            return END
+            return CallStep.CLOSING.value
             
         logger.info(f"Execution router: Routing to {current_step}")
         return current_step
@@ -383,7 +672,7 @@ def create_call_center_agent(
 
     # RARE HANDOFF: Name Verification → Handoff only if VERIFIED
     def name_verification_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
-        """Name verification step - handoff only if VERIFIED."""
+        """Name verification step - handoff only if VERIFIED, end call for terminal states."""
 
         result = name_verification_agent.invoke(state)
         
@@ -394,18 +683,40 @@ def create_call_center_agent(
             "current_step": CallStep.NAME_VERIFICATION.value
         }
         
-        # RARE HANDOFF: Only if VERIFIED
-        if result.get("name_verification_status") == VerificationStatus.VERIFIED.value:
+        verification_status = result.get("name_verification_status")
+        
+        # RARE HANDOFF: Only if VERIFIED - proceed to details verification
+        if verification_status == VerificationStatus.VERIFIED.value:
             update["current_step"] = CallStep.DETAILS_VERIFICATION.value
             logger.info("Name verification VERIFIED - handing off to details verification")
             return Command(update=update, goto=CallStep.DETAILS_VERIFICATION.value)
         
-        logger.info("Name verification incomplete - returning to __end__")
-        return Command(update=update, goto="__end__")
+        # END CALL: Terminal states that should end the call
+        elif verification_status in [
+            VerificationStatus.THIRD_PARTY.value,
+            VerificationStatus.UNAVAILABLE.value,
+            VerificationStatus.WRONG_PERSON.value,
+            VerificationStatus.VERIFICATION_FAILED.value
+        ]:
+            update['is_call_ended'] = True
+            update["current_step"] = CallStep.CLOSING.value
+            logger.info(f"Name verification terminal state: {verification_status} - ending call")
+            return Command(update=update, goto="__end__")
+        
+        # CONTINUE CALL: Only INSUFFICIENT_INFO should continue
+        elif verification_status == VerificationStatus.INSUFFICIENT_INFO.value:
+            # Stay in name verification step for router to continue trying
+            logger.info(f"Name verification insufficient info - returning to router")
+            return Command(update=update, goto="__end__")
+        
+        # FALLBACK: Unknown status - stay in verification
+        else:
+            logger.warning(f"Unknown name verification status: {verification_status} - staying in verification")
+            return Command(update=update, goto="__end__")
 
     # RARE HANDOFF: Details Verification → Handoff only if VERIFIED  
     def details_verification_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
-        """Details verification step - handoff only if VERIFIED."""
+        """Details verification step - handoff only if VERIFIED, end call for terminal states."""
         
         result = details_verification_agent.invoke(state)
         
@@ -417,14 +728,36 @@ def create_call_center_agent(
             "current_step": CallStep.DETAILS_VERIFICATION.value
         }
         
-        # RARE HANDOFF: Only if VERIFIED
-        if result.get("details_verification_status") == VerificationStatus.VERIFIED.value:
+        verification_status = result.get("details_verification_status")
+        
+        # RARE HANDOFF: Only if VERIFIED - proceed to reason for call
+        if verification_status == VerificationStatus.VERIFIED.value:
             update["current_step"] = CallStep.REASON_FOR_CALL.value
             logger.info("Details verification VERIFIED - handing off to reason for call")
             return Command(update=update, goto=CallStep.REASON_FOR_CALL.value)
         
-        logger.info("Details verification incomplete - returning to __end__")
-        return Command(update=update, goto="__end__")
+        # END CALL: Terminal states that should end the call
+        elif verification_status in [
+            VerificationStatus.THIRD_PARTY.value,
+            VerificationStatus.UNAVAILABLE.value,
+            VerificationStatus.WRONG_PERSON.value,
+            VerificationStatus.VERIFICATION_FAILED.value
+        ]:
+            update['is_call_ended'] = True
+            update["current_step"] = CallStep.CLOSING.value
+            logger.info(f"Details verification terminal state: {verification_status} - ending call")
+            return Command(update=update, goto="__end__")
+        
+        # CONTINUE CALL: Only INSUFFICIENT_INFO should continue
+        elif verification_status == VerificationStatus.INSUFFICIENT_INFO.value:
+            # Stay in details verification step for router to continue trying
+            logger.info(f"Details verification insufficient info - returning to router")
+            return Command(update=update, goto="__end__")
+        
+        # FALLBACK: Unknown status - stay in verification
+        else:
+            logger.warning(f"Unknown details verification status: {verification_status} - staying in verification")
+            return Command(update=update, goto="__end__")
 
     
     def reason_for_call_node(state: CallCenterAgentState) -> Command[Literal["negotiation"]]:

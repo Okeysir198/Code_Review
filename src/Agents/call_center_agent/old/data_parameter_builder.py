@@ -78,7 +78,7 @@ def calculate_outstanding_amount(account_aging_data: Dict[str, Any]) -> float:
 def format_outstanding_amount(client_data: Dict[str, Any]) -> str:
     """Format outstanding amount for use in prompts."""
     
-    account_aging = client_data.get("account_aging", {})
+    user_id = get_safe_value(client_data, "profile.user_id", "")     account_aging = client_data.get("account_aging", {})
     outstanding_float = calculate_outstanding_amount(account_aging)
     
     if outstanding_float <= 0:
@@ -390,7 +390,7 @@ class PaymentFlexibilityAnalyzer:
         """Assess client's payment capacity and flexibility options."""
         
         # Extract financial indicators
-        account_aging = client_data.get("account_aging", {})
+        user_id = get_safe_value(client_data, "profile.user_id", "")     account_aging = client_data.get("account_aging", {})
         payment_history = client_data.get("payment_history", [])
         failed_payments = client_data.get("failed_payments", [])
         
@@ -497,7 +497,7 @@ class BehavioralAnalyzer:
         try:
             # Traditional data analysis
             payment_history = client_data.get("payment_history", [])
-            account_aging = client_data.get("account_aging", {})
+            user_id = get_safe_value(client_data, "profile.user_id", "")     account_aging = client_data.get("account_aging", {})
             billing_analysis = client_data.get("billing_analysis", {})
             failed_payments = client_data.get("failed_payments", [])
             
@@ -847,7 +847,7 @@ class ParameterBuilder:
             logger.info(f"Payment Reliability: {behavioral_analysis.get('payment_reliability', 'unknown')}")
             
             # # Log aging breakdown for transparency
-            # account_aging = client_data.get("account_aging", {})
+            # user_id = get_safe_value(client_data, "profile.user_id", "")     account_aging = client_data.get("account_aging", {})
             # if account_aging:
             #     logger.info("Account aging breakdown:")
             #     logger.info(f"  Current (x0): R {account_aging.get('x0', 0)}")
@@ -926,7 +926,7 @@ class ParameterBuilder:
     def _extract_financial_info(client_data: Dict[str, Any]) -> Dict[str, str]:
         """Extract financial information with proper outstanding amount calculation."""
         try:
-            account_aging = client_data.get("account_aging", {})
+            user_id = get_safe_value(client_data, "profile.user_id", "")     account_aging = client_data.get("account_aging", {})
             subscription = client_data.get("subscription", {})
             
             if not isinstance(account_aging, dict):
@@ -1470,7 +1470,7 @@ def prepare_parameters_with_validation(
         )
         
         # Calculate outstanding amount properly
-        account_aging = client_data.get("account_aging", {})
+        user_id = get_safe_value(client_data, "profile.user_id", "")     account_aging = client_data.get("account_aging", {})
         outstanding_float = calculate_outstanding_amount(account_aging)
         outstanding_amount = format_currency(outstanding_float)
         

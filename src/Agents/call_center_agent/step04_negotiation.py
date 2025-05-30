@@ -14,16 +14,11 @@ from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-from src.Database.CartrackSQLDatabase import (
-    get_client_payment_history,
-    get_client_failed_payments,
-    add_client_note
-)
-
 def get_negotiation_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware negotiation prompt."""
     
     # Determine script type from aging
+    user_id = get_safe_value(client_data, "profile.user_id", "")     
     account_aging = client_data.get("account_aging", {})
     script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
     aging_context = ScriptManager.get_aging_context(script_type)
@@ -91,7 +86,7 @@ def get_negotiation_prompt(client_data: Dict[str, Any], agent_name: str, state: 
     
     # Base prompt
     base_prompt = f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <client_context>
@@ -99,6 +94,7 @@ You are {agent_name}, a professional debt collection specialist at Cartrack's Ac
 - Outstanding: {outstanding_amount}
 - Account Category: {category}
 - Urgency Level: {urgency_level}
+- Client user_id: {user_id}
 </client_context>
 
 <task>
@@ -131,6 +127,7 @@ Handle objections and explain consequences using aging-appropriate urgency and t
 - Focus on solutions, not problems
 - Create urgency appropriate to account status
 - Maximum impact per response
+- RESPOND MAX in 30 words
 </style>"""
 
     # Enhance with script content
@@ -152,12 +149,6 @@ def create_negotiation_agent(
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
     """Create a negotiation agent with aging-aware scripts."""
-    
-    agent_tools = [
-        get_client_payment_history,
-        get_client_failed_payments,
-        add_client_note
-    ] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         account_aging = client_data.get("account_aging", {})
@@ -188,7 +179,7 @@ def create_negotiation_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

@@ -20,15 +20,12 @@ from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.data.client_data_fetcher import calculate_outstanding_amount, format_currency
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-from src.Database.CartrackSQLDatabase import (
-    add_client_note,
-    get_client_account_aging
-)
 
 def get_cancellation_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware cancellation prompt."""
     
     # Determine script type from aging
+    user_id = client_data["profile"]["user_id"]
     account_aging = client_data.get("account_aging", {})
     script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
     aging_context = ScriptManager.get_aging_context(script_type)
@@ -72,7 +69,7 @@ def get_cancellation_prompt(client_data: Dict[str, Any], agent_name: str, state:
     
     # Base prompt
     base_prompt = f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <context>
@@ -81,6 +78,7 @@ You are {agent_name}, a professional debt collection specialist at Cartrack's Ac
 - Ticket Number: {ticket_number}
 - Aging Category: {category}
 - Urgency Level: {aging_context['urgency']}
+- Client user_id: {user_id}
 </context>
 
 <task>
@@ -116,6 +114,7 @@ Process cancellation professionally using aging-appropriate approach and require
 - Clear fee and settlement explanation
 - No retention attempts (focus on process)
 - Authority level appropriate to account status
+- RESPOND MAX in 30 words
 </style>"""
 
     # Enhance with script content
@@ -138,12 +137,11 @@ def create_cancellation_agent(
 ) -> CompiledGraph:
     """Create a cancellation agent."""
     
-    agent_tools = [add_client_note, get_client_account_aging] + (tools or [])
-    
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Pre-process to calculate cancellation fees and create ticket."""
         
         # Calculate cancellation fee and total balance
+        user_id = client_data["profile"]["user_id"]
         account_aging = client_data.get("account_aging", {})
         outstanding_balance = calculate_outstanding_amount(account_aging)
         
@@ -151,26 +149,26 @@ def create_cancellation_agent(
         cancellation_fee = 0.0  # Set based on your business rules
         total_balance = outstanding_balance + cancellation_fee
         
-        # Generate cancellation ticket
-        ticket_number = f"CAN{datetime.now().strftime('%Y%m%d%H%M')}{str(uuid.uuid4())[:4].upper()}"
+        # # Generate cancellation ticket
+        # ticket_number = f"CAN{datetime.now().strftime('%Y%m%d%H%M')}{str(uuid.uuid4())[:4].upper()}"
         
-        # Add cancellation note
-        user_id = client_data.get("user_id")
-        if user_id:
-            try:
-                add_client_note.invoke({
-                    "user_id": user_id,
-                    "note_text": f"Cancellation requested. Ticket: {ticket_number}, Total balance: {format_currency(total_balance)}"
-                })
-            except Exception as e:
-                if verbose:
-                    print(f"Error adding cancellation note: {e}")
+        # # Add cancellation note
+        # user_id = client_data.get("user_id")
+        # if user_id:
+        #     try:
+        #         add_client_note.invoke({
+        #             "user_id": user_id,
+        #             "note_text": f"Cancellation requested. Ticket: {ticket_number}, Total balance: {format_currency(total_balance)}"
+        #         })
+        #     except Exception as e:
+        #         if verbose:
+        #             print(f"Error adding cancellation note: {e}")
         
         return Command(
             update={
                 "cancellation_fee": format_currency(cancellation_fee),
                 "total_balance": format_currency(total_balance),
-                "ticket_number": ticket_number,
+                # "ticket_number": ticket_number,
                 "cancellation_requested": True,
                 "current_step": CallStep.CANCELLATION.value
             },
@@ -185,7 +183,7 @@ def create_cancellation_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

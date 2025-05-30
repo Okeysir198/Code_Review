@@ -17,12 +17,11 @@ from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-from src.Database.CartrackSQLDatabase import add_client_note
-
 def get_further_assistance_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware further assistance prompt."""
     
     # Determine script type from aging
+    user_id = client_data["profile"]["user_id"]     
     account_aging = client_data.get("account_aging", {})
     script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
     aging_context = ScriptManager.get_aging_context(script_type)
@@ -67,12 +66,13 @@ def get_further_assistance_prompt(client_data: Dict[str, Any], agent_name: str, 
     
     # Base prompt
     base_prompt = f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <context>
 - Aging Category: {category}
 - Urgency Level: {urgency_level}
+- Client user_id: {user_id}
 </context>
 
 <task>
@@ -102,6 +102,7 @@ Check for additional concerns appropriate to account status and urgency level.
 - Complete resolution focus
 - Professional care matching account status
 - Time-appropriate for {urgency_level.lower()} priority
+- RESPOND MAX in 30 words
 </style>"""
 
     # Enhance with script content
@@ -124,8 +125,7 @@ def create_further_assistance_agent(
 ) -> CompiledGraph:
     """Create a further assistance agent with aging-aware scripts."""
     
-    agent_tools = [add_client_note] + (tools or [])
-    
+
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         # Determine script type and urgency
         account_aging = client_data.get("account_aging", {})
@@ -150,7 +150,7 @@ def create_further_assistance_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

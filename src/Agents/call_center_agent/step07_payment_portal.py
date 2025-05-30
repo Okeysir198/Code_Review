@@ -11,15 +11,14 @@ from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
-from src.Agents.call_center_agent.data.client_data_fetcher import calculate_outstanding_amount, format_currency
+from src.Agents.call_center_agent.data.client_data_fetcher import calculate_outstanding_amount, format_currency, get_safe_value
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
-
-from src.Database.CartrackSQLDatabase import generate_sms_payment_url, add_client_note
 
 def get_payment_portal_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate aging-aware payment portal prompt."""
     
     # Determine script type from aging
+    user_id = get_safe_value(client_data, "profile.user_id", "")     
     account_aging = client_data.get("account_aging", {})
     script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
     aging_context = ScriptManager.get_aging_context(script_type)
@@ -93,13 +92,14 @@ def get_payment_portal_prompt(client_data: Dict[str, Any], agent_name: str, stat
     
     # Base prompt
     base_prompt = f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <context>
 - Outstanding: {outstanding_amount}
 - Aging Category: {category}
 - Urgency Level: {urgency_level}
+- Client user_id: {user_id}
 </context>
 
 <task>
@@ -133,6 +133,7 @@ Guide client through payment portal using aging-appropriate urgency and support 
 - Immediate problem solving
 - Persistent until completion
 - {urgency_level.lower()} priority assistance
+- RESPOND MAX in 30 words
 </style>"""
 
     # Enhance with script content
@@ -154,9 +155,7 @@ def create_payment_portal_agent(
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
     """Create a payment portal agent with aging-aware scripts."""
-    
-    agent_tools = [generate_sms_payment_url, add_client_note] + (tools or [])
-    
+      
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         # Get outstanding amount
         account_aging = client_data.get("account_aging", {})
@@ -171,21 +170,21 @@ def create_payment_portal_agent(
         payment_url = None
         url_generated = False
         
-        if outstanding_amount > 0 and user_id:
-            try:
-                url_result = generate_sms_payment_url.invoke({
-                    "user_id": int(user_id),
-                    "amount": outstanding_amount,
-                    "optional_reference": f"PTP_{user_id}"
-                })
+        # if outstanding_amount > 0 and user_id:
+        #     try:
+        #         url_result = generate_sms_payment_url.invoke({
+        #             "user_id": int(user_id),
+        #             "amount": outstanding_amount,
+        #             "optional_reference": f"PTP_{user_id}"
+        #         })
                 
-                if url_result.get("success"):
-                    payment_url = url_result.get("payment_url")
-                    url_generated = True
+        #         if url_result.get("success"):
+        #             payment_url = url_result.get("payment_url")
+        #             url_generated = True
                     
-            except Exception as e:
-                if verbose:
-                    print(f"Error generating payment URL: {e}")
+        #     except Exception as e:
+        #         if verbose:
+        #             print(f"Error generating payment URL: {e}")
         
         return Command(
             update={
@@ -207,7 +206,7 @@ def create_payment_portal_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

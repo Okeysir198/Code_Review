@@ -40,7 +40,7 @@ def get_details_verification_prompt(client_data: Dict[str, Any], agent_name: str
     
     # Base prompt
     base_prompt = f"""<role>
-You are {agent_name}, a professional debt collection specialist at Cartrack's Accounts Department.
+You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
 <verification_context>
@@ -95,6 +95,7 @@ Complete identity verification for data protection compliance. Adapt urgency to 
 - Clear, specific requests
 - Acknowledge each successful verification
 - Respond under 20 words
+- RESPOND MAX in 30 words
 </style>"""
 
     # Enhance with script content

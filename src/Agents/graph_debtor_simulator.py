@@ -8,7 +8,7 @@ import random
 from typing import Dict, Any, Optional, List
 from enum import Enum
 
-from langchain_core.messages import SystemMessage, BaseMessage
+from langchain_core.messages import SystemMessage, BaseMessage, AIMessage, HumanMessage
 from langchain_core.language_models import BaseChatModel
 from langgraph.prebuilt import create_react_agent
 from langgraph.graph.graph import CompiledGraph
@@ -32,7 +32,7 @@ def create_debtor_simulator(
     llm: BaseChatModel,
     client_data: Dict[str, Any],
     personality: Optional[str] = None,
-    cooperativeness: float = 0.7
+    cooperativeness: float = 1
 ) -> CompiledGraph:
     """
     Create a debtor simulator using create_react_agent.
@@ -58,7 +58,7 @@ def create_debtor_simulator(
         You are COOPERATIVE and willing to resolve the debt:
         - Answer questions directly and honestly
         - Provide verification information when asked
-        - Generally agreeable to payment options
+        - Generally agreeable to payment, always choose the debit order as payment option.
         - Friendly and straightforward tone
         - Confirm identity readily: "Yes, this is [name] speaking"
         """,
@@ -282,7 +282,6 @@ YOUR INFORMATION:
 - Full Name: {client_name}
 - First Name: {first_name}
 - Title: {title}
-- Username: {username}
 - Email: {client_email}
 - Outstanding Amount: {outstanding_amount}
 - ID Number: {id_number}
@@ -301,6 +300,7 @@ BEHAVIOR GUIDELINES:
 3. Stay in character consistently
 4. Provide verification details when pressed (based on personality)
 5. React realistically to payment requests
+6. Respond as you are on the phone call
 
 VERIFICATION BEHAVIOR:
 - Name confirmation: {"readily" if cooperativeness > 0.7 else "hesitantly"}
@@ -309,7 +309,7 @@ VERIFICATION BEHAVIOR:
 PAYMENT BEHAVIOR:
 - Immediate debit acceptance: {int(cooperativeness * 100)}%
 - DebiCheck acceptance: {int(cooperativeness * 80)}%
-- Payment portal preference: {int(cooperativeness * 90)}%
+- Payment portal preference: {int(cooperativeness * 50)}%
 
 RESPONSE RULES:
 - Never break character or mention this is a simulation
@@ -343,10 +343,10 @@ def get_personality_configs() -> Dict[str, Dict[str, float]]:
     """Get predefined personality configurations."""
     return {
         "cooperative": {
-            "cooperativeness": 0.9,
+            "cooperativeness": 1,
             "name_confirmation": 0.95,
-            "detail_sharing": 0.9,
-            "payment_acceptance": 0.8
+            "detail_sharing": 1,
+            "payment_acceptance": 1
         },
         "difficult": {
             "cooperativeness": 0.3,
@@ -408,7 +408,7 @@ def get_personality_configs() -> Dict[str, Dict[str, float]]:
 # Enhanced convenience functions
 def create_cooperative_debtor(llm: BaseChatModel, client_data: Dict[str, Any]) -> CompiledGraph:
     """Create a cooperative debtor simulator."""
-    return create_debtor_simulator(llm, client_data, "cooperative", 0.9)
+    return create_debtor_simulator(llm, client_data, "cooperative", 1)
 
 
 def create_difficult_debtor(llm: BaseChatModel, client_data: Dict[str, Any]) -> CompiledGraph:

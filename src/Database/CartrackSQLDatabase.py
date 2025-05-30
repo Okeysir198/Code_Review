@@ -618,8 +618,7 @@ def get_client_vehicle_info(user_id: str) -> List[Dict[str, Any]]:
     Retrieves all vehicles belonging to a client.
     
     Args:
-        user_id: Client ID (string, e.g., "83906")
-        
+        user_id: Client ID         
     Returns:
         List of dictionaries containing vehicle information:
         - vehicle_id: Unique vehicle identifier
@@ -670,7 +669,7 @@ def get_client_identity_details_old(user_id: str) -> List[Dict[str, Any]]:
     Returns one record per vehicle owned by the client.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of dictionaries containing:
@@ -725,7 +724,7 @@ def get_client_profile(user_id: str) -> Optional[Dict]:
     - You need to understand a client's fleet of vehicles and tracking setup
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906" or "JOHN01264")
+        user_id: Client's unique identifier 
         
     Returns:
         Nested dictionary containing detailed client information:
@@ -793,6 +792,7 @@ def get_client_profile(user_id: str) -> Optional[Dict]:
         """
         # Initialize structure
         result = {
+            "user_id": user_id,
             "user_name": None,
             "client_info": {
                 "title": "",
@@ -1046,7 +1046,7 @@ def get_client_account_aging(user_id: str) -> Optional[List[Dict[str, str]]]:
     Use this tool when discussing a client's outstanding balance and payment status.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List containing a dictionary with aging categories:
@@ -1070,7 +1070,7 @@ def get_client_account_status(user_id: str) -> Optional[List[Dict[str, str]]]:
     or if service might be affected due to payment issues.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List containing a dictionary with 'account_state' key:
@@ -1090,7 +1090,7 @@ def get_client_billing_analysis(user_id: str) -> List[Dict[str, Any]]:
     and metrics related to a client's billing status.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of dictionaries containing comprehensive account metrics including:
@@ -1112,7 +1112,7 @@ def get_client_contracts(user_id: str) -> List[Dict[str, Any]]:
     and service agreements.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of dictionaries containing contract information:
@@ -1149,7 +1149,7 @@ def get_client_account_overview(user_id: str) -> Optional[Dict[str, str]]:
     Use this as your go-to tool for understanding a client's complete situation.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         Dictionary containing client account status across multiple dimensions:
@@ -1214,7 +1214,7 @@ def get_client_account_statement(user_id: str) -> Optional[List[Dict[str, str]]]
     invoices issued, payments received, and credit notes.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of financial transactions containing:
@@ -1237,7 +1237,7 @@ def get_client_banking_details_old(user_id: str) -> Optional[List[Dict[str, str]
     bank account details, or billing preferences.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of dictionaries containing payment and banking details:
@@ -1361,7 +1361,7 @@ def get_client_payment_history(user_id: str) -> List[Dict[str, Any]]:
     whether they fulfilled those commitments.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of payment commitments (newest first) with:
@@ -1415,7 +1415,7 @@ def get_client_notes(user_id: str) -> List[Dict[str, Any]]:
     WhatsApp messages for a client.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of client notes and communications (newest first) with:
@@ -1452,7 +1452,7 @@ def get_client_debtor_letters(user_id: str) -> List[Dict[str, Any]]:
     such as payment reminders, collection notices, and other official correspondence.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of letters (newest first) with:
@@ -1486,7 +1486,7 @@ def get_client_failed_payments(user_id: str) -> List[Dict[str, Any]]:
     automatic and manual debit orders that were unsuccessful.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of failed payments (newest first) with:
@@ -1519,7 +1519,7 @@ def get_client_last_successful_payment(user_id: str) -> Dict[str, Any]:
     successful transaction occurred.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         Dictionary containing details about the last successful payment:
@@ -1564,7 +1564,7 @@ def get_client_last_valid_payment(user_id: str) -> Dict[str, Any]:
     as valid payments, unlike other reversed payments.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         Dictionary containing details about the last valid payment:
@@ -1605,7 +1605,7 @@ def get_client_last_reversed_payment(user_id: str) -> Dict[str, Any]:
     This can help identify patterns of attempted but unsuccessful payments.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         Dictionary containing details about the last reversed payment:
@@ -1655,7 +1655,7 @@ def update_payment_arrangements(user_id: str) -> Dict[str, Any]:
     completed or failed based on actual payments).
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
     
     Returns:
         Dictionary with:
@@ -1738,7 +1738,7 @@ def get_client_debit_mandates(user_id: str) -> List[Dict[str, Any]]:
     and to view the status and details of those mandates.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         
     Returns:
         List of debit order mandates (newest first) with:
@@ -1776,7 +1776,7 @@ def create_mandate_old(
     A mandate is required before creating a direct debit payment arrangement.
     
     Args:
-        user_id: Client ID (integer, e.g., 83906)
+        user_id: Client ID 
         service: Service identifier/category (e.g., 'PTP' for Promise to Pay, 'Subscription')
         amount: Collection amount (required for once-off mandates, calculated from contracts for recurring)
         collection_date: Collection date in 'YYYY-MM-DD' format (if provided, creates a once-off mandate; 
@@ -1946,7 +1946,7 @@ def create_mandate(
     A mandate is required before creating a direct debit payment arrangement.
     
     Args:
-        user_id: Client ID (integer, e.g., 83906)
+        user_id: Client ID 
         service: Service type - 'TT1' (default), 'TT2', or 'MIGRATE' for recurring mandates
                 or a descriptive identifier (e.g., 'PTP') for once-off mandates
         amount: Collection amount (required for once-off mandates, calculated from contracts for recurring)
@@ -2382,7 +2382,7 @@ def create_payment_arrangement(
     - 7 = Capitec Pay
     
     Args:
-        user_id: Client ID (integer, e.g., 83906)
+        user_id: Client ID
         pay_type_id: Payment method ID (see list above)
         payment1: Amount for first payment (required)
         date1: First payment date ('YYYY-MM-DD')
@@ -2644,7 +2644,7 @@ def get_client_subscription_amount(user_id: str, start_date: str = None, end_dat
     keeping up with their subscription obligations.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         start_date: Optional start date for historical calculation (format: "YYYY-MM-DD")
         end_date: Optional end date for historical calculation (format: "YYYY-MM-DD")
                   Note: If end_date is provided, start_date must also be provided
@@ -2690,7 +2690,7 @@ def create_payment_arrangement_payment_portal(
     Creates a single-payment arrangement through the payment portal.
     
     Args:
-        user_id: Client ID (integer, e.g., 83906)
+        user_id: Client ID 
         payment_type_id: Payment method ID (1=Direct Debit, 2=EFT, 3=Credit Card, 4=OZOW, 5=Pay@)
         payment_date: Payment date in 'YYYY-MM-DD' format
         amount: Payment amount (must be positive)
@@ -2882,7 +2882,7 @@ def generate_sms_payment_url(
     or email, allowing them to make payments online through the Cartrack payment portal.
     
     Args:
-        user_id: Client's unique identifier (as an integer, e.g., 83906)
+        user_id: Client's unique identifier
         amount: Payment amount
         optional_reference: Optional reference (e.g., invoice number, arrangement ID)
         
@@ -3318,7 +3318,7 @@ def validate_next_of_kin_contact(
     if the contact information would create a duplicate across the client's vehicles.
     
     Args:
-        user_id: Client's unique identifier (as an integer, e.g., 83906)
+        user_id: Client's unique identifier
         name: Name of the next of kin
         phone: Phone number of the next of kin
         email: Email address of the next of kin (optional)
@@ -4022,7 +4022,7 @@ def add_client_note(user_id: str, note_text: str) -> Dict[str, Any]:
     The note will be timestamped with the current date and time.
     
     Args:
-        user_id: Client's unique identifier (e.g., "83906")
+        user_id: Client's unique identifier 
         note_text: The content of the note to add
         
     Returns:

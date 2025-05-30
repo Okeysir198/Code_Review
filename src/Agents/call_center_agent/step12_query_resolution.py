@@ -18,12 +18,11 @@ from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep, V
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value, calculate_outstanding_amount, format_currency
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-from src.Database.CartrackSQLDatabase import add_client_note
-
 def get_query_resolution_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
     """Generate query resolution prompt with call scripts and 2-step verification."""
     
     # Determine script type from aging
+    user_id = client_data["profile"]["user_id"]
     account_aging = client_data.get("account_aging", {})
     script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
     aging_context = ScriptManager.get_aging_context(script_type)
@@ -53,6 +52,7 @@ You are a professional debt collection specialist from Cartrack Account Departme
 - Target Client: {client_full_name}
 - Outstanding: {outstanding_amount}
 - Verification Stage: Name confirmation required
+- Client user_id: {user_id}
 </context>
 
 <task>
@@ -82,6 +82,7 @@ Q: "Can I get extension?" → "Need to discuss. Are you {client_full_name}?"
 - Always end with exact name verification question
 - Natural, conversational tone
 - Do not say "sure" or "yes"..., just answer quickly
+- RESPOND MAX in 30 words
 </style>"""
         return base_prompt
     
@@ -95,6 +96,7 @@ You are a professional debt collection specialist from Cartrack Account Departme
 - Client: {client_full_name} (NAME VERIFIED ✓)
 - Outstanding: {outstanding_amount}
 - Verification Stage: Details/ID confirmation required
+- Client user_id: {user_id}
 </context>
 
 <task>
@@ -124,6 +126,7 @@ Q: "How does Cartrack work?" → "Vehicle tracking service. Your ID number pleas
 - Always end with ID verification request
 - Maintain urgency appropriate to account status
 - Do not say "sure" or "yes"..., just answer quickly
+- RESPOND MAX in 30 words
 </style>"""
         return base_prompt
     
@@ -198,6 +201,7 @@ You are a professional debt collection specialist from Cartrack Account Departme
 - Aging Category: {category}
 - Urgency Level: {urgency_level}
 - Return to: {return_to_step}
+- Client user_id: {user_id}
 </context>
 
 <task>
@@ -236,6 +240,7 @@ Return to: {return_to_step}
 - Stay focused on payment goal with appropriate urgency
 - Natural, conversational tone
 - Use aging-appropriate redirect message
+- RESPOND MAX in 30 words
 </style>"""
 
         # Enhance with call scripts system for fully verified users
@@ -257,8 +262,6 @@ def create_query_resolution_agent(
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
     """Create a query resolution agent with call scripts and 2-step verification."""
-    
-    agent_tools = (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         # Get the return step
@@ -366,7 +369,7 @@ def create_query_resolution_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=agent_tools,
+        tools=tools,
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,

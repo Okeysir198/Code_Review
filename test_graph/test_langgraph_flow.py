@@ -196,7 +196,7 @@ Current user: ID {user_id}
 - For ANY field not explicitly provided by the user, ASK rather than assume
 
 ## REFERENCE
-Today's Date: {today_date}
+Today's Date: {datetime.datetime.now().isoformat()}
 """
 messages_context_window = 20
 

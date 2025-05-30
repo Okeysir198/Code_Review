@@ -213,185 +213,77 @@ graph_closing_agent = create_closing_agent(
 )
 
 logger.info("✅ Special handling agents created successfully")
-
 ################################################################################
-# Testing Utilities
+agent_llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0)
+debtor_llm = ChatOllama(model="qwen2.5:7b-instruct", temperature=0.7)
 
-def get_all_individual_agents():
-    """Return dictionary of all individual agents for testing."""
-    return {
-        "introduction": graph_introduction_agent,
-        "name_verification": graph_name_verification_agent,
-        "details_verification": graph_details_verification_agent,
-        "reason_for_call": graph_reason_for_call_agent,
-        "negotiation": graph_negotiation_agent,
-        "promise_to_pay": graph_promise_to_pay_agent,
-        "debicheck_setup": graph_debicheck_setup_agent,
-        "payment_portal": graph_payment_portal_agent,
-        "subscription_reminder": graph_subscription_reminder_agent,
-        "client_details_update": graph_client_details_update_agent,
-        "referrals": graph_referrals_agent,
-        "further_assistance": graph_further_assistance_agent,
-        "query_resolution": graph_query_resolution_agent,
-        "escalation": graph_escalation_agent,
-        "cancellation": graph_cancellation_agent,
-        "closing": graph_closing_agent
-    }
+from src.Agents.graph_call_simulation import *
 
-def get_core_workflow_agents():
-    """Return dictionary of core workflow agents (main call flow)."""
-    return {
-        "introduction": graph_introduction_agent,
-        "name_verification": graph_name_verification_agent,
-        "details_verification": graph_details_verification_agent,
-        "reason_for_call": graph_reason_for_call_agent,
-        "negotiation": graph_negotiation_agent,
-        "promise_to_pay": graph_promise_to_pay_agent,
-        "closing": graph_closing_agent
-    }
+# Create all simulation types
+simulation_cooperative = create_cooperative_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
 
-def get_payment_agents():
-    """Return dictionary of payment-related agents."""
-    return {
-        "promise_to_pay": graph_promise_to_pay_agent,
-        "debicheck_setup": graph_debicheck_setup_agent,
-        "payment_portal": graph_payment_portal_agent,
-        "subscription_reminder": graph_subscription_reminder_agent
-    }
+simulation_difficult = create_difficult_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
 
-def get_special_handling_agents():
-    """Return dictionary of special handling agents."""
-    return {
-        "query_resolution": graph_query_resolution_agent,
-        "escalation": graph_escalation_agent,
-        "cancellation": graph_cancellation_agent,
-        "closing": graph_closing_agent
-    }
+simulation_confused = create_confused_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
 
-################################################################################
-# Debtor Simulator Variants for Testing Different Scenarios
+simulation_busy = create_busy_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
 
-def get_debtor_simulators():
-    """Create different debtor personality simulators for testing."""
-    simulators = {}
-    
-    # Cooperative debtor
-    simulators["cooperative"] = create_debtor_simulator(
-        llm=llm,
-        client_data=client_data,
-        personality="cooperative",
-        cooperativeness=0.9
-    )
-    
-    # Difficult debtor
-    simulators["difficult"] = create_debtor_simulator(
-        llm=llm,
-        client_data=client_data,
-        personality="difficult",
-        cooperativeness=0.3
-    )
-    
-    # Confused debtor
-    simulators["confused"] = create_debtor_simulator(
-        llm=llm,
-        client_data=client_data,
-        personality="confused",
-        cooperativeness=0.6
-    )
-    
-    # Busy debtor
-    simulators["busy"] = create_debtor_simulator(
-        llm=llm,
-        client_data=client_data,
-        personality="busy",
-        cooperativeness=0.7
-    )
-    
-    # Suspicious debtor
-    simulators["suspicious"] = create_debtor_simulator(
-        llm=llm,
-        client_data=client_data,
-        personality="suspicious",
-        cooperativeness=0.4
-    )
-    
-    # Wrong person
-    simulators["wrong_person"] = create_debtor_simulator(
-        llm=llm,
-        client_data=client_data,
-        personality="wrong_person",
-        cooperativeness=0.0
-    )
-    
-    # Third party spouse
-    simulators["third_party_spouse"] = create_debtor_simulator(
-        llm=llm,
-        client_data=client_data,
-        personality="third_party_spouse",
-        cooperativeness=0.7
-    )
-    
-    return simulators
+simulation_suspicious = create_suspicious_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
 
-# Create debtor simulators
-graph_debtor_simulators = get_debtor_simulators()
+simulation_wrong_person = create_wrong_person_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
 
-logger.info("✅ All debtor simulator variants created successfully")
+simulation_third_party_spouse = create_third_party_spouse_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
+simulation_third_party_assistant = create_third_party_assistant_simulation(
+    agent_llm=llm,
+    debtor_llm=debtor_llm,
+    client_data=client_data,
+    config=CONFIG
+)
+simulation_third_party_parent = create_third_party_parent_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
+simulation_third_party_employee = create_third_party_employee_simulation(
+    agent_llm=agent_llm,
+    debtor_llm=debtor_llm, 
+    client_data=client_data,
+    config=CONFIG
+)
 
-################################################################################
-# Summary and Status
-
-# logger.info("=" * 80)
-# logger.info("REFACTORED CALL CENTER AGENTS - SIMPLIFIED ARCHITECTURE")
-# logger.info("=" * 80)
-# logger.info("✅ Main call center agent with optimized router: graph_call_center_agent1")
-# logger.info("✅ All 16 individual step agents - self-contained with own prompts")
-# logger.info("✅ All debtor simulator variants (7 personalities) created")
-# logger.info("✅ Removed complex analysis - simple data fetching only")
-# logger.info("✅ Each agent owns its prompt and parameter logic")
-# logger.info("✅ Outstanding amount calculation: overdue only (not total balance)")
-# logger.info("=" * 80)
-# logger.info("🎯 Architecture: Self-contained agents with embedded prompts")
-# logger.info("📦 Data fetching: Simple client_data_fetcher.py")
-# logger.info("🗑️ Removed: prompts.py (800+ lines) + data_parameter_builder.py (1000+ lines)")
-# logger.info("=" * 80)
-
-################################################################################
-# Export key functions and objects for external use
-
-# __all__ = [
-#     # Main agents
-#     'graph_call_center_agent1',
-#     'graph_debtor_simulator',
-#     'graph_debtor_simulators',
-    
-#     # Individual step agents
-#     'graph_introduction_agent',
-#     'graph_name_verification_agent',
-#     'graph_details_verification_agent',
-#     'graph_reason_for_call_agent',
-#     'graph_negotiation_agent',
-#     'graph_promise_to_pay_agent',
-#     'graph_debicheck_setup_agent',
-#     'graph_payment_portal_agent',
-#     'graph_subscription_reminder_agent',
-#     'graph_client_details_update_agent',
-#     'graph_referrals_agent',
-#     'graph_further_assistance_agent',
-#     'graph_query_resolution_agent',
-#     'graph_escalation_agent',
-#     'graph_cancellation_agent',
-#     'graph_closing_agent',
-    
-#     # Utility functions
-#     'get_all_individual_agents',
-#     'get_core_workflow_agents',
-#     'get_payment_agents',
-#     'get_special_handling_agents',
-#     'get_debtor_simulators'
-# ]
-
-# print(f"📦 Exported {len(__all__)} objects for external use")
-# print("🎯 Main agent: graph_call_center_agent1")
-# print("🔧 Self-contained agents with embedded prompts")
-# print("📊 Simple data fetching with outstanding amount calculation")

@@ -3,26 +3,24 @@
     "."
   ],
   "graphs": {
-    "graph_call_center_agent"              : "./src/Agents/graph_test_call_center.py:graph_call_center_agent1",
-    "graph_debtor_simulator"               : "./src/Agents/graph_test_call_center.py:graph_debtor_simulator",
-    
-    "graph_introduction_agent"             : "./src/Agents/graph_test_call_center.py:graph_introduction_agent",
-    "graph_name_verification_agent"        : "./src/Agents/graph_test_call_center.py:graph_name_verification_agent",
-    "graph_details_verification_agent"     : "./src/Agents/graph_test_call_center.py:graph_details_verification_agent",
-    "graph_reason_for_call_agent"          : "./src/Agents/graph_test_call_center.py:graph_reason_for_call_agent",
-    "graph_negotiation_agent"              : "./src/Agents/graph_test_call_center.py:graph_negotiation_agent",
-    "graph_promise_to_pay_agent"           : "./src/Agents/graph_test_call_center.py:graph_promise_to_pay_agent",
-    "graph_debicheck_setup_agent"          : "./src/Agents/graph_test_call_center.py:graph_debicheck_setup_agent",
-    "graph_payment_portal_agent"           : "./src/Agents/graph_test_call_center.py:graph_payment_portal_agent",
-    "graph_subscription_reminder_agent"    : "./src/Agents/graph_test_call_center.py:graph_subscription_reminder_agent",
-    "graph_client_details_update_agent"    : "./src/Agents/graph_test_call_center.py:graph_client_details_update_agent",
-    "graph_referrals_agent"                : "./src/Agents/graph_test_call_center.py:graph_referrals_agent",
-    "graph_further_assistance_agent"       : "./src/Agents/graph_test_call_center.py:graph_further_assistance_agent",
-    "graph_query_resolution_agent"         : "./src/Agents/graph_test_call_center.py:graph_query_resolution_agent",
-    "graph_escalation_agent"               : "./src/Agents/graph_test_call_center.py:graph_escalation_agent",
-    "graph_cancellation_agent"             : "./src/Agents/graph_test_call_center.py:graph_cancellation_agent",
-    "graph_closing_agent"                  : "./src/Agents/graph_test_call_center.py:graph_closing_agent",
-    "graph_agent_with_tool"                 :"./test_graph/test_langgraph_flow.py:agent_with_tools"
+
+    "graph_agent_with_tool"                : "./test_graph/test_langgraph_flow.py:agent_with_tools",
+
+    "simulation_cooperative"               : "./src/Agents/graph_test_call_center.py:simulation_cooperative",
+    "simulation_difficult"                 : "./src/Agents/graph_test_call_center.py:simulation_difficult",
+    "simulation_confused"                  : "./src/Agents/graph_test_call_center.py:simulation_confused",
+    "simulation_busy"                      : "./src/Agents/graph_test_call_center.py:simulation_busy",
+    "simulation_suspicious"                : "./src/Agents/graph_test_call_center.py:simulation_suspicious",
+    "simulation_wrong_person"              : "./src/Agents/graph_test_call_center.py:simulation_wrong_person",
+    "simulation_third_party_spouse"        : "./src/Agents/graph_test_call_center.py:simulation_third_party_spouse",
+    "simulation_third_party_parent"        : "./src/Agents/graph_test_call_center.py:simulation_third_party_parent",
+    "simulation_third_party_assistant"     : "./src/Agents/graph_test_call_center.py:simulation_third_party_assistant",
+    "simulation_third_party_employee"      : "./src/Agents/graph_test_call_center.py:simulation_third_party_employee",
+    "simulation_third_party"               : "./src/Agents/graph_test_call_center.py:simulation_third_party_spouse",
+
+    "graph_call_center_agent"              : "./src/Agents/graph_test_call_center.py:graph_call_center_agent1"
+
   },
   "env": ".env"
 }
+
