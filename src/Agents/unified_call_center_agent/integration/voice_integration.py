@@ -1,480 +1,359 @@
-# src/Agents/unified_call_center_agent/integration/voice_integration.py
-"""
-Voice Integration Adapter - Seamlessly integrates unified agent with existing voice chat frontend
-"""
+"""Enhanced Voice interaction handler for AI-powered conversational agents with message streaming."""
+
 import logging
 import uuid
-from typing import Dict, Any, Optional, Generator, List
-from datetime import datetime
-
-from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import HumanMessage, AIMessage
+import json
+from typing import Dict, Any, Optional, Tuple, List, Generator, Union, Set, Callable
+import numpy as np
+from fastrtc import AdditionalOutputs
 from langgraph.graph.graph import CompiledGraph
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
-from ..agent.unified_workflow import (
-    create_voice_compatible_workflow,
-    create_conversation_config,
-    get_conversation_state,
-    get_conversation_history
-)
-from ..core.unified_agent_state import UnifiedAgentState
+from src.STT import create_stt_model, BaseSTTModel
+from src.TTS import create_tts_model, BaseTTSModel
 
 logger = logging.getLogger(__name__)
 
-class UnifiedVoiceHandler:
-    """
-    Voice handler that integrates the unified agent with existing voice chat frontend.
+
+class Colors:
+    """ANSI color codes."""
+    YELLOW = "\x1B[33m"
+    GREEN = "\x1B[32m"
+    CYAN = "\x1B[36m"
+    MAGENTA = "\x1B[35m"
+    BLUE = "\x1B[34m"
+    RESET = "\x1B[0m"
+    BOLD = "\x1B[1m"
+
+
+class MessageStreamer:
+    """Handles real-time message streaming to external handlers."""
     
-    Provides the same interface as the current VoiceInteractionHandler but uses
-    the new unified agent system internally for superior conversation quality.
-    """
+    def __init__(self):
+        self.handlers = []
     
-    def __init__(self, config: Dict[str, Any], workflow_factory=None):
-        self.config = config
-        self.workflow_factory = workflow_factory or self._default_workflow_factory
-        self.current_workflow = None
-        self.current_client_data = None
-        self.message_handlers = []
-        
-        # Compatibility with existing voice handler interface
-        self.model = self._create_model()
-        
-        logger.info("UnifiedVoiceHandler initialized")
+    def add_handler(self, handler: Callable[[str, str], None]):
+        """Add a message handler function that takes (role, content)."""
+        self.handlers.append(handler)
     
-    def _create_model(self) -> BaseChatModel:
-        """Create language model from config"""
-        from langchain_ollama import ChatOllama
-        
-        llm_config = self.config.get("llm", {})
-        return ChatOllama(
-            model=llm_config.get("model_name", "qwen2.5:14b-instruct"),
-            temperature=llm_config.get("temperature", 0),
-            num_ctx=llm_config.get("context_window", 32000)
-        )
-    
-    def _default_workflow_factory(self, client_data: Dict[str, Any]) -> CompiledGraph:
-        """Default workflow factory if none provided"""
-        return create_voice_compatible_workflow(
-            model=self.model,
-            client_data=client_data,
-            config=self.config,
-            agent_name="Sarah"
-        )
-    
-    def update_client_data(self, user_id: str, client_data: Dict[str, Any]):
-        """
-        Update client data and create new workflow.
-        
-        Args:
-            user_id: Client identifier
-            client_data: Client information and account data
-        """
-        
-        logger.info(f"Updating client data for user: {user_id}")
-        
-        self.current_client_data = client_data
-        
-        # Create new workflow for this client
-        self.current_workflow = self.workflow_factory(client_data)
-        
-        client_name = client_data.get('profile', {}).get('client_info', {}).get('client_full_name', 'Unknown')
-        logger.info(f"Workflow ready for client: {client_name}")
-    
-    def process_audio_input(
-        self,
-        audio_input,
-        state,  # Not used in unified system, kept for compatibility
-        chatbot_history: List[Dict],
-        thread_id: str
-    ) -> Generator[Any, None, None]:
-        """
-        Process audio input and generate response.
-        
-        Compatible with existing voice chat frontend interface.
-        
-        Args:
-            audio_input: Audio input from user
-            state: Legacy state (ignored)
-            chatbot_history: Chat history for display
-            thread_id: Conversation thread identifier
-            
-        Yields:
-            Response objects compatible with existing frontend
-        """
-        
-        if not self.current_workflow:
-            yield self._create_error_response("No workflow available. Please load client data first.")
-            return
-        
-        try:
-            # Create conversation config
-            config = create_conversation_config(thread_id)
-            
-            # Simulate audio processing (in real implementation, would use STT)
-            # For now, assume audio_input contains the transcribed text
-            if hasattr(audio_input, 'content'):
-                user_message = audio_input.content
-            elif isinstance(audio_input, str):
-                user_message = audio_input
-            else:
-                user_message = "Hello"  # Default for testing
-            
-            logger.info(f"Processing audio input: {user_message[:50]}...")
-            
-            # Get current conversation state for context
-            current_state = get_conversation_state(self.current_workflow, config)
-            
-            # Prepare input for workflow
-            if current_state and current_state.get('messages'):
-                # Continuing conversation
-                workflow_input = {
-                    "messages": [HumanMessage(content=user_message)]
-                }
-            else:
-                # Starting new conversation
-                workflow_input = {}
-            
-            # Invoke workflow
-            result = self.current_workflow.invoke(workflow_input, config)
-            
-            # Extract AI response
-            ai_response = ""
-            if result.get('messages'):
-                last_message = result['messages'][-1]
-                if hasattr(last_message, 'content'):
-                    ai_response = last_message.content
-                else:
-                    ai_response = str(last_message)
-            
-            # Log conversation messages
-            self._log_conversation_turn(user_message, ai_response, result)
-            
-            # Update chatbot history for frontend display
-            updated_history = self._update_chatbot_history(
-                chatbot_history, user_message, ai_response
-            )
-            
-            # Create response object compatible with existing frontend
-            response_obj = self._create_voice_response(
-                ai_response, updated_history, result
-            )
-            
-            yield response_obj
-            
-        except Exception as e:
-            logger.error(f"Error processing audio input: {e}")
-            yield self._create_error_response(f"Processing error: {str(e)}")
-    
-    def _log_conversation_turn(self, user_message: str, ai_response: str, result: Dict[str, Any]):
-        """Log conversation turn for handlers"""
-        
-        # Call registered message handlers
-        for handler in self.message_handlers:
+    def stream_message(self, role: str, content: str):
+        """Stream message to all registered handlers."""
+        for handler in self.handlers:
             try:
-                handler("human", user_message)
-                handler("assistant", ai_response)
+                handler(role, content)
             except Exception as e:
                 logger.error(f"Message handler error: {e}")
+
+
+class VoiceInteractionHandler:
+    """Enhanced voice interaction handler with message streaming."""
+    
+    def __init__(self, config: Dict[str, Any], workflow_factory: Optional[Callable] = None):
+        self.config = self._setup_config(config or {})
+        self.workflow_factory = workflow_factory
+        self.message_streamer = MessageStreamer()
+        self._setup_logging()
         
-        # Log conversation metadata
-        metadata = {
-            "turn_count": result.get("turn_count", 0),
-            "current_objective": result.get("current_objective", "unknown"),
-            "client_mood": result.get("client_mood", "neutral"),
-            "last_action": result.get("last_action", "unknown"),
-            "last_intent": result.get("last_intent", "none")
+        # Client data caching
+        self.cached_client_data = None
+        self.cached_user_id = None
+        self.cached_workflow = None
+        
+        # Initialize models
+        self.stt_model = self._init_stt() if self.config['configurable'].get('enable_stt_model') else None
+        self.tts_model = self._init_tts() if self.config['configurable'].get('enable_tts_model') else None
+
+    def add_message_handler(self, handler: Callable[[str, str], None]):
+        """Add external message handler for real-time streaming."""
+        self.message_streamer.add_handler(handler)
+
+    def update_client_data(self, user_id: str, client_data: Dict[str, Any]):
+        """Update cached client data and workflow."""
+        try:
+            if user_id != self.cached_user_id or not self.cached_workflow:
+                logger.info(f"Updating client data cache for user_id: {user_id}")
+                
+                self.cached_user_id = user_id
+                self.cached_client_data = client_data
+                
+                # Create new workflow with cached data
+                if self.workflow_factory and client_data:
+                    self.cached_workflow = self.workflow_factory(client_data)
+                    logger.info(f"Created new workflow for user_id: {user_id}")
+                else:
+                    self.cached_workflow = None
+                    logger.warning(f"No workflow factory or client data for user_id: {user_id}")
+                    
+        except Exception as e:
+            logger.error(f"Error updating client data for user_id {user_id}: {e}")
+            self.cached_workflow = None
+
+    def get_current_workflow(self) -> Optional[CompiledGraph]:
+        """Get the current cached workflow."""
+        return self.cached_workflow
+
+    def _setup_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        """Setup configuration with defaults."""
+        config.setdefault('stt', {})
+        config.setdefault('tts', {})
+        config.setdefault('logging', {'level': 'error', 'console_output': True})
+        config.setdefault('configurable', {
+            'thread_id': str(uuid.uuid4()),
+            'enable_stt_model': True,
+            'enable_tts_model': True
+        })
+        return config
+
+    def _setup_logging(self):
+        """Configure logging."""
+        level_map = {
+            'none': logging.CRITICAL + 1,
+            'error': logging.ERROR,
+            'warning': logging.WARNING,
+            'info': logging.INFO,
+            'debug': logging.DEBUG
         }
         
-        logger.info(f"Conversation turn logged - {metadata}")
-    
-    def _update_chatbot_history(
-        self, 
-        current_history: List[Dict], 
-        user_message: str, 
-        ai_response: str
-    ) -> List[Dict]:
-        """Update chatbot history for frontend display"""
+        level = level_map.get(self.config['logging'].get('level', 'error').lower(), logging.ERROR)
+        logger.setLevel(level)
         
-        updated_history = current_history.copy()
-        
-        # Add user message
-        updated_history.append({
-            "role": "user",
-            "content": user_message,
-            "timestamp": datetime.now().isoformat()
-        })
-        
-        # Add AI response
-        updated_history.append({
-            "role": "assistant", 
-            "content": ai_response,
-            "timestamp": datetime.now().isoformat()
-        })
-        
-        # Keep history manageable (last 20 messages)
-        if len(updated_history) > 20:
-            updated_history = updated_history[-20:]
-        
-        return updated_history
-    
-    def _create_voice_response(
-        self, 
-        ai_response: str, 
-        updated_history: List[Dict], 
-        result: Dict[str, Any]
-    ) -> Any:
-        """Create response object compatible with existing voice frontend"""
-        
-        # Import the response class from existing system
+        if self.config['logging'].get('console_output', True) and not logger.handlers:
+            handler = logging.StreamHandler()
+            handler.setLevel(level)
+            handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+            logger.addHandler(handler)
+
+    def _init_stt(self) -> BaseSTTModel:
+        """Initialize STT model."""
         try:
-            from fastrtc import AdditionalOutputs
-            
-            # FastRTC AdditionalOutputs expects specific parameters
-            # Check the actual constructor signature
-            return AdditionalOutputs(
-                updated_history,  # First positional argument is the chatbot history
-                additional_outputs={
-                    "ai_response": ai_response,
-                    "conversation_state": {
-                        "turn_count": result.get("turn_count", 0),
-                        "current_objective": result.get("current_objective", "unknown"),
-                        "client_mood": result.get("client_mood", "neutral"),
-                        "verification_status": {
-                            "name": result.get("name_verification", "pending"),
-                            "details": result.get("details_verification", "pending")
-                        },
-                        "call_ended": result.get("call_ended", False),
-                        "objectives_completed": len(result.get("completed_objectives", []))
-                    }
-                }
-            )
-            
-        except (ImportError, TypeError) as e:
-            logger.warning(f"FastRTC AdditionalOutputs error: {e}, using fallback")
-            # Fallback if FastRTC not available or constructor changed
-            return {
-                "chatbot_history": updated_history,
-                "ai_response": ai_response,
-                "conversation_state": result
-            }
-    
-    def _create_error_response(self, error_message: str) -> Any:
-        """Create error response compatible with frontend"""
-        
-        error_history = [{
-            "role": "assistant",
-            "content": error_message,
-            "timestamp": datetime.now().isoformat()
-        }]
-        
+            return create_stt_model(self.config['stt'])
+        except Exception as e:
+            logger.error(f"STT init failed: {e}")
+            raise
+
+    def _init_tts(self) -> BaseTTSModel:
+        """Initialize TTS model."""
         try:
-            from fastrtc import AdditionalOutputs
-            
-            # Use positional argument for chatbot history
-            return AdditionalOutputs(error_history)
-            
-        except (ImportError, TypeError) as e:
-            logger.warning(f"FastRTC AdditionalOutputs error: {e}, using fallback")
-            return {
-                "chatbot_history": error_history,
-                "error": error_message
-            }
-    
-    def add_message_handler(self, handler):
-        """Add message handler for logging/monitoring"""
-        self.message_handlers.append(handler)
-        logger.info("Message handler added")
-    
-    def get_conversation_status(self, thread_id: str) -> Dict[str, Any]:
-        """Get current conversation status"""
-        
-        if not self.current_workflow:
-            return {"error": "No workflow available"}
-        
+            return create_tts_model(self.config['tts'])
+        except Exception as e:
+            logger.error(f"TTS init failed: {e}")
+            raise
+
+    def _print(self, label: str, text: str, color: str):
+        """Print formatted message."""
+        print(f"{Colors.BOLD}{color}[{label}]:{Colors.RESET} {color}{text}{Colors.RESET}")
+
+    def _print_tool_response(self, tool_name: str, content: Any):
+        """Print tool response."""
+        print(f"{Colors.BOLD}{Colors.MAGENTA}[Tool Response - {tool_name}]:{Colors.RESET}")
         try:
-            config = create_conversation_config(thread_id)
-            state = get_conversation_state(self.current_workflow, config)
-            
-            if state:
-                return {
-                    "active": True,
-                    "turn_count": state.get("turn_count", 0),
-                    "current_objective": state.get("current_objective", "unknown"),
-                    "client_mood": state.get("client_mood", "neutral"),
-                    "verification_completed": state.get("name_verification") == "VERIFIED" and state.get("details_verification") == "VERIFIED",
-                    "payment_secured": state.get("payment_secured", False),
-                    "call_ended": state.get("call_ended", False),
-                    "objectives_completed": len(state.get("completed_objectives", []))
-                }
+            if isinstance(content, str):
+                formatted = json.dumps(json.loads(content), indent=2)
+            elif isinstance(content, dict):
+                formatted = json.dumps(content, indent=2)
             else:
-                return {"active": False, "message": "No conversation state found"}
+                formatted = str(content)
+        except:
+            formatted = str(content)
+        print(f"{Colors.MAGENTA}{formatted}{Colors.RESET}")
+
+    def _process_tool_messages(self, message, tracked_calls: Set[str]):
+        """Process tool messages with streaming (no duplication)."""
+        if hasattr(message, "tool_calls") and message.tool_calls:
+            for tool_call in message.tool_calls:
+                tool_id = getattr(tool_call, "id", str(id(tool_call)))
+                tool_name = getattr(tool_call, "name", "unknown")
+                tool_args = getattr(tool_call, "args", {})
+                call_id = f"{tool_name}:{tool_id}"
+                
+                if call_id not in tracked_calls:
+                    tool_msg = f"{tool_name}({tool_args})"
+                    self._print("Tool Call", tool_msg, Colors.BLUE)
+                    tracked_calls.add(call_id)
+        
+        if isinstance(message, ToolMessage):
+            tool_name = getattr(message, "name", "Unknown Tool")
+            content = getattr(message, "content", None)
+            if content:
+                self._print_tool_response(tool_name, content)
+                # Only stream tool response once per message
+                tool_msg_id = f"tool_response_{id(message)}"
+                if tool_msg_id not in tracked_calls:
+                    try:
+                        if isinstance(content, str) and len(content) > 200:
+                            truncated = content[:200] + "..."
+                            self.message_streamer.stream_message("tool", f"RESPONSE: {tool_name} -> {truncated}")
+                        else:
+                            self.message_streamer.stream_message("tool", f"RESPONSE: {tool_name} -> {content}")
+                        tracked_calls.add(tool_msg_id)
+                    except Exception as e:
+                        self.message_streamer.stream_message("tool", f"RESPONSE: {tool_name} -> [Error: {e}]")
+
+    def _extract_ai_response(self, workflow_result: Dict[str, Any]) -> str:
+        """Extract AI response from workflow result."""
+        if "error" in workflow_result:
+            return workflow_result["error"]
+        
+        messages = workflow_result.get("messages", [])
+        for msg in reversed(messages):
+            if isinstance(msg, AIMessage) and hasattr(msg, "content") and msg.content:
+                return msg.content
+        
+        return "No AI response found."
+
+    def _format_chatbot(self, chatbot: List[Dict]) -> List[Dict]:
+        """Format chatbot messages."""
+        return [
+            {"role": str(msg.get("role", "")), "content": str(msg.get("content", ""))}
+            for msg in chatbot
+            if isinstance(msg, dict) and msg.get('role') and msg.get('content')
+        ]
+
+    def _normalize_audio(self, audio_chunk: tuple) -> tuple:
+        """Normalize audio format to int16."""
+        if isinstance(audio_chunk, tuple) and len(audio_chunk) == 2:
+            sample_rate, audio_array = audio_chunk
+            if hasattr(audio_array, 'dtype') and audio_array.dtype == np.float32:
+                audio_array = (audio_array * 32767).astype(np.int16)
+                return (sample_rate, audio_array)
+        return audio_chunk
+
+    def process_message(self, user_message: str, workflow: CompiledGraph = None) -> Dict[str, Any]:
+        """Process message through workflow with enhanced streaming (no duplication)."""
+        # Use cached workflow if no workflow provided
+        if workflow is None:
+            workflow = self.get_current_workflow()
+        
+        if not workflow:
+            return {"messages": [], "error": "No workflow available. Please select a client first."}
+        
+        try:
+            workflow_input = {"messages": [HumanMessage(content=user_message)]}
+            config = {"configurable": self.config.get('configurable', {})}
+            
+            tracked_calls = set()
+            tracked_messages = set()  # Track streamed messages to prevent duplication
+            final_result = None
+            
+            # Stream user message only once
+            user_msg_id = f"user_{hash(user_message)}"
+            if user_msg_id not in tracked_messages:
+                self.message_streamer.stream_message("user", user_message)
+                tracked_messages.add(user_msg_id)
+            
+            for event in workflow.stream(workflow_input, config=config, stream_mode="values"):
+                if event and isinstance(event, dict) and "messages" in event:
+                    final_result = event
+                    
+                    # Process only new messages to avoid duplication
+                    if event["messages"]:
+                        latest_message = event["messages"][-1]
+                        
+                        # Process tool messages
+                        self._process_tool_messages(latest_message, tracked_calls)
+                        
+                        # Stream AI messages only once
+                        if isinstance(latest_message, AIMessage) and latest_message.content:
+                            ai_msg_id = f"ai_{id(latest_message)}"
+                            if ai_msg_id not in tracked_messages:
+                                self.message_streamer.stream_message("ai", latest_message.content)
+                                tracked_messages.add(ai_msg_id)
+            
+            return final_result or {"messages": [], "error": "No valid events received"}
+            
+        except Exception as e:
+            logger.error(f"Workflow error: {e}")
+            self.message_streamer.stream_message("error", f"Workflow error: {e}")
+            return {"messages": [], "error": f"Workflow execution error: {str(e)}"}
+
+    def process_text_input(self, text_input: str, workflow: CompiledGraph = None,
+                          gradio_chatbot: Optional[List[Dict[str, str]]] = None,
+                          thread_id: Optional[Union[str, int]] = None) -> Generator:
+        """Process text input with streaming response."""
+        try:
+            chatbot = gradio_chatbot or []
+            
+            # Set thread ID
+            self.config['configurable']["thread_id"] = str(thread_id or uuid.uuid4())
+            
+            # Add user message
+            self._print("Text Input", text_input, Colors.YELLOW)
+            chatbot.append({"role": "user", "content": text_input})
+            yield None, chatbot, ""
+
+            # Process and get response with cached workflow
+            workflow_result = self.process_message(text_input, workflow)
+            response = self._extract_ai_response(workflow_result)
+            
+            # Add AI response
+            self._print("AI Response", response, Colors.GREEN)
+            chatbot.append({"role": "assistant", "content": response})
+            yield None, chatbot, ""
+            
+            # Generate TTS if enabled
+            if self.tts_model and self.config['configurable'].get('enable_tts_model') and response.strip():
+                for audio_chunk in self.tts_model.stream_text_to_speech(response):
+                    yield self._normalize_audio(audio_chunk), chatbot, ""
                 
         except Exception as e:
-            logger.error(f"Error getting conversation status: {e}")
-            return {"error": str(e)}
-    
-    def clear_conversation(self, thread_id: str) -> bool:
-        """Clear conversation history"""
-        
-        if not self.current_workflow:
-            return False
-        
+            logger.error(f"Text processing error: {e}")
+            chatbot.append({"role": "assistant", "content": "Sorry, an error occurred."})
+            yield None, chatbot, ""
+
+    def process_audio_input(self, audio_input: Tuple[int, np.ndarray], workflow: CompiledGraph = None,
+                           gradio_chatbot: Optional[List[Dict[str, str]]] = None,
+                           thread_id: Optional[Union[str, int]] = None) -> Generator:
+        """Process audio input with enhanced streaming response."""
         try:
-            from ..agent.unified_workflow import clear_conversation_history
+            chatbot = gradio_chatbot or []
+            sample_rate = audio_input[0]
             
-            config = create_conversation_config(thread_id)
-            return clear_conversation_history(self.current_workflow, config)
+            # Check if audio is valid
+            if (not audio_input[1].size or not self.stt_model or 
+                not self.config['configurable'].get('enable_stt_model')):
+                yield (sample_rate, np.array([], dtype=np.int16))
+                yield AdditionalOutputs(self._format_chatbot(chatbot))
+                return
+            
+            # Transcribe audio
+            stt_result = self.stt_model.transcribe(audio_input)
+            stt_text = (stt_result.get("text", "") if isinstance(stt_result, dict) 
+                       else str(stt_result)).strip()
+            
+            if not stt_text:
+                yield (sample_rate, np.array([], dtype=np.int16))
+                yield AdditionalOutputs(self._format_chatbot(chatbot))
+                return
+            
+            # Process conversation
+            self._print("Voice Input", stt_text, Colors.YELLOW)
+            chatbot.append({"role": "user", "content": stt_text})
+            
+            # Set thread ID and get response with cached workflow
+            self.config['configurable']["thread_id"] = str(thread_id or uuid.uuid4())
+            workflow_result = self.process_message(stt_text, workflow)
+            response = self._extract_ai_response(workflow_result)
+            
+            self._print("AI Response", response, Colors.GREEN)
+            chatbot.append({"role": "assistant", "content": response})
+            
+            # Update UI with final chatbot state
+            yield AdditionalOutputs(self._format_chatbot(chatbot))
+            
+            # Generate TTS
+            if self.tts_model and self.config['configurable'].get('enable_tts_model') and response.strip():
+                for chunk in self.tts_model.stream_text_to_speech(response):
+                    yield self._normalize_audio(chunk)
+            else:
+                yield (sample_rate, np.array([0], dtype=np.int16))
             
         except Exception as e:
-            logger.error(f"Error clearing conversation: {e}")
-            return False
+            logger.error(f"Audio processing error: {e}")
+            chatbot.append({"role": "assistant", "content": "Sorry, an error occurred."})
+            yield (16000, np.array([0], dtype=np.int16))
+            yield AdditionalOutputs(self._format_chatbot(chatbot))
 
-# Factory function for easy integration
-def create_unified_voice_handler(config: Dict[str, Any]) -> UnifiedVoiceHandler:
-    """
-    Create unified voice handler for integration with existing frontend.
-    
-    Args:
-        config: Configuration dictionary from app_config
-        
-    Returns:
-        UnifiedVoiceHandler ready for use
-    """
-    
-    def workflow_factory(client_data: Dict[str, Any]) -> CompiledGraph:
-        """Create workflow with appropriate model selection"""
-        
-        from langchain_ollama import ChatOllama
-        
-        # Select model based on conversation complexity
-        llm_config = config.get("llm", {})
-        model = ChatOllama(
-            model=llm_config.get("model_name", "qwen2.5:14b-instruct"),
-            temperature=llm_config.get("temperature", 0),
-            num_ctx=llm_config.get("context_window", 32000)
-        )
-        
-        return create_voice_compatible_workflow(
-            model=model,
-            client_data=client_data,
-            config=config,
-            agent_name="Sarah"
-        )
-    
-    handler = UnifiedVoiceHandler(config, workflow_factory)
-    logger.info("Unified voice handler created and ready for integration")
-    
-    return handler
-
-# Compatibility layer for existing VoiceInteractionHandler interface
-class VoiceInteractionHandler:
-    """
-    Compatibility wrapper that provides the same interface as the existing
-    VoiceInteractionHandler but uses the unified agent internally.
-    
-    This allows seamless integration with existing voice chat frontend
-    without requiring any changes to the frontend code.
-    """
-    
-    def __init__(self, config: Dict[str, Any], workflow_factory=None):
-        # Create unified handler internally
-        self.unified_handler = UnifiedVoiceHandler(config, workflow_factory)
-        
-        # Expose the same interface
-        self.config = config
-        self.workflow = None  # Compatibility property
-        
-        logger.info("VoiceInteractionHandler (unified) initialized")
-    
-    def update_client_data(self, user_id: str, client_data: Dict[str, Any]):
-        """Compatibility method"""
-        self.unified_handler.update_client_data(user_id, client_data)
-        # Set workflow property for compatibility
-        self.workflow = self.unified_handler.current_workflow
-    
-    def process_audio_input(self, audio_input, state, chatbot_history: List[Dict], thread_id: str):
-        """Compatibility method"""
-        return self.unified_handler.process_audio_input(audio_input, state, chatbot_history, thread_id)
-    
-    def add_message_handler(self, handler):
-        """Compatibility method"""
-        self.unified_handler.add_message_handler(handler)
-    
-    # Additional compatibility properties/methods as needed
-    @property
-    def message_streamer(self):
-        """Compatibility property"""
-        class MessageStreamer:
-            def __init__(self, handlers):
-                self.handlers = handlers
-        
-        return MessageStreamer(self.unified_handler.message_handlers)
-
-# Usage example for testing integration
-def test_voice_integration():
-    """Test voice integration with sample data"""
-    
-    # Sample configuration
-    test_config = {
-        "llm": {
-            "model_name": "qwen2.5:7b-instruct",
-            "temperature": 0,
-            "context_window": 16384
-        },
-        "configurable": {
-            "use_memory": True
-        }
-    }
-    
-    # Sample client data
-    test_client_data = {
-        'user_id': '12345',
-        'profile': {
-            'user_id': '12345',
-            'client_info': {
-                'client_full_name': 'John Smith',
-                'first_name': 'John',
-                'title': 'Mr'
-            }
-        },
-        'account_aging': {
-            'xbalance': '299.00',
-            'x0': '0.00',
-            'x30': '299.00'
-        }
-    }
-    
-    # Create voice handler
-    voice_handler = create_unified_voice_handler(test_config)
-    
-    # Update with client data
-    voice_handler.update_client_data('12345', test_client_data)
-    
-    # Test conversation
-    thread_id = "test_integration_001"
-    chatbot_history = []
-    
-    print("=== Testing Voice Integration ===")
-    
-    # Process first message (should trigger greeting)
-    for response in voice_handler.process_audio_input("Hello", None, chatbot_history, thread_id):
-        if hasattr(response, 'chatbot_history'):
-            chatbot_history = response.chatbot_history
-            print(f"Agent: {chatbot_history[-1]['content']}")
-        break
-    
-    # Process client confirmation
-    for response in voice_handler.process_audio_input("Yes, this is John", None, chatbot_history, thread_id):
-        if hasattr(response, 'chatbot_history'):
-            chatbot_history = response.chatbot_history
-            print(f"Agent: {chatbot_history[-1]['content']}")
-        break
-    
-    # Check conversation status
-    status = voice_handler.get_conversation_status(thread_id)
-    print(f"Conversation status: {status}")
-    
-    return voice_handler
-
-if __name__ == "__main__":
-    test_voice_integration()
+    def set_log_level(self, level: str):
+        """Set logging level at runtime."""
+        self.config['logging']['level'] = level
+        self._setup_logging()
