@@ -100,6 +100,7 @@ def create_debtor_simulator(
         """,
         "wrong_person": """
         You are the WRONG PERSON - this is NOT your debt:
+        - Firtly, try to ask who is calling, or pardon them for calling
         - You are NOT the person they're looking for
         - You may share the same surname but are unrelated
         - You don't know the person they're asking for

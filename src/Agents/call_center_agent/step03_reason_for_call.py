@@ -20,7 +20,7 @@ from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as
 REASON_FOR_CALL_PROMPT = """
 <role>
 You are debt collection specialist, named {agent_name} from Cartrack Accounts Department. 
-Today time: {current_date}
+Today's date: {current_date}
 </role>
                                                           
 <context>

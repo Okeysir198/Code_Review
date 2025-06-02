@@ -31,15 +31,15 @@ config['configurable']['enable_tts_model'] = True
 llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0, num_ctx=32000)
 logger.info("✅ LLM initialized successfully")
 
-################################################################################
-# Debtor Simulator
-graph_debtor_simulator = create_debtor_simulator(
-    llm=llm,
-    client_data=client_data,
-    personality="cooperative",
-    cooperativeness=0.8,
-)
-logger.info("✅ Debtor simulator agent created successfully")
+# ################################################################################
+# # Debtor Simulator
+# graph_debtor_simulator = create_debtor_simulator(
+#     llm=llm,
+#     client_data=client_data,
+#     personality="cooperative",
+#     cooperativeness=0.8,
+# )
+# logger.info("✅ Debtor simulator agent created successfully")
 
 ################################################################################
 # Complete Call Center Agent with Optimized Router
@@ -74,148 +74,148 @@ logger.info("✅ All step agent imports successful")
 ################################################################################
 # Individual Step Agents (Direct Instantiation with Refactored Architecture)
 
-# Core Call Flow Agents
-graph_introduction_agent = create_introduction_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# # Core Call Flow Agents
+# graph_introduction_agent = create_introduction_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_name_verification_agent = create_name_verification_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_name_verification_agent = create_name_verification_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_details_verification_agent = create_details_verification_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_details_verification_agent = create_details_verification_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_reason_for_call_agent = create_reason_for_call_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_reason_for_call_agent = create_reason_for_call_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_negotiation_agent = create_negotiation_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_negotiation_agent = create_negotiation_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-logger.info("✅ Core call flow agents created successfully")
+# logger.info("✅ Core call flow agents created successfully")
 
-# Payment Processing Agents
-graph_promise_to_pay_agent = create_promise_to_pay_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# # Payment Processing Agents
+# graph_promise_to_pay_agent = create_promise_to_pay_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_debicheck_setup_agent = create_debicheck_setup_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_debicheck_setup_agent = create_debicheck_setup_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_payment_portal_agent = create_payment_portal_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_payment_portal_agent = create_payment_portal_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_subscription_reminder_agent = create_subscription_reminder_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_subscription_reminder_agent = create_subscription_reminder_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-logger.info("✅ Payment processing agents created successfully")
+# logger.info("✅ Payment processing agents created successfully")
 
-# Account Management Agents
-graph_client_details_update_agent = create_client_details_update_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# # Account Management Agents
+# graph_client_details_update_agent = create_client_details_update_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_referrals_agent = create_referrals_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_referrals_agent = create_referrals_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_further_assistance_agent = create_further_assistance_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_further_assistance_agent = create_further_assistance_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-logger.info("✅ Account management agents created successfully")
+# logger.info("✅ Account management agents created successfully")
 
-# Special Handling Agents
-graph_query_resolution_agent = create_query_resolution_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# # Special Handling Agents
+# graph_query_resolution_agent = create_query_resolution_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_escalation_agent = create_escalation_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_escalation_agent = create_escalation_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_cancellation_agent = create_cancellation_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_cancellation_agent = create_cancellation_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
-graph_closing_agent = create_closing_agent(
-    model=llm,
-    client_data=client_data,
-    script_type=ScriptType.RATIO_1_INFLOW.value,
-    agent_name="AI Agent",
-    config=config
-)
+# graph_closing_agent = create_closing_agent(
+#     model=llm,
+#     client_data=client_data,
+#     script_type=ScriptType.RATIO_1_INFLOW.value,
+#     agent_name="AI Agent",
+#     config=config
+# )
 
 logger.info("✅ Special handling agents created successfully")
 ################################################################################
 agent_llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0)
-debtor_llm = ChatOllama(model="qwen2.5:7b-instruct", temperature=0.7)
+debtor_llm = ChatOllama(model="qwen2.5:3b-instruct", temperature=0.7)
 
 from src.Agents.graph_call_simulation import *
 

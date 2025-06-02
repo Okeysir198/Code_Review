@@ -24,7 +24,7 @@ from src.Database.CartrackSQLDatabase import (
 PROMISE_TO_PAY_PROMPT = """
 <role>
 You are debt collection specialist, named {agent_name} from Cartrack Accounts Department. 
-Today time: {current_date}
+Today's date: {current_date}
 </role>
                                                                                                        
 <context>
@@ -86,9 +86,6 @@ def create_promise_to_pay_agent(
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
     """Create promise to pay agent with concise payment securing"""
-    
-    tools = [get_client_banking_details, get_client_account_overview, 
-             create_payment_arrangement, date_helper] + (tools or [])
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
         """Check banking details availability"""

@@ -5,7 +5,7 @@ Router intelligently detects step relevance, completion, and handles routing dec
 import logging
 from typing import Literal, Optional, Dict, Any
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.types import Command
 from langgraph.graph.graph import CompiledGraph
@@ -164,6 +164,10 @@ def create_call_center_agent(
         script_type = determine_script_type_from_aging(account_aging, client_data)
         logger.info(f"Auto-determined script type: {script_type}")
 
+    model_3b = ChatOllama(model="qwen2.5:3b-instruct", temperature=0, num_ctx=4096)
+    model_7b = ChatOllama(model="qwen2.5:7b-instruct", temperature=0, num_ctx=4096)
+    llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0, num_ctx=32000)
+
     config = config or {}
     max_name_attempts = CONFIG.get("verification", {}).get("max_name_verification_attempts", 5)
     max_details_attempts = CONFIG.get("verification", {}).get("max_details_verification_attempts", 5)
@@ -173,7 +177,7 @@ def create_call_center_agent(
     # ========================================================================
     
     introduction_agent = create_introduction_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -184,7 +188,7 @@ def create_call_center_agent(
     logger.info("✅ Introduction agent created")
     
     name_verification_agent = create_name_verification_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -195,7 +199,7 @@ def create_call_center_agent(
     logger.info("✅ Name verification agent created")
     
     details_verification_agent = create_details_verification_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -206,7 +210,7 @@ def create_call_center_agent(
     logger.info("✅ Details verification agent created")
     
     reason_for_call_agent = create_reason_for_call_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -217,7 +221,7 @@ def create_call_center_agent(
     logger.info("✅ Reason for call agent created")
     
     negotiation_agent = create_negotiation_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -243,7 +247,7 @@ def create_call_center_agent(
     logger.info("✅ Promise to pay agent created")
     
     debicheck_setup_agent = create_debicheck_setup_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -269,7 +273,7 @@ def create_call_center_agent(
     # ========================================================================
     
     subscription_reminder_agent = create_subscription_reminder_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -291,7 +295,7 @@ def create_call_center_agent(
     logger.info("✅ Client details update agent created")
     
     referrals_agent = create_referrals_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -302,7 +306,7 @@ def create_call_center_agent(
     logger.info("✅ Referrals agent created")
     
     further_assistance_agent = create_further_assistance_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -317,7 +321,7 @@ def create_call_center_agent(
     # ========================================================================
     
     query_resolution_agent = create_query_resolution_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -328,7 +332,7 @@ def create_call_center_agent(
     logger.info("✅ Query resolution agent created")
     
     escalation_agent = create_escalation_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -350,7 +354,7 @@ def create_call_center_agent(
     logger.info("✅ Cancellation agent created")
     
     closing_agent = create_closing_agent(
-        model=model,
+        model=model_3b,
         client_data=client_data,
         script_type=script_type,
         agent_name=agent_name,
@@ -363,7 +367,7 @@ def create_call_center_agent(
     # OPTIMIZED ROUTER LLM PROMPT - Step-Aware Classification
     def _get_optimized_router_prompt(state):
         """Generate highly optimized step-aware router classification prompt."""
-        current_step = state.get("current_step", "unknown")
+        current_step = state.get("current_step", CallStep.INTRODUCTION.value)
         
         # Get last client message
         messages = state.get("messages", [])
@@ -371,16 +375,10 @@ def create_call_center_agent(
         last_ai_message = ""
         
         for msg in reversed(messages):
-            if isinstance(msg, dict):
-                if msg.get("type") == "human" and not last_client_message:
-                    last_client_message = msg.get("content", "")
-                elif msg.get("type") == "ai" and not last_ai_message:
-                    last_ai_message = msg.get("content", "")
-            elif hasattr(msg, 'type'):
-                if msg.type == "human" and not last_client_message:
-                    last_client_message = msg.content
-                elif msg.type == "ai" and not last_ai_message:
-                    last_ai_message = msg.content
+            if isinstance(msg, HumanMessage) and not last_client_message:
+                last_client_message = msg.content
+            elif isinstance(msg, AIMessage) and not last_ai_message:
+                last_ai_message = msg.content
 
         # Pre-analyze message for keyword patterns
         msg_lower = last_client_message.lower()
@@ -492,7 +490,7 @@ def create_call_center_agent(
             if len(messages) >= 2:
                 # Check if AI explained the overdue amount
                 for msg in reversed(messages):
-                    if hasattr(msg, 'type') and msg.type == "ai":
+                    if isinstance(msg, AIMessage):
                         content = msg.content.lower()
                         if any(indicator in content for indicator in ["overdue", "payment", "owe", "balance"]):
                             return True
@@ -504,7 +502,7 @@ def create_call_center_agent(
             if len(messages) >= 2:
                 # Check last client response for agreement
                 for msg in reversed(messages):
-                    if hasattr(msg, 'type') and msg.type == "human":
+                    if isinstance(msg, HumanMessage):
                         content = msg.content.lower()
                         agreement_indicators = ["okay", "fine", "yes", "understand", "let's do it"]
                         if any(indicator in content for indicator in agreement_indicators):
@@ -516,7 +514,7 @@ def create_call_center_agent(
             # Complete if payment arrangement was secured (AI confirms arrangement)
             messages = state.get("messages", [])
             for msg in reversed(messages):
-                if hasattr(msg, 'type') and msg.type == "ai":
+                if isinstance(msg, AIMessage):
                     content = msg.content.lower()
                     secured_indicators = ["perfect", "excellent", "great", "setting up", "arranging", "processing"]
                     if any(indicator in content for indicator in secured_indicators):
@@ -557,7 +555,7 @@ def create_call_center_agent(
             # Detect payment method from conversation
             messages = state.get("messages", [])
             for msg in reversed(messages):
-                if hasattr(msg, 'type') and msg.type == "ai":
+                if isinstance(msg, AIMessage):
                     content = msg.content.lower()
                     if "debicheck" in content or "bank" in content:
                         return CallStep.DEBICHECK_SETUP.value
@@ -576,14 +574,10 @@ def create_call_center_agent(
     def router_node(state: CallCenterAgentState) -> Dict[str, Any]:
         """Enhanced router with step-aware classification and robust completion detection."""
         
+        current_step = state.get("current_step", CallStep.INTRODUCTION.value)
         # Skip for first message
         if len(state.get("messages", [])) < 2:
             return {"current_step": CallStep.INTRODUCTION.value}
-        
-        if state.get("is_call_ended"):
-            return {"current_step": CallStep.CLOSING.value}
-        
-        current_step = state.get("current_step", CallStep.INTRODUCTION.value)
         
         # 1. Business rule overrides (highest priority)
         name_failed = (state.get("name_verification_attempts", 0) >= max_name_attempts and 
@@ -594,6 +588,12 @@ def create_call_center_agent(
         if name_failed or details_failed or state.get("is_call_ended"):
             logger.info("Business rule override - routing to closing")
             return {"current_step": CallStep.CLOSING.value}
+        
+        if current_step == CallStep.NAME_VERIFICATION.value and state.get("name_verification_status") != VerificationStatus.VERIFIED.value:
+            return {"current_step": CallStep.NAME_VERIFICATION.value}
+        
+        if current_step == CallStep.DETAILS_VERIFICATION.value and state.get("details_verification_status") != VerificationStatus.VERIFIED.value:
+            return {"current_step": CallStep.DETAILS_VERIFICATION.value}
         
         # 2. Use optimized router LLM for classification
         router_llm = ChatOllama(model="qwen2.5:3b-instruct", temperature=0, num_ctx=4096)

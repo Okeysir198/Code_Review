@@ -19,7 +19,7 @@ from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as
 CLIENT_DETAILS_UPDATE_PROMPT = """
 <role>
 You are debt collection specialist, named {agent_name} from Cartrack Accounts Department. 
-Today time: {current_date}
+Today's date: {current_date}
 </role>
                                                                 
 <context>
@@ -51,9 +51,13 @@ Under 15 words. Quick verification. Professional efficiency.
 """
 
 def create_client_details_update_agent(
-    model: BaseChatModel, client_data: Dict[str, Any], script_type: str,
-    agent_name: str = "AI Agent", tools: Optional[List[BaseTool]] = None,
-    verbose: bool = False, config: Optional[Dict[str, Any]] = None
+    model: BaseChatModel,
+    client_data: Dict[str, Any],
+    script_type: str,
+    agent_name: str = "AI Agent",
+    tools: Optional[List[BaseTool]] = None,
+    verbose: bool = False,
+    config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
@@ -72,5 +76,13 @@ def create_client_details_update_agent(
         
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
-    return create_basic_agent(model, dynamic_prompt, tools or [], pre_processing_node, 
-                            CallCenterAgentState, verbose, config, "ClientDetailsUpdateAgent")
+    return create_basic_agent(
+        model=model,
+        prompt=dynamic_prompt,
+        tools=tools,
+        pre_processing_node=pre_processing_node,
+        state_schema=CallCenterAgentState,
+        verbose=verbose,
+        config=config,
+        name="ClientDetailsUpdateAgent"
+    )

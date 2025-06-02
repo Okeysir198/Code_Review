@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 DETAILS_VERIFICATION_PROMPT = """
 <role>
 You are debt collection specialist, named {agent_name} from Cartrack Accounts Department. 
-Today time: {current_date}
+Today's date: {current_date}
 </role>
                                                                
 <context>
@@ -125,7 +125,7 @@ def create_details_verification_agent(
             return other_fields[0]
         return "id_number"
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent", "__end__"]]:
         """Process verification attempt"""
         attempts = state.get("details_verification_attempts", 0) + 1
         max_attempts = config.get("verification", {}).get("max_details_verification_attempts", 5)
@@ -162,6 +162,11 @@ def create_details_verification_agent(
             "vehicle_model": "vehicle model", "vehicle_color": "vehicle color"
         }
         
+        if verification_status == VerificationStatus.VERIFIED.value:
+            goto = "__end__"
+        else:
+            goto = "agent"
+            
         return Command(
             update={
                 "details_verification_attempts": attempts,
@@ -170,7 +175,7 @@ def create_details_verification_agent(
                 "field_to_verify": field_names.get(field_to_verify, field_to_verify),
                 "current_step": CallStep.DETAILS_VERIFICATION.value
             },
-            goto="agent"
+            goto=goto
         )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
