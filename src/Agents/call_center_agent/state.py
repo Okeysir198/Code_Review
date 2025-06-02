@@ -49,6 +49,7 @@ class CallCenterAgentState(MessagesState):
     name_verification_attempts: int = 0
     details_verification_status: str = VerificationStatus.INSUFFICIENT_INFO.value
     details_verification_attempts: int = 0
+    verification_stage: str = "name_verification_needed"  
     matched_fields: List[str] = []
     
     # ===== PAYMENT STATE =====

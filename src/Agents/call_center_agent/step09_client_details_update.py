@@ -2,191 +2,75 @@
 """
 Client Details Update Agent - Enhanced with aging-aware script integration
 """
+from datetime import datetime
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
-from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value
+from src.Agents.call_center_agent.parameter_helper import prepare_parameters
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-def get_client_details_update_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
-    """Generate aging-aware client details update prompt."""
-    
-    # Determine script type from aging
-    user_id = get_safe_value(client_data, "profile.user_id", "")     
-    account_aging = client_data.get("account_aging", {})
-    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
-    aging_context = ScriptManager.get_aging_context(script_type)
-    
-    # Extract current contact information
-    current_mobile = get_safe_value(client_data, "profile.client_info.contact.mobile", "")
-    current_email = get_safe_value(client_data, "profile.client_info.email_address", "")
-    
-    # Build aging-specific approach to updates
-    update_approaches_by_category = {
-        "First Missed Payment": {
-            "justification": "As part of standard account maintenance",
-            "tone": "routine and helpful",
-            "urgency": "to ensure you receive important account notifications"
-        },
-        "Failed Promise to Pay": {
-            "justification": "To ensure reliable communication for payment arrangements",
-            "tone": "solution-focused",
-            "urgency": "so we can coordinate future payments effectively"
-        },
-        "2-3 Months Overdue": {
-            "justification": "For critical account communications",
-            "tone": "professional and direct",
-            "urgency": "to ensure you receive urgent account updates"
-        },
-        "Pre-Legal 120+ Days": {
-            "justification": "For essential legal correspondence",
-            "tone": "formal and necessary",
-            "urgency": "to ensure you receive all legal notifications"
-        },
-        "Legal 150+ Days": {
-            "justification": "Required for legal proceedings",
-            "tone": "mandatory compliance",
-            "urgency": "for proper legal service of documents"
-        }
-    }
-    
-    category = aging_context['category']
-    approach = update_approaches_by_category.get(category, update_approaches_by_category["First Missed Payment"])
-    
-    # Build urgency-appropriate verification process
-    verification_processes_by_urgency = {
-        "Medium": [
-            "Can you confirm your mobile number?",
-            "And your email address?",
-            "Thank you, I've updated your details"
-        ],
-        "High": [
-            "I need to verify your mobile number for urgent communications",
-            "And confirm your email address",
-            "Details updated - you'll receive important account notifications"
-        ],
-        "Very High": [
-            "I must verify your current mobile number for critical updates",
-            "And your current email address",
-            "Updated - essential you receive all account communications"
-        ],
-        "Critical": [
-            "Legal requirement to verify your current mobile number",
-            "And current email address for legal correspondence",
-            "Details updated for legal compliance"
-        ]
-    }
-    
-    urgency_level = aging_context['urgency']
-    verification_process = verification_processes_by_urgency.get(urgency_level, verification_processes_by_urgency["Medium"])
-    
-    # Base prompt
-    base_prompt = f"""<role>
-You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
+CLIENT_DETAILS_UPDATE_PROMPT = """
+<role>
+You are debt collection specialist, named {agent_name} from Cartrack Accounts Department. 
+Today time: {current_date}
 </role>
-
+                                                                
 <context>
-- Current Mobile: {current_mobile}
-- Current Email: {current_email}
-- Aging Category: {category}
-- Urgency Level: {urgency_level}
-- Client user_id: {user_id}
+Client: {client_full_name} | Current Mobile: {current_mobile} | Current Email: {current_email}
+Urgency: {urgency_level} | Category: {aging_category} 
+Verification Status: VERIFIED
+user_id: {user_id}
 </context>
 
-<task>
-Update client contact information using aging-appropriate justification and urgency.
-</task>
+<script>{formatted_script}</script>
 
-<aging_specific_approach>
-**Justification**: "{approach['justification']}"
-**Purpose**: "{approach['urgency']}"
-**Tone**: "{approach['tone']}"
-</aging_specific_approach>
+<task>Update contact details. Quick verification process.</task>
 
-<verification_process>
-{chr(10).join([f"{i+1}. '{step}'" for i, step in enumerate(verification_process)])}
-</verification_process>
+<justification_by_urgency>
+Medium: "Verifying details for account notifications."
+High: "Updating details for urgent communications."
+Critical: "Required for legal correspondence."
+</justification_by_urgency>
 
-<urgency_context>
-{aging_context['approach']}
-</urgency_context>
+<process>
+1. Confirm mobile number
+2. Confirm email address  
+3. Update complete
+</process>
 
-<positioning_strategy>
-- Position as beneficial service appropriate to account status
-- Frame as {approach['tone']} maintenance
-- Emphasize {approach['urgency']}
-- Be efficient but thorough
-</positioning_strategy>
-
-<style>
-- {aging_context['tone']}
-- Professional {approach['tone']}
-- Appropriate urgency for {urgency_level.lower()} priority account
-- Clear benefit messaging
-- Efficient process
-- RESPOND MAX in 30 words
-</style>"""
-
-    # Enhance with script content
-    return ScriptManager.get_script_enhanced_prompt(
-        base_prompt=base_prompt,
-        script_type=script_type,
-        step=ScriptCallStep.CLIENT_DETAILS_UPDATE,
-        client_data=client_data,
-        state=state
-    )
+<response_style>
+Under 15 words. Quick verification. Professional efficiency.
+</response_style>
+"""
 
 def create_client_details_update_agent(
-    model: BaseChatModel,
-    client_data: Dict[str, Any],
-    script_type: str = None,  # Auto-determined from aging
-    agent_name: str = "AI Agent",
-    tools: Optional[List[BaseTool]] = None,
-    verbose: bool = False,
-    config: Optional[Dict[str, Any]] = None
+    model: BaseChatModel, client_data: Dict[str, Any], script_type: str,
+    agent_name: str = "AI Agent", tools: Optional[List[BaseTool]] = None,
+    verbose: bool = False, config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create a client details update agent with aging-aware scripts."""
     
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent"]]:
-        # Extract current contact information
-        current_mobile = get_safe_value(client_data, "profile.client_info.contact.mobile", "")
-        current_email = get_safe_value(client_data, "profile.client_info.email_address", "")
-        
-        # Determine script type and urgency
-        account_aging = client_data.get("account_aging", {})
-        script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
-        aging_context = ScriptManager.get_aging_context(script_type)
-        
-        return Command(
-            update={
-                "current_mobile": current_mobile,
-                "current_email": current_email,
-                "aging_category": aging_context['category'],
-                "urgency_level": aging_context['urgency'].lower(),
-                "update_request": "Let me verify your contact details",
-                "current_step": CallStep.CLIENT_DETAILS_UPDATE.value
-            },
-            goto="agent"
-        )
+        return Command(update={"current_step": CallStep.CLIENT_DETAILS_UPDATE.value}, goto="agent")
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        prompt_content = get_client_details_update_prompt(client_data, agent_name, state.to_dict() if hasattr(state, 'to_dict') else state)
-        print(f"Prompt: {prompt_content}")
+        params = prepare_parameters(client_data, state, agent_name)
+        params["current_date"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+        script_template = ScriptManager.get_script_content(script_type, ScriptCallStep.CLIENT_DETAILS_UPDATE)
+        formatted_script = script_template.format(**params) if script_template else "Verifying your contact details for notifications."
+        params["formatted_script"] = formatted_script
+        
+        prompt_content = CLIENT_DETAILS_UPDATE_PROMPT.format(**params)
+        if verbose: print(f"Client Details Update Prompt: {prompt_content}")
+        
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
-    return create_basic_agent(
-        model=model,
-        prompt=dynamic_prompt,
-        tools=tools,
-        pre_processing_node=pre_processing_node,
-        state_schema=CallCenterAgentState,
-        verbose=verbose,
-        config=config,
-        name="ClientDetailsUpdateAgent"
-    )
+    return create_basic_agent(model, dynamic_prompt, tools or [], pre_processing_node, 
+                            CallCenterAgentState, verbose, config, "ClientDetailsUpdateAgent")

@@ -2,6 +2,7 @@
 """
 Optimized call scripts with behavioral intelligence for LLM debt collection agents.
 Integrates script content with tactical guidance and objection handling.
+CLEANED VERSION - Removed methods duplicated in parameter_helper.py
 """
 
 from enum import Enum
@@ -203,89 +204,6 @@ class ScriptManager:
         ScriptType.PRE_LEGAL_150_PLUS: PreLegal150PlusScript,
         ScriptType.RECENTLY_SUSPENDED_120_PLUS: RecentlySuspended120PlusScript,
     }
-    @classmethod
-    def _get_script_parameters(cls, client_data: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Gathers all potential parameters from client_data and state for script formatting.
-        """
-        params = {}
-
-        # Client Profile Information
-        client_info = client_data.get("profile", {}).get("client_info", {})
-        params["client_title"] = client_info.get("title", "Sir/Madam")
-        params["client_first_name"] = client_info.get("first_name", "Valued Client")
-        params["client_last_name"] = client_info.get("last_name", "")
-        params["client_full_name"] = client_info.get("client_full_name", "Valued Client")
-        params["client_name"] = client_info.get("first_name", client_info.get("client_full_name", "Valued Client")) # A common short version
-
-        # Account Overview Information
-        account_overview = client_data.get("account_overview", {})
-        params["outstanding_amount"] = f"R{float(account_overview.get('xbalance', 0)):.2f}"
-        params["total_overdue_amount"] = f"R{float(client_data.get('account_aging', {}).get('xbalance', 0)):.2f}" # More explicit for total
-        params["subscription_amount"] = f"R{float(account_overview.get('subscription', 0)):.2f}"
-        params["last_successful_payment_date"] = account_overview.get("last_successful_payment_date", "N/A")
-        params["payment_status"] = account_overview.get("payment_status", "unknown")
-        params["account_status"] = account_overview.get("account_status", "unknown")
-        params["cancellation_fee"] = f"R{float(account_overview.get('cancellation_fee', 0)):.2f}"
-
-        # Payment History (for PTP and Short Paid)
-        payment_history = client_data.get("payment_history", [])
-        if payment_history:
-            # Assuming the most recent payment might be relevant for short_paid/failed_ptp
-            last_payment = payment_history[-1] # Or iterate to find specific type
-            params["paid_amount"] = f"R{float(last_payment.get('amount_paid', 0)):.2f}"
-            params["payment_date"] = last_payment.get("payment_date", "a recent date")
-            params["agreed_amount"] = f"R{float(last_payment.get('agreed_amount', 0)):.2f}"
-            params["shortfall_amount"] = f"R{float(last_payment.get('shortfall', 0)):.2f}"
-
-        # State-specific parameters (e.g., agent name, dynamic values)
-        params["agent_name"] = state.get("agent_name", "the Agent")
-        params["field_to_verify"] = state.get("field_to_verify", "identity") # For details_verification step
-        params["amount_with_fee"] = f"R{float(state.get('amount_with_fee', 0)):.2f}"
-        params["outcome_summary"] = state.get("outcome_summary", "We appreciate your time.")
-        params["discount_percentage"] = state.get("discount_percentage", "N/A")
-        params["discounted_amount"] = f"R{float(state.get('discounted_amount', 0)):.2f}"
-        params["discounted_amount_50"] = f"R{float(state.get('discounted_amount_50', 0)):.2f}"
-        params["campaign_end_date"] = state.get("campaign_end_date", "N/A")
-        params["campaign_first_date"] = state.get("campaign_first_date", "N/A")
-        params["total_balance"] = f"R{float(client_data.get('account_aging', {}).get('xbalance', 0)):.2f}" # Or account_overview.get('total_invoices') if that's the total owed
-
-        # Add salutation based on client title if available
-        params["salutation"] = f"Good day, {params['client_title']}" if params["client_title"] != "Sir/Madam" else "Good day"
-        
-        return params
-    
-    @classmethod
-    def format_script_content(cls, script_template: str, client_data: Dict[str, Any], state: Dict[str, Any]) -> str:
-        """
-        Formats a script template string with dynamic client and state data.
-        """
-        if not script_template:
-            return ""
-
-        params = cls._get_script_parameters(client_data, state)
-        
-        # Use str.format_map for safe formatting with missing keys
-        # This allows for a dictionary of values and handles missing keys gracefully by ignoring them.
-        # However, for critical parameters, you might want to pre-check or provide robust defaults.
-        
-        # A safer approach is to use a custom formatter that handles missing keys:
-        class SafeDict(dict):
-            def __missing__(self, key):
-                logger.warning(f"Missing script parameter: '{key}'. Using empty string as default.")
-                return ''
-        
-        safe_params = SafeDict(params)
-
-        try:
-            formatted_script = script_template.format_map(safe_params)
-            return formatted_script
-        except KeyError as e:
-            logger.error(f"Failed to format script due to missing key: {e}. Template: '{script_template}'")
-            return script_template # Return original template if formatting fails unexpectedly
-        except Exception as e:
-            logger.error(f"An unexpected error occurred during script formatting: {e}. Template: '{script_template}'")
-            return script_template
 
     @classmethod
     def determine_script_type_from_aging(cls, account_aging: Dict[str, Any], client_data: Dict[str, Any] = None) -> ScriptType:
@@ -440,8 +358,7 @@ class ScriptManager:
         base_prompt: str,
         script_type: ScriptType,
         step: CallStep,
-        client_data: Dict[str, Any],
-        state: Dict[str, Any]
+        formatted_script_content: str
     ) -> str:
         """
         Enhance any prompt with appropriate script content based on aging type.
@@ -449,32 +366,18 @@ class ScriptManager:
             base_prompt: The base prompt to enhance
             script_type: ScriptType enum value
             step: CallStep enum value
-            client_data: Client data dictionary
-            state: Current state dictionary
+            formatted_script_content: Already formatted script content
         Returns:
             Enhanced prompt string
         """
-        # Get raw script-specific content
-        raw_script_content = cls.get_script_content(script_type, step)
-        
-        # Format the script content with client_data and state
-        formatted_script_content = cls.format_script_content(raw_script_content, client_data, state)
-
-        # Get formatted objection and emotional responses
-        # Note: You might want to pass client_data/state to these methods as well if their content
-        # also needs dynamic formatting. For simplicity here, assuming they are mostly static
-        # or handled by broader context in the LLM.
-        objection_responses_template = cls.get_objection_response(script_type, "general")
-        formatted_objection_responses = cls.format_script_content(objection_responses_template, client_data, state)
-
-        emotional_responses_template = cls.get_emotional_response(script_type, "neutral")
-        formatted_emotional_responses = cls.format_script_content(emotional_responses_template, client_data, state)
-        
         # Get aging-specific context
         aging_context = cls.get_aging_context(script_type)
         
+        # Get script class for objection and emotional responses
+        script_class = cls.get_script_class(script_type)
+        
         # Build enhanced prompt
-        enhanced_prompt = f"""{base_prompt}
+        enhanced_prompt = """{base_prompt}
 
 <script_context>
 Script Type: {script_type.value}
@@ -496,11 +399,11 @@ Recommended Tone: {aging_context['tone']}
 </consequences_framework>
 
 <objection_handling>
-{formatted_objection_responses}
+{cls._format_objection_responses(script_class.OBJECTION_RESPONSES)}
 </objection_handling>
 
 <emotional_intelligence>
-{formatted_emotional_responses}
+{cls._format_emotional_responses(script_class.EMOTIONAL_RESPONSES)}
 </emotional_intelligence>"""
 
         return enhanced_prompt
@@ -518,55 +421,14 @@ Recommended Tone: {aging_context['tone']}
         return script.SCRIPTS.get(step.value, "")
     
     @classmethod
-    def get_objection_response(cls, script_type: ScriptType, objection_key: str) -> str:
-        """Get response for specific objection."""
-        script = cls.get_script_class(script_type)
-        return script.OBJECTION_RESPONSES.get(objection_key, script.OBJECTION_RESPONSES.get("general", "I understand your concern. Let's find a solution that works."))
+    def _format_objection_responses(cls, objection_responses: Dict[str, str]) -> str:
+        """Format objection responses for prompt inclusion."""
+        return "\n".join([f"- {key}: {value}" for key, value in objection_responses.items()])
     
     @classmethod
-    def get_emotional_response(cls, script_type: ScriptType, emotional_state: str) -> str:
-        """Get response for client emotional state."""
-        script = cls.get_script_class(script_type)
-        return script.EMOTIONAL_RESPONSES.get(emotional_state, script.EMOTIONAL_RESPONSES.get("neutral", "I'm here to help resolve this matter."))
-    
-    @classmethod
-    def get_escalation_response(cls, script_type: ScriptType, escalation_trigger: str) -> str:
-        """Get response for escalation situations."""
-        script = cls.get_script_class(script_type)
-        return script.ESCALATION_RESPONSES.get(escalation_trigger, "Let me help resolve this matter for you.")
-    
-    @classmethod
-    def get_behavioral_guidance(cls, script_type: ScriptType, step: CallStep) -> Dict[str, Any]:
-        """Get complete behavioral guidance for step."""
-        script = cls.get_script_class(script_type)
-        
-        return {
-            "script_content": script.SCRIPTS.get(step.value, ""),
-            "objection_responses": script.OBJECTION_RESPONSES,
-            "emotional_responses": script.EMOTIONAL_RESPONSES,
-            "escalation_responses": script.ESCALATION_RESPONSES,
-            "tactical_guidance": cls._get_tactical_guidance(script_type, step)
-        }
-    
-    @classmethod
-    def _get_tactical_guidance(cls, script_type: ScriptType, step: CallStep) -> Dict[str, str]:
-        """Get tactical guidance based on script type and step."""
-        guidance = {
-            "approach": "professional_persistent",
-            "urgency_level": "medium",
-            "success_indicators": "client_engagement",
-            "failure_triggers": "aggressive_resistance"
-        }
-        
-        # Adjust based on script type
-        if "pre_legal" in script_type.value or "150" in script_type.value:
-            guidance["urgency_level"] = "high"
-            guidance["approach"] = "firm_but_solution_focused"
-        elif "2_3" in script_type.value:
-            guidance["urgency_level"] = "medium_high"
-            guidance["consequence_emphasis"] = "recovery_fees"
-        
-        return guidance
+    def _format_emotional_responses(cls, emotional_responses: Dict[str, str]) -> str:
+        """Format emotional responses for prompt inclusion."""
+        return "\n".join([f"- {key}: {value}" for key, value in emotional_responses.items()])
 
 # Convenience functions for backward compatibility
 def get_script_text(script_type: str, section: str) -> str:
@@ -593,6 +455,7 @@ def get_available_scripts() -> Dict[str, str]:
         ScriptType.PRE_LEGAL_150_PLUS.value: "Legal 150+ days (attorney)",
         ScriptType.RECENTLY_SUSPENDED_120_PLUS.value: "120+ days campaign discount"
     }
+
 # Convenience functions for easy integration
 def determine_script_type_from_aging(account_aging: Dict[str, Any], client_data: Dict[str, Any] = None) -> str:
     """
@@ -612,8 +475,8 @@ def get_aging_aware_script_content(
     base_prompt: str,
     account_aging: Dict[str, Any],
     step: str,
-    client_data: Dict[str, Any] = None,
-    state: Dict[str, Any] = None
+    formatted_script_content: str,
+    client_data: Dict[str, Any] = None
 ) -> str:
     """
     Convenience function to get aging-aware script content.
@@ -622,8 +485,8 @@ def get_aging_aware_script_content(
         base_prompt: Base prompt to enhance
         account_aging: Account aging data
         step: Call step as string
+        formatted_script_content: Already formatted script content
         client_data: Optional client data
-        state: Optional state data
         
     Returns:
         Enhanced prompt with script content
@@ -635,6 +498,5 @@ def get_aging_aware_script_content(
         base_prompt=base_prompt,
         script_type=script_type,
         step=call_step,
-        client_data=client_data or {},
-        state=state or {}
+        formatted_script_content=formatted_script_content
     )

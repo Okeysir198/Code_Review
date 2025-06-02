@@ -30,7 +30,7 @@ def get_introduction_prompt(client_data: Dict[str, Any], agent_name: str, state:
     client_title = get_safe_value(client_data, "profile.client_info.title", "Mr/Ms")
     
     # Base prompt
-    base_prompt = f"""<role>
+    base_prompt = """<role>
 You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
 </role>
 
