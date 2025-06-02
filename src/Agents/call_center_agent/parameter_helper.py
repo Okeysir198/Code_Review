@@ -1,10 +1,11 @@
 # src/Agents/call_center_agent/parameter_helper.py
 """
-Lean parameter preparation for consistent script and prompt formatting
+Enhanced parameter preparation for consistent script and prompt formatting
+Added current_date and removed redundant conversation context
 """
 import logging
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, List
 from src.Agents.call_center_agent.call_scripts import ScriptManager
 from app_config import CONFIG
 
@@ -16,7 +17,7 @@ def prepare_parameters(
     agent_name: str = "AI Agent"
 ) -> Dict[str, str]:
     """
-    Prepare all parameters needed for script and prompt formatting.
+    Enhanced parameter preparation with current date and cleaned structure.
     
     Args:
         client_data: Client data from data fetcher
@@ -24,13 +25,16 @@ def prepare_parameters(
         agent_name: Agent name
         
     Returns:
-        Dict with all formatted parameters
+        Dict with all formatted parameters including current_date
     """
     params = {}
     
     # === CORE IDENTIFIERS ===
     params["user_id"] = _get_safe_value(client_data, "profile.user_id", "")
     params["agent_name"] = agent_name
+    
+    # === CURRENT DATE (NEW) ===
+    params["current_date"] = datetime.now().strftime("%A, %B %d, %Y")
     
     # === CLIENT INFO ===
     client_info = client_data.get("profile", {}).get("client_info", {})
@@ -55,6 +59,7 @@ def prepare_parameters(
     params["subscription_date"] = f"{banking_details.get('debit_date')} of each month"
     
     params['banking_details'] = banking_details
+    
     # === ACCOUNT STATUS ===
     params["account_status"] = account_overview.get("account_status", "Overdue")
     
@@ -117,8 +122,6 @@ def prepare_parameters(
     params["call_outcome"] = state.get("call_outcome", "incomplete")
     params["should_offer_referrals"] = state.get("should_offer_referrals", False)
     
-
-    params["current_date"] = datetime.now().strftime("%Y-%m-%d %H:%M")
     return params
 
 def _get_safe_value(data: Dict[str, Any], path: str, default: str = "") -> str:
@@ -146,3 +149,56 @@ def _format_currency(amount: Any) -> str:
         return f"R {float(amount):.2f}"
     except (ValueError, TypeError):
         return "R 0.00"
+
+# Additional helper functions for enhanced functionality
+def build_conversation_summary(state: Dict[str, Any]) -> str:
+    """Build a summary of conversation progress (for logging)"""
+    summary_parts = []
+    
+    # Verification progress
+    if state.get("name_verification_status") == "VERIFIED":
+        summary_parts.append("Name verified")
+    if state.get("details_verification_status") == "VERIFIED":
+        summary_parts.append("Details verified")
+    
+    # Payment progress
+    if state.get("payment_secured"):
+        method = state.get("payment_method_preference", "unknown")
+        summary_parts.append(f"Payment secured ({method})")
+    
+    # Special requests
+    if state.get("escalation_requested"):
+        summary_parts.append("Escalation requested")
+    if state.get("cancellation_requested"):
+        summary_parts.append("Cancellation requested")
+    
+    return " | ".join(summary_parts) if summary_parts else "In progress"
+
+def detect_client_mood_from_messages(messages: List) -> str:
+    """Simple mood detection based on recent messages"""
+    if not messages:
+        return "neutral"
+    
+    # Get last few client messages
+    recent_client_messages = []
+    for msg in reversed(messages[-6:]):
+        if hasattr(msg, 'type') and msg.type == 'human':
+            recent_client_messages.append(msg.content.lower())
+            if len(recent_client_messages) >= 3:
+                break
+    
+    combined_text = " ".join(recent_client_messages)
+    
+    # Simple keyword-based mood detection
+    if any(word in combined_text for word in ["angry", "frustrated", "sick", "harassment"]):
+        return "angry"
+    elif any(word in combined_text for word in ["confused", "don't understand", "what"]):
+        return "confused"
+    elif any(word in combined_text for word in ["yes", "okay", "sure", "fine"]):
+        return "cooperative"
+    elif any(word in combined_text for word in ["can't", "won't", "refuse", "no"]):
+        return "resistant"
+    elif any(word in combined_text for word in ["money", "afford", "broke", "tight"]):
+        return "financial_stress"
+    else:
+        return "neutral"

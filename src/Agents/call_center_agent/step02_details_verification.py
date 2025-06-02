@@ -1,6 +1,6 @@
 # src/Agents/call_center_agent/step02_details_verification.py
 """
-Details Verification Agent - Lean version with concise responses
+Enhanced Details Verification Agent - Natural conversation with fast ID verification
 """
 import random
 import logging
@@ -9,7 +9,6 @@ from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langchain_core.messages import SystemMessage
-from langchain_core.prompts import PromptTemplate 
 from langgraph.graph.graph import CompiledGraph
 from langgraph.types import Command
 
@@ -21,60 +20,26 @@ from src.Agents.call_center_agent.tools.verify_client_details import verify_clie
 
 logger = logging.getLogger(__name__)
 
-# Optimized prompt template - ensures concise responses
+# Enhanced conversational prompt for details verification
 DETAILS_VERIFICATION_PROMPT = """
-<role>
-You are debt collection specialist, named {agent_name} from Cartrack Accounts Department. 
-Today's date: {current_date}
-</role>
-                                                               
-<context>
-Target client: {client_full_name} | Outstanding amount: {outstanding_amount} | Details Verification Status: {details_verification_status}
-Verification Attempt: {details_verification_attempts}/{max_details_verification_attempts} 
-Need to verify: {field_to_verify} | Verified items: {matched_fields}
-Urgency: {urgency_level} | Category: {aging_category} 
-user_id: {user_id}
-</context>
+You're {agent_name} from Cartrack continuing the conversation with {client_full_name} about their {outstanding_amount} overdue account.
 
-<script>
-{formatted_script}
-</script>
+TODAY: {current_date}
+OBJECTIVE: Verify {client_name}'s {field_to_verify} for security before discussing the account details.
 
-<task>
-Get {field_to_verify} for verification. Match urgency to account severity.
-</task>
+VERIFIED SO FAR: {matched_fields_display}
 
-<approach_by_urgency>
-**Standard/Medium Urgency**: 
-- Security Notice: "This call is recorded for quality and security purposes"
-- Request: "Please provide your {field_to_verify}"
-- If Resistant: "This protects your account information"
+RESPOND NATURALLY FOR SECURITY VERIFICATION:
+- If they're cooperative: "For security, could you confirm your {field_to_verify}?"
+- If they're hesitant: "I understand your caution. I need to verify your {field_to_verify} to protect your account before we can proceed."
+- If they're resistant: "This is standard security protocol. Your {field_to_verify} helps ensure I'm speaking with the account holder."
+- If they provide details: "Thank you. Let me verify that information."
 
-**High Urgency**: 
-- Security Notice: "This call is recorded. Due to the urgency of your account status"
-- Request: "I need your {field_to_verify} immediately to proceed"
-- If Resistant: "Security verification is required for overdue accounts"
+URGENCY LEVEL: {urgency_level} - {aging_approach}
 
-**Legal/Critical Urgency**:
-- Security Notice: "This is a legal matter. I must verify your identity"
-- Request: "Provide your {field_to_verify} now to proceed with this matter"
-- If Resistant: "Legal proceedings require proper identification"
-</approach_by_urgency>
+You're building on the successful name verification. Be professional but reassuring - explain that this protects their account information. If they've been cooperative so far, keep the momentum going. If they're cautious, take time to explain why verification is necessary.
 
-<rules>
-- Request ONE field only: {field_to_verify}
-- NO account details until verified
-- Match tone to {urgency_level} urgency
-- Security non-negotiable
-</rules>
-
-<response_style>
-CRITICAL: Keep responses under 15 words. Be direct. No explanations unless asked.
-Examples:
-✓ "Your ID number please"
-✓ "I need your email address for verification"  
-✗ "For security purposes and to ensure I'm speaking with the right person, could you please provide..."
-</response_style>
+Keep responses natural and under 25 words unless security explanation is needed. Focus on getting the specific information you need: {field_to_verify}.
 """
 
 def create_details_verification_agent(
@@ -86,7 +51,7 @@ def create_details_verification_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create details verification agent with concise responses"""
+    """Create enhanced details verification agent with fast ID detection"""
     
     FIELD_PRIORITY = ["id_number", "passport_number", "vehicle_registration", 
                      "vehicle_make", "vehicle_model", "vehicle_color", "email", "username"]
@@ -98,63 +63,143 @@ def create_details_verification_agent(
         vehicles = profile.get("vehicles", [])
         
         fields = {}
-        if client_info.get("id_number"): fields["id_number"] = client_info["id_number"]
-        if profile.get("user_name"): fields["username"] = profile["user_name"]
-        if client_info.get("email_address"): fields["email"] = client_info["email_address"]
+        if client_info.get("id_number"): 
+            fields["id_number"] = client_info["id_number"]
+        if profile.get("user_name"): 
+            fields["username"] = profile["user_name"]
+        if client_info.get("email_address"): 
+            fields["email"] = client_info["email_address"]
         
         if vehicles and isinstance(vehicles[0], dict):
             v = vehicles[0]
-            if v.get("registration"): fields["vehicle_registration"] = v["registration"]
-            if v.get("make"): fields["vehicle_make"] = v["make"]
-            if v.get("model"): fields["vehicle_model"] = v["model"]
-            if v.get("color"): fields["vehicle_color"] = v["color"]
+            if v.get("registration"): 
+                fields["vehicle_registration"] = v["registration"]
+            if v.get("make"): 
+                fields["vehicle_make"] = v["make"]
+            if v.get("model"): 
+                fields["vehicle_model"] = v["model"]
+            if v.get("color"): 
+                fields["vehicle_color"] = v["color"]
         
         return fields
     
     def _select_next_field(available_fields: Dict[str, str], matched_fields: List[str]) -> str:
-        """Select next verification field"""
+        """Select next verification field with priority"""
         remaining = [f for f in FIELD_PRIORITY if f in available_fields and f not in matched_fields]
-        if not remaining: return "id_number"
+        if not remaining: 
+            return "id_number"
         
+        # Prioritize ID number and passport
         high_priority = [f for f in FIELD_PRIORITY[:2] if f in remaining]
-        if high_priority: return high_priority[0]
+        if high_priority: 
+            return high_priority[0]
         
-        other_fields = [f for f in remaining if f not in FIELD_PRIORITY[:2]]
+        # Then vehicle details
+        vehicle_fields = [f for f in remaining if f.startswith("vehicle_")]
+        if vehicle_fields:
+            random.shuffle(vehicle_fields)
+            return vehicle_fields[0]
+        
+        # Then other fields
+        other_fields = [f for f in remaining if not f.startswith("vehicle_")]
         if other_fields:
             random.shuffle(other_fields)
             return other_fields[0]
+            
         return "id_number"
     
+    def _get_last_client_message(messages: List) -> str:
+        """Extract last human message"""
+        for message in reversed(messages):
+            if hasattr(message, 'type') and message.type == 'human':
+                return message.content.strip()
+            elif hasattr(message, 'content') and not hasattr(message, 'type'):
+                return message.content.strip()
+        return ""
+    
+    def _quick_details_check(messages: List, available_fields: Dict[str, str]) -> bool:
+        """Fast check if client provided verification details"""
+        last_msg = _get_last_client_message(messages)
+        
+        if not last_msg:
+            return False
+        
+        # Check for ID number patterns (13 digits for SA ID)
+        import re
+        id_pattern = r'\b\d{13}\b'
+        if re.search(id_pattern, last_msg):
+            return True
+        
+        # Check for vehicle registration patterns
+        reg_patterns = [r'\b[A-Z]{2,3}[\s\-]?\d{3,4}[\s\-]?[A-Z]{2,3}\b', r'\b\d{3}[\s\-]?\d{3}[\s\-]?\d{3}\b']
+        if any(re.search(pattern, last_msg.upper()) for pattern in reg_patterns):
+            return True
+        
+        # Check for email patterns
+        email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        if re.search(email_pattern, last_msg):
+            return True
+        
+        # Check if they mentioned specific vehicle details
+        for field, value in available_fields.items():
+            if field.startswith("vehicle_") and value.lower() in last_msg.lower():
+                return True
+        
+        return False
+    
+    def _format_matched_fields(matched_fields: List[str]) -> str:
+        """Format matched fields for display"""
+        if not matched_fields:
+            return "None yet"
+        
+        field_names = {
+            "id_number": "ID Number", "email": "Email", "username": "Username",
+            "vehicle_registration": "Vehicle Registration", "vehicle_make": "Vehicle Make",
+            "vehicle_model": "Vehicle Model", "vehicle_color": "Vehicle Color"
+        }
+        
+        return ", ".join([field_names.get(field, field.title()) for field in matched_fields])
+    
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent", "__end__"]]:
-        """Process verification attempt"""
+        """Enhanced preprocessing with fast details detection"""
+        
         attempts = state.get("details_verification_attempts", 0) + 1
         max_attempts = config.get("verification", {}).get("max_details_verification_attempts", 5)
-        
         matched_fields = state.get("matched_fields", [])
         available_fields = _get_available_fields(client_data)
+        
+        # Select field to verify
         field_to_verify = _select_next_field(available_fields, matched_fields)
         
         verification_status = VerificationStatus.INSUFFICIENT_INFO.value
-        all_matched = matched_fields
+        all_matched = matched_fields.copy()
         
-        try:
-            result = verify_client_details.invoke({
-                "client_details": available_fields,
-                "messages": state.get("messages", []),
-                "required_match_count": 3,
-                "max_failed_attempts": max_attempts
-            })
-            
-            new_matched = result.get("matched_fields", [])
-            all_matched = list(set(matched_fields + new_matched))
-            verification_status = result.get("classification", VerificationStatus.INSUFFICIENT_INFO.value)
-            
-        except Exception as e:
-            if verbose: logger.error(f"Verification error: {e}")
+        messages = state.get("messages", [])
         
+        # Fast check if client provided details
+        if len(messages) >= 2 and _quick_details_check(messages, available_fields):
+            try:
+                # Use existing verification tool for accuracy
+                result = verify_client_details.invoke({
+                    "client_details": available_fields,
+                    "messages": messages,
+                    "required_match_count": 3,
+                    "max_failed_attempts": max_attempts
+                })
+                
+                new_matched = result.get("matched_fields", [])
+                all_matched = list(set(matched_fields + new_matched))
+                verification_status = result.get("classification", VerificationStatus.INSUFFICIENT_INFO.value)
+                
+            except Exception as e:
+                if verbose: 
+                    logger.error(f"Verification error: {e}")
+        
+        # Auto-fail if max attempts reached
         if attempts >= max_attempts and verification_status == VerificationStatus.INSUFFICIENT_INFO.value:
             verification_status = VerificationStatus.VERIFICATION_FAILED.value
         
+        # Format field name for display
         field_names = {
             "id_number": "ID number", "passport_number": "passport number",
             "username": "username", "email": "email address",
@@ -162,50 +207,78 @@ def create_details_verification_agent(
             "vehicle_model": "vehicle model", "vehicle_color": "vehicle color"
         }
         
+        # Determine next action
         if verification_status == VerificationStatus.VERIFIED.value:
-            goto = "__end__"
+            logger.info("Details verification VERIFIED - jumping to reason for call")
+            return Command(
+                update={
+                    "details_verification_attempts": attempts,
+                    "details_verification_status": verification_status,
+                    "matched_fields": all_matched,
+                    "field_to_verify": field_names.get(field_to_verify, field_to_verify),
+                    "current_step": CallStep.REASON_FOR_CALL.value
+                },
+                goto="__end__"  # Direct jump!
+            )
+        
+        elif verification_status in [
+            VerificationStatus.THIRD_PARTY.value,
+            VerificationStatus.UNAVAILABLE.value,
+            VerificationStatus.WRONG_PERSON.value,
+            VerificationStatus.VERIFICATION_FAILED.value
+        ]:
+            logger.info(f"Details verification terminal: {verification_status} - ending call")
+            return Command(
+                update={
+                    "details_verification_attempts": attempts,
+                    "details_verification_status": verification_status,
+                    "matched_fields": all_matched,
+                    "is_call_ended": True,
+                    "current_step": CallStep.CLOSING.value
+                },
+                goto="__end__"
+            )
+        
         else:
-            goto = "agent"
-            
-        return Command(
-            update={
-                "details_verification_attempts": attempts,
-                "details_verification_status": verification_status,
-                "matched_fields": all_matched,
-                "field_to_verify": field_names.get(field_to_verify, field_to_verify),
-                "current_step": CallStep.DETAILS_VERIFICATION.value
-            },
-            goto=goto
-        )
+            # Continue verification
+            logger.info(f"Details verification continuing - attempt {attempts}")
+            return Command(
+                update={
+                    "details_verification_attempts": attempts,
+                    "details_verification_status": verification_status,
+                    "matched_fields": all_matched,
+                    "field_to_verify": field_names.get(field_to_verify, field_to_verify),
+                    "current_step": CallStep.DETAILS_VERIFICATION.value
+                },
+                goto="agent"
+            )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate concise verification prompt"""
-        # Step 1: Prepare parameters
+        """Generate enhanced conversational prompt"""
+        
+        # Prepare parameters
         params = prepare_parameters(client_data, state, agent_name)
+        params["matched_fields_display"] = _format_matched_fields(state.get("matched_fields", []))
         
-         # Step 2: Format script
-        script_template = ScriptManager.get_script_content(script_type, ScriptCallStep.NAME_VERIFICATION)
-        formatted_script = script_template.format(**params) if script_template else f"Are you {params['client_full_name']}?"
-        params["formatted_script"] = formatted_script
-        
-        # Step 3: Format prompt
+        # Get aging-specific approach
         aging_context = ScriptManager.get_aging_context(script_type)
         params["aging_approach"] = aging_context['approach']
-        params["tone"] = aging_context['tone']
         
+        # Format enhanced prompt
         prompt_content = DETAILS_VERIFICATION_PROMPT.format(**params)
         
-        if verbose: print(f"Details Verification Prompt: {prompt_content}")
+        if verbose:
+            print(f"Enhanced Details Verification Prompt: {prompt_content}")
         
         return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=tools or [],
+        tools=[],  # No tools needed - verification logic handles details
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,
         config=config,
-        name="DetailsVerificationAgent"
+        name="EnhancedDetailsVerificationAgent"
     )
