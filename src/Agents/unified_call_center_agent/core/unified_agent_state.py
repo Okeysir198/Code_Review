@@ -1,4 +1,6 @@
 # src/Agents/unified_call_center_agent/core/unified_agent_state.py
+# Fix for the state management issues
+
 """
 Unified Agent State - Optimized for LangGraph's MessagesState and built-in memory
 """
@@ -133,13 +135,47 @@ class UnifiedAgentState(MessagesState):
         
         # Update cooperation with smoothing (70% old, 30% new)
         old_cooperation = self.cooperation_level
-        self.cooperation_level = (old_cooperation * 0.7) + (cooperation_change * 0.3)
+        self.cooperation_level = max(0.0, min(1.0, (old_cooperation * 0.7) + (cooperation_change * 0.3)))
         
         # Update rapport based on cooperation trend
         if cooperation_change > 0:
             self.rapport_level = min(1.0, self.rapport_level + 0.1)
         elif cooperation_change < -0.2:
             self.rapport_level = max(0.0, self.rapport_level - 0.1)
+
+    # Factory method to create initial state with defaults
+    @classmethod
+    def create_initial_state(cls, client_data: Dict[str, Any]) -> 'UnifiedAgentState':
+        """Create initial state with client data"""
+        profile = client_data.get("profile", {})
+        client_info = profile.get("client_info", {})
+        account_aging = client_data.get("account_aging", {})
+        
+        # Calculate outstanding amount
+        try:
+            total = float(account_aging.get("xbalance", 0))
+            current = float(account_aging.get("x0", 0))
+            outstanding = max(total - current, 0.0)
+            outstanding_str = f"R {outstanding:.2f}"
+        except (ValueError, TypeError):
+            outstanding_str = "R 0.00"
+        
+        return cls(
+            user_id=profile.get("user_id", ""),
+            client_name=client_info.get("client_full_name", "Client"),
+            outstanding_amount=outstanding_str,
+            current_objective=ConversationObjective.IDENTITY_VERIFICATION.value,
+            name_verification=VerificationStatus.PENDING.value,
+            details_verification=VerificationStatus.PENDING.value,
+            verification_attempts={"name": 0, "details": 0},
+            turn_count=0,
+            completed_objectives=[],
+            client_concerns=[],
+            mentioned_topics=[],
+            call_ended=False,
+            messages=[]  # Initialize empty messages
+        )
+
 
 # Example of extending state for specific use cases if needed
 class CallCenterAgentState(UnifiedAgentState):

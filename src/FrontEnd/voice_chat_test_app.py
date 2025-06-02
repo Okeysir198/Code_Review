@@ -17,9 +17,7 @@ sys.path.append("../..")
 
 from fastrtc import WebRTC, ReplyOnPause, AlgoOptions, SileroVadOptions, AdditionalOutputs
 from src.Agents.call_center_agent.data.client_data_fetcher import get_client_data, format_currency, get_safe_value, clear_cache
-# from src.VoiceHandler import VoiceInteractionHandler
-from src.Agents.unified_call_center_agent import VoiceInteractionHandler
-
+from src.VoiceHandler import VoiceInteractionHandler
 from src.Agents.graph_call_center_agent import create_call_center_agent
 from langchain_ollama import ChatOllama
 from app_config import CONFIG
@@ -450,8 +448,8 @@ def create_voice_chat_test_app():
         border: 1px solid #e2e8f0;
         border-radius: 8px;
         padding: 16px;
-        height: 600px;
-        overflow-y: auto;
+        /*height: 600px;*/
+        /*overflow-y: auto;*/
     }
     
     .mandate-info {
@@ -459,8 +457,8 @@ def create_voice_chat_test_app():
         border: 1px solid #bbf7d0;
         border-radius: 8px;
         padding: 16px;
-        height: 600px;
-        overflow-y: auto;
+        /*height: 600px;*/
+        /*overflow-y: auto;*/
     }
     
     .conversation-display textarea {
@@ -498,43 +496,7 @@ def create_voice_chat_test_app():
         
         # First row: Controls Layout
         with gr.Row(elem_classes=["status-row"]):
-            # Left: Client ID and Buttons
-            with gr.Column(scale=1):
-                with gr.Row():
-                    user_id_input = gr.Textbox(
-                        label="🆔 Client ID",
-                        placeholder="Enter client ID",
-                        value="28173",
-                        scale=3
-                    )
-                    with gr.Column(scale=1):
-                        load_btn = gr.Button("🔄 Load", variant="primary", size="sm")
-                        status_display = gr.Textbox(
-                            label="📊 Status",
-                            value="Ready to load client",
-                            interactive=False,
-                            scale=1
-                        )
-                        
-            
-            # Middle: Status Information
-            with gr.Column(scale=1):
-                script_type_display = gr.Textbox(
-                    label="📋 Script Type",
-                    value="Not determined",
-                    interactive=False,
-                    scale=1
-                )
-                call_step_display = gr.Textbox(
-                    label="📍 Call Step",
-                    value="Not started",
-                    interactive=False,
-                    scale=1
-                )
-                # NEW: Refresh Data Button
-                refresh_data_btn = gr.Button("🔄 Refresh Data", variant="secondary", size="sm")
-            
-            # Right: Voice Interface
+            # Voice Interface
             with gr.Column(scale=1):
                 audio = WebRTC(
                     label="🎤 Voice Communication",
@@ -549,10 +511,86 @@ def create_voice_chat_test_app():
                         "channelCount": {"exact": 1},
                     }
                 )
-                new_conv_btn = gr.Button("🆕 New conversation", size="sm")
+
+            
+            # Middle: Status Information
+            with gr.Column(scale=1):
+                with gr.Row():
+                    script_type_display = gr.Textbox(
+                        label="📋 Script Type",
+                        value="Not determined",
+                        interactive=False,
+                        scale=1
+                    )
+                    call_step_display = gr.Textbox(
+                        label="📍 Call Step",
+                        value="Not started",
+                        interactive=False,
+                        scale=1
+                    )
+                with gr.Row():
+                    new_conv_btn = gr.Button("🆕 New conversation", variant="primary", size="sm")
+                    refresh_data_btn = gr.Button("🔄 Refresh Debtor Data", variant="secondary", size="sm")
+                    
+            
+            # Left: Client ID and Buttons
+            with gr.Column(scale=1):
+                with gr.Row():
+                    user_id_input = gr.Textbox(
+                        label="🆔 Client ID",
+                        placeholder="Enter client ID",
+                        value="28173",
+                        scale=3
+                    )
+                       
+                    status_display = gr.Textbox(
+                        label="📊 Status",
+                        value="Ready to load client",
+                        interactive=False,
+                        scale=1
+                    )
+                load_btn = gr.Button("Search debtor data", variant="primary", size="sm")
+            
         
         # Second row: 3 Columns
         with gr.Row():
+            # Column 3: Console Area
+            with gr.Column(scale=2):
+                # Live Conversation
+                with gr.Row():
+                    with gr.Column(scale=3):
+                        gr.Markdown("### 💬 **Live Conversation**")
+                    # Console controls
+                    clear_btn = gr.Button("🧹 Clear Debug", size="sm", variant="secondary", scale=1)
+                    clear_conv_btn = gr.Button("💬 Clear Conversation", size="sm", variant="secondary", scale=1)
+                    # refresh_btn = gr.Button("🔄 Refresh", size="sm", variant="secondary")
+                    
+                
+                conversation_output = gr.Textbox(
+                    label="Conversation Log",
+                    value="💬 Conversation will appear here during voice chat...\n",
+                    lines=15,
+                    interactive=False,
+                    max_lines=15,
+                    elem_classes=["conversation-display"],
+                    autoscroll=True,
+                    show_copy_button=True
+                )
+                
+                # Debug Console
+                with gr.Accordion("🔧 Debug Console", open=True):
+                    console_output = gr.Textbox(
+                        label="Debug Logs",
+                        value="🖥️ Debug console - Load a client to start...\n",
+                        lines=20,
+                        interactive=False,
+                        max_lines=20,
+                        elem_classes=["console-display"],
+                        autoscroll=True,
+                        show_copy_button=True
+                    )
+                    
+                    
             # Column 1: Client Information
             with gr.Column(scale=1):
                 client_info_display = gr.Markdown(
@@ -570,39 +608,7 @@ def create_voice_chat_test_app():
                     container=True
                 )
             
-            # Column 3: Console Area
-            with gr.Column(scale=2):
-                # Live Conversation
-                gr.Markdown("### 💬 **Live Conversation**")
-                conversation_output = gr.Textbox(
-                    label="Conversation Log",
-                    value="💬 Conversation will appear here during voice chat...\n",
-                    lines=15,
-                    interactive=False,
-                    max_lines=20,
-                    elem_classes=["conversation-display"],
-                    autoscroll=True,
-                    show_copy_button=True
-                )
-                
-                # Debug Console
-                with gr.Accordion("🔧 Debug Console", open=False):
-                    console_output = gr.Textbox(
-                        label="Debug Logs",
-                        value="🖥️ Debug console - Load a client to start...\n",
-                        lines=20,
-                        interactive=False,
-                        max_lines=25,
-                        elem_classes=["console-display"],
-                        autoscroll=True,
-                        show_copy_button=True
-                    )
-                    
-                    # Console controls
-                    with gr.Row():
-                        clear_btn = gr.Button("🧹 Clear Debug", size="sm", variant="secondary")
-                        refresh_btn = gr.Button("🔄 Refresh", size="sm", variant="secondary")
-                        clear_conv_btn = gr.Button("💬 Clear Conversation", size="sm", variant="secondary")
+            
         
         # Real-time updates with proper error handling
         def update_console_realtime():
@@ -747,10 +753,10 @@ def create_voice_chat_test_app():
             outputs=[conversation_output]
         )
         
-        refresh_btn.click(
-            fn=lambda: console_capture.get_output(),
-            outputs=[console_output]
-        )
+        # refresh_btn.click(
+        #     fn=lambda: console_capture.get_output(),
+        #     outputs=[console_output]
+        # )
         
         # Initialize app
         def initialize():

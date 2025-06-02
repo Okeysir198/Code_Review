@@ -1,4 +1,6 @@
 # src/Agents/unified_call_center_agent/agent/unified_workflow.py
+# Enhanced with better error handling and compatibility
+
 """
 Unified Workflow Factory - Creates simple LangGraph workflow with single intelligent node
 """
@@ -51,38 +53,6 @@ def create_unified_call_center_workflow(
         agent_name=agent_name
     )
     
-    # Initialize state with client data
-    def initialize_state_with_client_data(state: UnifiedAgentState) -> Dict[str, Any]:
-        """Initialize state with client information"""
-        
-        profile = client_data.get("profile", {})
-        client_info = profile.get("client_info", {})
-        account_aging = client_data.get("account_aging", {})
-        
-        # Calculate outstanding amount
-        try:
-            total = float(account_aging.get("xbalance", 0))
-            current = float(account_aging.get("x0", 0))
-            outstanding = max(total - current, 0.0)
-            outstanding_str = f"R {outstanding:.2f}"
-        except (ValueError, TypeError):
-            outstanding_str = "R 0.00"
-        
-        return {
-            "user_id": profile.get("user_id", ""),
-            "client_name": client_info.get("client_full_name", "Client"),
-            "outstanding_amount": outstanding_str,
-            "current_objective": ConversationObjective.IDENTITY_VERIFICATION.value,
-            "name_verification": VerificationStatus.PENDING.value,
-            "details_verification": VerificationStatus.PENDING.value,
-            "verification_attempts": {"name": 0, "details": 0},
-            "turn_count": 0,
-            "completed_objectives": [],
-            "client_concerns": [],
-            "mentioned_topics": [],
-            "call_ended": False
-        }
-    
     def conversation_node(state: UnifiedAgentState) -> Command[Literal["__end__"]]:
         """
         Single conversation node that handles entire call flow.
@@ -98,20 +68,32 @@ def create_unified_call_center_workflow(
         try:
             # Check if this is the first turn (no messages yet)
             messages = state.get("messages", [])
+            
             if not messages:
-                # Initialize state with client data
-                initial_state = initialize_state_with_client_data(state)
+                # Initialize state with client data using factory method
+                initial_state_data = UnifiedAgentState.create_initial_state(client_data)
                 
                 # Create greeting message
-                greeting = f"Good day, this is {agent_name} from Cartrack Accounts Department. May I speak with {initial_state['client_name']}, please?"
+                greeting = f"Good day, this is {agent_name} from Cartrack Accounts Department. May I speak with {initial_state_data.client_name}, please?"
                 
-                logger.info(f"Starting new conversation for client: {initial_state['client_name']}")
+                logger.info(f"Starting new conversation for client: {initial_state_data.client_name}")
                 
                 return Command(
                     update={
-                        **initial_state,
-                        "messages": [AIMessage(content=greeting)],
+                        "user_id": initial_state_data.user_id,
+                        "client_name": initial_state_data.client_name,
+                        "outstanding_amount": initial_state_data.outstanding_amount,
+                        "current_objective": initial_state_data.current_objective,
+                        "name_verification": initial_state_data.name_verification,
+                        "details_verification": initial_state_data.details_verification,
+                        "verification_attempts": initial_state_data.verification_attempts,
                         "turn_count": 1,
+                        "completed_objectives": [],
+                        "client_concerns": [],
+                        "mentioned_topics": [],
+                        "payment_secured": False,
+                        "call_ended": False,
+                        "messages": [AIMessage(content=greeting)],
                         "last_action": "greeting"
                     },
                     goto="__end__"
@@ -169,15 +151,24 @@ def create_unified_call_center_workflow(
     
     # Add memory/persistence if configured
     if config.get('configurable', {}).get('use_memory', True):
-        compile_kwargs["checkpointer"] = MemorySaver()
-        logger.info("Workflow compiled with memory persistence")
+        try:
+            compile_kwargs["checkpointer"] = MemorySaver()
+            logger.info("Workflow compiled with memory persistence")
+        except Exception as e:
+            logger.warning(f"Memory persistence failed, compiling without: {e}")
     else:
         logger.info("Workflow compiled without persistence")
     
-    compiled_workflow = workflow.compile(**compile_kwargs)
-    
-    logger.info("Unified call center workflow created successfully")
-    return compiled_workflow
+    try:
+        compiled_workflow = workflow.compile(**compile_kwargs)
+        logger.info("Unified call center workflow created successfully")
+        return compiled_workflow
+    except Exception as e:
+        logger.error(f"Failed to compile workflow: {e}")
+        # Fallback: compile without memory
+        compiled_workflow = workflow.compile()
+        logger.info("Workflow compiled without memory as fallback")
+        return compiled_workflow
 
 def create_conversation_config(thread_id: str = None) -> Dict[str, Any]:
     """
@@ -336,7 +327,11 @@ def create_voice_compatible_workflow(
 def test_unified_workflow():
     """Test function for the unified workflow"""
     
-    from langchain_ollama import ChatOllama
+    try:
+        from langchain_ollama import ChatOllama
+    except ImportError:
+        print("langchain_ollama not available for testing")
+        return None
     
     # Sample client data
     test_client_data = {
@@ -359,43 +354,51 @@ def test_unified_workflow():
     # Test configuration
     test_config = {
         'configurable': {
-            'use_memory': True
+            'use_memory': False  # Disable memory for testing
         }
     }
     
-    # Create model and workflow
-    model = ChatOllama(model="qwen2.5:7b-instruct", temperature=0)
-    workflow = create_unified_call_center_workflow(
-        model=model,
-        client_data=test_client_data,
-        config=test_config
-    )
-    
-    # Test conversation
-    config = create_conversation_config("test_thread_001")
-    
-    print("=== Testing Unified Workflow ===")
-    
-    # Initial invocation (should generate greeting)
-    result1 = workflow.invoke({}, config)
-    print(f"Agent: {result1['messages'][-1].content}")
-    
-    # Simulate client response
-    result2 = workflow.invoke({
-        "messages": [HumanMessage(content="Yes, this is John speaking")]
-    }, config)
-    print(f"Agent: {result2['messages'][-1].content}")
-    
-    # Simulate payment agreement
-    result3 = workflow.invoke({
-        "messages": [HumanMessage(content="Okay, let's arrange payment")]
-    }, config)
-    print(f"Agent: {result3['messages'][-1].content}")
-    
-    print(f"Final state - Call ended: {result3.get('call_ended', False)}")
-    print(f"Objectives completed: {len(result3.get('completed_objectives', []))}")
-    
-    return workflow
+    try:
+        # Create model and workflow
+        model = ChatOllama(model="qwen2.5:7b-instruct", temperature=0)
+        workflow = create_unified_call_center_workflow(
+            model=model,
+            client_data=test_client_data,
+            config=test_config
+        )
+        
+        # Test conversation
+        config = create_conversation_config("test_thread_001")
+        
+        print("=== Testing Unified Workflow ===")
+        
+        # Initial invocation (should generate greeting)
+        result1 = workflow.invoke({}, config)
+        if result1 and 'messages' in result1 and result1['messages']:
+            print(f"Agent: {result1['messages'][-1].content}")
+        
+        # Simulate client response
+        result2 = workflow.invoke({
+            "messages": [HumanMessage(content="Yes, this is John speaking")]
+        }, config)
+        if result2 and 'messages' in result2 and result2['messages']:
+            print(f"Agent: {result2['messages'][-1].content}")
+        
+        # Simulate payment agreement
+        result3 = workflow.invoke({
+            "messages": [HumanMessage(content="Okay, let's arrange payment")]
+        }, config)
+        if result3 and 'messages' in result3 and result3['messages']:
+            print(f"Agent: {result3['messages'][-1].content}")
+        
+        print(f"Final state - Call ended: {result3.get('call_ended', False)}")
+        print(f"Objectives completed: {len(result3.get('completed_objectives', []))}")
+        
+        return workflow
+        
+    except Exception as e:
+        print(f"Test failed: {e}")
+        return None
 
 if __name__ == "__main__":
     test_unified_workflow()
