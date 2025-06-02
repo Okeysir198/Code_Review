@@ -17,7 +17,9 @@ sys.path.append("../..")
 
 from fastrtc import WebRTC, ReplyOnPause, AlgoOptions, SileroVadOptions, AdditionalOutputs
 from src.Agents.call_center_agent.data.client_data_fetcher import get_client_data, format_currency, get_safe_value, clear_cache
-from src.VoiceHandler import VoiceInteractionHandler
+# from src.VoiceHandler import VoiceInteractionHandler
+from src.Agents.unified_call_center_agent import VoiceInteractionHandler
+
 from src.Agents.graph_call_center_agent import create_call_center_agent
 from langchain_ollama import ChatOllama
 from app_config import CONFIG
