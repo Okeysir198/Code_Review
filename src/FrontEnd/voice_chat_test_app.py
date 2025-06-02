@@ -2,7 +2,7 @@
 """
 Voice Chat Test App with FastRTC Integration and Live Call Step Updates
 3 Columns: Client Info | Mandate History | Console Logs with Real-time Updates
-CLEANED VERSION: Proper live call step tracking from workflow state
+UPDATED VERSION: Added refresh data button and improved conversation clearing
 """
 
 import gradio as gr
@@ -75,6 +75,11 @@ class ConsoleCapture:
         self.output = ""
         self.conversation_output = ""
         self.buffer = io.StringIO()
+        self.last_messages.clear()
+    
+    def clear_conversation_only(self):
+        """Clear only conversation output, keep debug logs."""
+        self.conversation_output = ""
         self.last_messages.clear()
 
 
@@ -149,13 +154,13 @@ class VoiceTestInterface:
             console_capture.write(f"⚠️ Error in get_current_call_step: {e}\n")
             return "Step error"
     
-    def update_client_data(self, user_id: str) -> str:
-        """Update client data and setup voice handler."""
+    def update_client_data(self, user_id: str, preserve_workflow: bool = False) -> str:
+        """Update client data and setup voice handler with option to preserve workflow."""
         try:
             if not user_id or not user_id.strip():
                 return "❌ No client ID provided"
             
-            console_capture.write(f"\n🔄 UPDATING CLIENT DATA: {user_id}\n")
+            console_capture.write(f"\n🔄 {'REFRESHING' if preserve_workflow else 'UPDATING'} CLIENT DATA: {user_id}\n")
             
             # Clear cache for fresh data
             clear_cache(user_id)
@@ -167,28 +172,33 @@ class VoiceTestInterface:
             
             self.current_client_data = client_data
             self.current_user_id = user_id
-            self.last_known_step = "Introduction"
             
-            # Create workflow factory
-            def workflow_factory(client_data_param):
-                workflow = self.create_voice_workflow(client_data_param)
-                self.workflow = workflow  # Cache workflow reference
-                return workflow
+            if not preserve_workflow:
+                # Full setup for new client
+                self.last_known_step = "Introduction"
+                
+                # Create workflow factory
+                def workflow_factory(client_data_param):
+                    workflow = self.create_voice_workflow(client_data_param)
+                    self.workflow = workflow  # Cache workflow reference
+                    return workflow
+                
+                # Create voice handler
+                self.voice_handler = VoiceInteractionHandler(CONFIG, workflow_factory)
+                
+                # Clear existing handlers and add our handler
+                self.voice_handler.message_streamer.handlers.clear()
+                self.voice_handler.add_message_handler(console_capture.log_conversation)
             
-            # Create voice handler
-            self.voice_handler = VoiceInteractionHandler(CONFIG, workflow_factory)
-            
-            # Clear existing handlers and add our handler
-            self.voice_handler.message_streamer.handlers.clear()
-            self.voice_handler.add_message_handler(console_capture.log_conversation)
-            
-            # Update client data
-            self.voice_handler.update_client_data(user_id, client_data)
+            # Update client data in existing or new voice handler
+            if self.voice_handler:
+                self.voice_handler.update_client_data(user_id, client_data)
             
             client_name = get_safe_value(client_data, 'profile.client_info.client_full_name', 'Unknown')
-            console_capture.write(f"✅ Voice handler ready for: {client_name}\n")
+            action = "refreshed" if preserve_workflow else "ready"
+            console_capture.write(f"✅ Voice handler {action} for: {client_name}\n")
             
-            return f"✅ Ready for client: {client_name}"
+            return f"✅ {'Refreshed' if preserve_workflow else 'Ready for'} client: {client_name}"
             
         except Exception as e:
             console_capture.write(f"❌ Error updating client data: {e}\n")
@@ -407,12 +417,16 @@ def get_mandate_history(user_id: str) -> str:
         return f"## 🏦 **Payment Summary**\n\n❌ Error loading data: {str(e)}"
 
 
-def start_new_conversation() -> str:
-    """Start new conversation with fresh thread_id."""
+def start_new_conversation() -> Tuple[str, str]:
+    """Start new conversation with fresh thread_id and clear conversation."""
     new_thread_id = str(uuid.uuid4())
     console_capture.write(f"\n🆕 NEW CONVERSATION - Thread: {new_thread_id}\n")
-    console_capture.write("🧹 History cleared\n")
-    return new_thread_id
+    console_capture.write("🧹 Conversation history cleared\n")
+    
+    # Clear conversation logs but keep debug logs
+    console_capture.clear_conversation_only()
+    
+    return new_thread_id, "💬 New conversation started...\n"
 
 
 def clear_console() -> str:
@@ -483,7 +497,7 @@ def create_voice_chat_test_app():
         # First row: Controls Layout
         with gr.Row(elem_classes=["status-row"]):
             # Left: Client ID and Buttons
-            with gr.Column(scale=2):
+            with gr.Column(scale=1):
                 with gr.Row():
                     user_id_input = gr.Textbox(
                         label="🆔 Client ID",
@@ -502,19 +516,21 @@ def create_voice_chat_test_app():
                         
             
             # Middle: Status Information
-            with gr.Column(scale=3):
-                    script_type_display = gr.Textbox(
-                        label="📋 Script Type",
-                        value="Not determined",
-                        interactive=False,
-                        scale=1
-                    )
-                    call_step_display = gr.Textbox(
-                        label="📍 Call Step",
-                        value="Not started",
-                        interactive=False,
-                        scale=1
-                    )
+            with gr.Column(scale=1):
+                script_type_display = gr.Textbox(
+                    label="📋 Script Type",
+                    value="Not determined",
+                    interactive=False,
+                    scale=1
+                )
+                call_step_display = gr.Textbox(
+                    label="📍 Call Step",
+                    value="Not started",
+                    interactive=False,
+                    scale=1
+                )
+                # NEW: Refresh Data Button
+                refresh_data_btn = gr.Button("🔄 Refresh Data", variant="secondary", size="sm")
             
             # Right: Voice Interface
             with gr.Column(scale=1):
@@ -646,12 +662,27 @@ def create_voice_chat_test_app():
             
             client_info = get_client_info_display(user_id)
             mandate_history = get_mandate_history(user_id)
-            status = interface.update_client_data(user_id)
+            status = interface.update_client_data(user_id, preserve_workflow=False)
             
             console_capture.write(f"✅ Client data loaded successfully\n")
             console_capture.write(f"🔍 Ready for voice verification\n\n")
             
             return client_info, mandate_history, status, user_id, script_display, "Introduction"
+        
+        def refresh_client_data_only(user_id):
+            """Refresh client data without affecting workflow or conversation."""
+            if not user_id:
+                return get_client_info_display(""), get_mandate_history(""), "❌ No client ID"
+            
+            console_capture.write(f"\n📊 REFRESHING CLIENT DATA (preserving workflow)\n")
+            
+            client_info = get_client_info_display(user_id)
+            mandate_history = get_mandate_history(user_id)
+            status = interface.update_client_data(user_id, preserve_workflow=True)
+            
+            console_capture.write(f"📊 Client data refreshed without disrupting conversation\n\n")
+            
+            return client_info, mandate_history, status
         
         # Connect events
         load_btn.click(
@@ -668,10 +699,17 @@ def create_voice_chat_test_app():
                     current_user_id, script_type_display, call_step_display]
         )
         
-        # New conversation handler
+        # NEW: Refresh Data Button Handler
+        refresh_data_btn.click(
+            fn=refresh_client_data_only,
+            inputs=[current_user_id],
+            outputs=[client_info_display, mandate_history_display, status_display]
+        )
+        
+        # New conversation handler - now clears conversation
         new_conv_btn.click(
             fn=start_new_conversation,
-            outputs=[current_thread_id]
+            outputs=[current_thread_id, conversation_output]
         )
         
         # Audio streaming
@@ -688,9 +726,6 @@ def create_voice_chat_test_app():
                     threshold=0.6,
                     min_speech_duration_ms=250,
                     min_silence_duration_ms=500,
-                    # window_size_samples=512,
-                    # speech_pad_ms=10,
-                    # max_speech_duration_s=10.0,
                 ),
             ),
             inputs=[audio, gr.State([]), current_thread_id],
@@ -721,6 +756,7 @@ def create_voice_chat_test_app():
             console_capture.write(f"🕒 Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             console_capture.write(f"⚡ Using fast concurrent data fetcher\n")
             console_capture.write(f"📍 Live call step tracking enabled\n")
+            console_capture.write(f"🔄 Refresh data button added (preserves workflow)\n")
             console_capture.write(f"{'='*60}\n\n")
             
             initial_thread_id = str(uuid.uuid4())
