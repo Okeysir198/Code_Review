@@ -494,6 +494,23 @@ def create_voice_chat_test_app():
         current_user_id = gr.State("")
         current_thread_id = gr.State(str(uuid.uuid4()))
         
+        # Enhanced audio constraints
+        enhanced_constraints = {
+            "echoCancellation": {"exact": True},
+            "noiseSuppression": {"exact": True},
+            "autoGainControl": {"exact": True},
+            "sampleRate": {"ideal": 16000},
+            "channelCount": {"exact": 1},
+            
+            # Advanced noise suppression
+            "googNoiseSuppression": {"exact": True},
+            "googNoiseSuppression2": {"exact": True},
+            "googEchoCancellation": {"exact": True},
+            "googEchoCancellation2": {"exact": True},
+            "googAutoGainControl": {"exact": True},
+            "googHighpassFilter": {"exact": True},
+            "googTypingNoiseDetection": {"exact": True}
+        }
         # First row: Controls Layout
         with gr.Row(elem_classes=["status-row"]):
             # Voice Interface
@@ -503,13 +520,7 @@ def create_voice_chat_test_app():
                     mode="send-receive",
                     modality="audio",
                     button_labels={"start": "🎙️ Start", "stop": "⏹️ Stop"},
-                    track_constraints={
-                        "echoCancellation": {"exact": True},
-                        "noiseSuppression": {"ideal": True},
-                        "autoGainControl": {"exact": True},
-                        "sampleRate": {"ideal": 16000},
-                        "channelCount": {"exact": 1},
-                    }
+                    track_constraints=enhanced_constraints
                 )
 
             

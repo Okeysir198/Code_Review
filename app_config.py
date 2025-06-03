@@ -18,7 +18,25 @@ CONFIG = {
         "enable_tts_model": True,
 
     },
-    
+
+    "audio": {
+        "noise_suppression": {
+            "enabled": True,
+            "method": "webrtc_enhanced",  # webrtc_enhanced,
+            "aggressiveness": "medium",   # low, medium, high
+            "vad_threshold": 50.0,        # Voice Activity Detection threshold
+            "grace_period_ms": 200        # Grace period for voice detection
+        },
+        "echo_cancellation": {
+            "enabled": True,
+            "aggressive": True
+        },
+        "auto_gain_control": {
+            "enabled": True,
+            "target_level": -18           # dB target level
+        }
+    },
+
     # Ollama chat model config
     "llm": {
         "model_name": "qwen2.5:14b-instruct", #"qwen2.5:7b-instruct-q5_K_M", #phi4-mini:latest, cogito:3b-v1-preview-llama-q4_K_M, qwen2.5:7b-instruct, qwen2.5:3b-instruct

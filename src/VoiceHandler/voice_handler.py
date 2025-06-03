@@ -63,6 +63,30 @@ class VoiceInteractionHandler:
         self.stt_model = self._init_stt() if self.config['configurable'].get('enable_stt_model') else None
         self.tts_model = self._init_tts() if self.config['configurable'].get('enable_tts_model') else None
 
+        # Initialize noise suppression if enabled
+        self.noise_suppression_enabled = config.get('audio', {}).get('noise_suppression', {}).get('enabled', False)
+
+        # Enhanced audio constraints for WebRTC
+        self.enhanced_audio_constraints = {
+            "echoCancellation": {"exact": True},
+            "noiseSuppression": {"exact": True},
+            "autoGainControl": {"exact": True},
+            "sampleRate": {"ideal": 16000},
+            "channelCount": {"exact": 1},
+            
+            # Advanced WebRTC noise suppression
+            "googNoiseSuppression": {"exact": True},
+            "googNoiseSuppression2": {"exact": True},
+            "googEchoCancellation": {"exact": True},
+            "googEchoCancellation2": {"exact": True},
+            "googAutoGainControl": {"exact": True},
+            "googAutoGainControl2": {"exact": True},
+            "googHighpassFilter": {"exact": True},
+            "googTypingNoiseDetection": {"exact": True},
+            "googAudioMirroring": {"exact": False},
+            "googNoiseReduction": {"exact": True}
+        }
+
     def add_message_handler(self, handler: Callable[[str, str], None]):
         """Add external message handler for real-time streaming."""
         self.message_streamer.add_handler(handler)
