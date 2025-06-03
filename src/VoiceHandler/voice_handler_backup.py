@@ -1,4 +1,4 @@
-"""Voice interaction handler for AI-powered conversational agents."""
+"""Enhanced Voice interaction handler for AI-powered conversational agents with message streaming."""
 
 import logging
 import uuid
@@ -26,12 +26,32 @@ class Colors:
     BOLD = "\x1B[1m"
 
 
+class MessageStreamer:
+    """Handles real-time message streaming to external handlers."""
+    
+    def __init__(self):
+        self.handlers = []
+    
+    def add_handler(self, handler: Callable[[str, str], None]):
+        """Add a message handler function that takes (role, content)."""
+        self.handlers.append(handler)
+    
+    def stream_message(self, role: str, content: str):
+        """Stream message to all registered handlers."""
+        for handler in self.handlers:
+            try:
+                handler(role, content)
+            except Exception as e:
+                logger.error(f"Message handler error: {e}")
+
+
 class VoiceInteractionHandler:
-    """Voice interaction handler for AI conversational agents."""
+    """Enhanced voice interaction handler with message streaming."""
     
     def __init__(self, config: Dict[str, Any], workflow_factory: Optional[Callable] = None):
         self.config = self._setup_config(config or {})
         self.workflow_factory = workflow_factory
+        self.message_streamer = MessageStreamer()
         self._setup_logging()
         
         # Client data caching
@@ -42,6 +62,34 @@ class VoiceInteractionHandler:
         # Initialize models
         self.stt_model = self._init_stt() if self.config['configurable'].get('enable_stt_model') else None
         self.tts_model = self._init_tts() if self.config['configurable'].get('enable_tts_model') else None
+
+        # Initialize noise suppression if enabled
+        self.noise_suppression_enabled = config.get('audio', {}).get('noise_suppression', {}).get('enabled', False)
+
+        # Enhanced audio constraints for WebRTC
+        self.enhanced_audio_constraints = {
+            "echoCancellation": {"exact": True},
+            "noiseSuppression": {"exact": True},
+            "autoGainControl": {"exact": True},
+            "sampleRate": {"ideal": 16000},
+            "channelCount": {"exact": 1},
+            
+            # Advanced WebRTC noise suppression
+            "googNoiseSuppression": {"exact": True},
+            "googNoiseSuppression2": {"exact": True},
+            "googEchoCancellation": {"exact": True},
+            "googEchoCancellation2": {"exact": True},
+            "googAutoGainControl": {"exact": True},
+            "googAutoGainControl2": {"exact": True},
+            "googHighpassFilter": {"exact": True},
+            "googTypingNoiseDetection": {"exact": True},
+            "googAudioMirroring": {"exact": False},
+            "googNoiseReduction": {"exact": True}
+        }
+
+    def add_message_handler(self, handler: Callable[[str, str], None]):
+        """Add external message handler for real-time streaming."""
+        self.message_streamer.add_handler(handler)
 
     def update_client_data(self, user_id: str, client_data: Dict[str, Any]):
         """Update cached client data and workflow."""
@@ -134,7 +182,7 @@ class VoiceInteractionHandler:
         print(f"{Colors.MAGENTA}{formatted}{Colors.RESET}")
 
     def _process_tool_messages(self, message, tracked_calls: Set[str]):
-        """Process tool messages."""
+        """Process tool messages with streaming (no duplication)."""
         if hasattr(message, "tool_calls") and message.tool_calls:
             for tool_call in message.tool_calls:
                 tool_id = getattr(tool_call, "id", str(id(tool_call)))
@@ -143,7 +191,8 @@ class VoiceInteractionHandler:
                 call_id = f"{tool_name}:{tool_id}"
                 
                 if call_id not in tracked_calls:
-                    self._print("Tool Call", f"{tool_name}({tool_args})", Colors.BLUE)
+                    tool_msg = f"{tool_name}({tool_args})"
+                    self._print("Tool Call", tool_msg, Colors.BLUE)
                     tracked_calls.add(call_id)
         
         if isinstance(message, ToolMessage):
@@ -151,6 +200,18 @@ class VoiceInteractionHandler:
             content = getattr(message, "content", None)
             if content:
                 self._print_tool_response(tool_name, content)
+                # Only stream tool response once per message
+                tool_msg_id = f"tool_response_{id(message)}"
+                if tool_msg_id not in tracked_calls:
+                    try:
+                        if isinstance(content, str) and len(content) > 200:
+                            truncated = content[:200] + "..."
+                            self.message_streamer.stream_message("tool", f"RESPONSE: {tool_name} -> {truncated}")
+                        else:
+                            self.message_streamer.stream_message("tool", f"RESPONSE: {tool_name} -> {content}")
+                        tracked_calls.add(tool_msg_id)
+                    except Exception as e:
+                        self.message_streamer.stream_message("tool", f"RESPONSE: {tool_name} -> [Error: {e}]")
 
     def _extract_ai_response(self, workflow_result: Dict[str, Any]) -> str:
         """Extract AI response from workflow result."""
@@ -182,7 +243,7 @@ class VoiceInteractionHandler:
         return audio_chunk
 
     def process_message(self, user_message: str, workflow: CompiledGraph = None) -> Dict[str, Any]:
-        """Process message through workflow."""
+        """Process message through workflow with enhanced streaming (no duplication)."""
         # Use cached workflow if no workflow provided
         if workflow is None:
             workflow = self.get_current_workflow()
@@ -195,17 +256,38 @@ class VoiceInteractionHandler:
             config = {"configurable": self.config.get('configurable', {})}
             
             tracked_calls = set()
+            tracked_messages = set()  # Track streamed messages to prevent duplication
             final_result = None
+            
+            # Stream user message only once
+            user_msg_id = f"user_{hash(user_message)}"
+            if user_msg_id not in tracked_messages:
+                self.message_streamer.stream_message("user", user_message)
+                tracked_messages.add(user_msg_id)
             
             for event in workflow.stream(workflow_input, config=config, stream_mode="values"):
                 if event and isinstance(event, dict) and "messages" in event:
                     final_result = event
-                    self._process_tool_messages(event["messages"][-1], tracked_calls)
+                    
+                    # Process only new messages to avoid duplication
+                    if event["messages"]:
+                        latest_message = event["messages"][-1]
+                        
+                        # Process tool messages
+                        self._process_tool_messages(latest_message, tracked_calls)
+                        
+                        # Stream AI messages only once
+                        if isinstance(latest_message, AIMessage) and latest_message.content:
+                            ai_msg_id = f"ai_{id(latest_message)}"
+                            if ai_msg_id not in tracked_messages:
+                                self.message_streamer.stream_message("ai", latest_message.content)
+                                tracked_messages.add(ai_msg_id)
             
             return final_result or {"messages": [], "error": "No valid events received"}
             
         except Exception as e:
             logger.error(f"Workflow error: {e}")
+            self.message_streamer.stream_message("error", f"Workflow error: {e}")
             return {"messages": [], "error": f"Workflow execution error: {str(e)}"}
 
     def process_text_input(self, text_input: str, workflow: CompiledGraph = None,
@@ -245,7 +327,7 @@ class VoiceInteractionHandler:
     def process_audio_input(self, audio_input: Tuple[int, np.ndarray], workflow: CompiledGraph = None,
                            gradio_chatbot: Optional[List[Dict[str, str]]] = None,
                            thread_id: Optional[Union[str, int]] = None) -> Generator:
-        """Process audio input with streaming response."""
+        """Process audio input with enhanced streaming response."""
         try:
             chatbot = gradio_chatbot or []
             sample_rate = audio_input[0]
