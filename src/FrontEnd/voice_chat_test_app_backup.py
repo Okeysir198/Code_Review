@@ -2,7 +2,7 @@
 """
 Voice Chat Test App with FastRTC Integration and Live Call Step Updates
 3 Columns: Client Info | Mandate History | Console Logs with Real-time Updates
-UPDATED VERSION: Added tool message display and text input for manual messaging
+UPDATED VERSION: Added refresh data button and improved conversation clearing
 """
 
 import gradio as gr
@@ -24,7 +24,7 @@ from app_config import CONFIG
 
 
 class ConsoleCapture:
-    """Captures console output and conversation logs separately with deduplication and tool message support."""
+    """Captures console output and conversation logs separately with deduplication."""
     
     def __init__(self):
         self.output = ""
@@ -53,23 +53,11 @@ class ConsoleCapture:
         role_icons = {
             "user": "👤", "human": "👤",
             "assistant": "🤖", "ai": "🤖",
-            "tool": "🔧", "tool_call": "🔧", "tool_response": "📋",
-            "system": "📍", "error": "❌"
+            "tool": "🔧", "system": "📍", "error": "❌"
         }
         
         icon = role_icons.get(role.lower(), role.upper()[:1])
-        
-        # Special formatting for tool messages
-        if role.lower() in ["tool", "tool_call", "tool_response"]:
-            # Format tool messages with better readability
-            if role.lower() == "tool_call":
-                conv_msg = f"[{timestamp}] 🔧 TOOL CALL: {content}\n"
-            elif role.lower() == "tool_response":
-                conv_msg = f"[{timestamp}] 📋 TOOL RESPONSE: {content}\n"
-            else:
-                conv_msg = f"[{timestamp}] 🔧 TOOL: {content}\n"
-        else:
-            conv_msg = f"[{timestamp}] {icon} {role.upper()}: {content}\n"
+        conv_msg = f"[{timestamp}] {icon} {role.upper()}: {content}\n"
         
         self.conversation_output += conv_msg
         self.write(conv_msg)
@@ -268,54 +256,6 @@ class VoiceTestInterface:
         except Exception as e:
             console_capture.write(f"❌ Audio processing error: {e}\n")
             yield AdditionalOutputs(chatbot_history + [{"role": "assistant", "content": f"Audio error: {str(e)}"}])
-    
-    def process_text_input(self, text_input: str, thread_id: str) -> Generator:
-        """Process text input through the voice handler with audio streaming."""
-        try:
-            if not text_input.strip():
-                yield "", "📝 Text input is empty", None
-                return
-            
-            # Update thread_id for state tracking
-            self.current_thread_id = thread_id
-            
-            console_capture.write(f"\n{'='*60}\n")
-            console_capture.write(f"📝 PROCESSING TEXT INPUT\n")
-            console_capture.write(f"🧵 Thread ID: {thread_id}\n")
-            console_capture.write(f"🕒 Time: {datetime.now().strftime('%H:%M:%S')}\n")
-            console_capture.write(f"📍 Current Step: {self.get_current_call_step()}\n")
-            console_capture.write(f"💬 Message: {text_input}\n")
-            console_capture.write(f"{'='*60}\n")
-            
-            if self.voice_handler:
-                # Process the message through the workflow using the voice handler's method
-                try:
-                    # Use the voice handler's process_text_input method which handles TTS
-                    for text_result in self.voice_handler.process_text_input(
-                        text_input, None, [], thread_id
-                    ):
-                        if text_result is None:
-                            # Still processing
-                            yield "", "🔄 Processing...", None
-                        else:
-                            audio_chunk, chatbot, _ = text_result
-                            if audio_chunk is not None:
-                                # Audio chunk received, stream it
-                                yield "", "🔊 Playing response...", audio_chunk
-                            else:
-                                # Final result
-                                yield "", "✅ Message processed successfully", None
-                
-                except Exception as e:
-                    console_capture.write(f"❌ Text processing error: {e}\n")
-                    yield "", f"❌ Error: {str(e)}", None
-            else:
-                console_capture.write("❌ Voice handler not available\n")
-                yield "", "❌ Voice handler not available", None
-                
-        except Exception as e:
-            console_capture.write(f"❌ Text processing error: {e}\n")
-            yield "", f"❌ Error: {str(e)}", None
 
 
 def safe_format_currency(value) -> str:
@@ -479,11 +419,7 @@ def get_mandate_history(user_id: str) -> str:
 
 def start_new_conversation() -> Tuple[str, str]:
     """Start new conversation with fresh thread_id and clear conversation."""
-    # Generate truly unique thread ID with timestamp and random component
-    timestamp = str(int(datetime.now().timestamp() * 1000))  # Millisecond timestamp
-    random_part = str(uuid.uuid4())[:8]
-    new_thread_id = f"thread_{timestamp}_{random_part}"
-    
+    new_thread_id = str(uuid.uuid4())
     console_capture.write(f"\n🆕 NEW CONVERSATION - Thread: {new_thread_id}\n")
     console_capture.write("🧹 Conversation history cleared\n")
     
@@ -501,7 +437,7 @@ def clear_console() -> str:
 
 
 def create_voice_chat_test_app():
-    """Create voice chat test app with live call step updates and text input."""
+    """Create voice chat test app with live call step updates."""
     
     interface = VoiceTestInterface()
     
@@ -512,6 +448,8 @@ def create_voice_chat_test_app():
         border: 1px solid #e2e8f0;
         border-radius: 8px;
         padding: 16px;
+        /*height: 600px;*/
+        /*overflow-y: auto;*/
     }
     
     .mandate-info {
@@ -519,6 +457,8 @@ def create_voice_chat_test_app():
         border: 1px solid #bbf7d0;
         border-radius: 8px;
         padding: 16px;
+        /*height: 600px;*/
+        /*overflow-y: auto;*/
     }
     
     .conversation-display textarea {
@@ -543,25 +483,16 @@ def create_voice_chat_test_app():
         padding: 8px;
         margin: 4px 0;
     }
-    
-    .text-input-section {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        padding: 12px;
-        margin-top: 8px;
-    }
     """
     
     with gr.Blocks(title="🎙️ Call Center AI Agent", theme=gr.themes.Default(), css=app_css) as app:
         
         gr.Markdown("# 🎙️ **Debtor Call Center AI Agent**")
-        gr.Markdown("### Real-time voice call testing with live call step tracking and tool message display")
+        gr.Markdown("### Real-time voice call testing with live call step tracking")
         
-        # State variables - Generate unique thread_id for each session
-        session_thread_id = str(uuid.uuid4())  # Unique per page load/visit
+        # State variables
         current_user_id = gr.State("")
-        current_thread_id = gr.State(session_thread_id)
+        current_thread_id = gr.State(str(uuid.uuid4()))
         
         # Enhanced audio constraints
         enhanced_constraints = {
@@ -580,7 +511,6 @@ def create_voice_chat_test_app():
             "googHighpassFilter": {"exact": True},
             "googTypingNoiseDetection": {"exact": True}
         }
-        
         # First row: Controls Layout
         with gr.Row(elem_classes=["status-row"]):
             # Voice Interface
@@ -640,15 +570,16 @@ def create_voice_chat_test_app():
                 # Live Conversation
                 with gr.Row():
                     with gr.Column(scale=3):
-                        gr.Markdown("### 💬 **Live Conversation & Tool Messages**")
+                        gr.Markdown("### 💬 **Live Conversation**")
                     # Console controls
                     clear_btn = gr.Button("🧹 Clear Debug", size="sm", variant="secondary", scale=1)
                     clear_conv_btn = gr.Button("💬 Clear Conversation", size="sm", variant="secondary", scale=1)
+                    # refresh_btn = gr.Button("🔄 Refresh", size="sm", variant="secondary")
                     
                 
                 conversation_output = gr.Textbox(
-                    label="Conversation Log (includes tool calls and responses)",
-                    value="💬 Conversation will appear here during voice chat...\n🔧 Tool messages will also be displayed here\n",
+                    label="Conversation Log",
+                    value="💬 Conversation will appear here during voice chat...\n",
                     lines=15,
                     interactive=False,
                     max_lines=15,
@@ -662,44 +593,12 @@ def create_voice_chat_test_app():
                     console_output = gr.Textbox(
                         label="Debug Logs",
                         value="🖥️ Debug console - Load a client to start...\n",
-                        lines=12,
+                        lines=20,
                         interactive=False,
-                        max_lines=12,
+                        max_lines=20,
                         elem_classes=["console-display"],
                         autoscroll=True,
                         show_copy_button=True
-                    )
-                
-                # Text Input Section
-                with gr.Group(elem_classes=["text-input-section"]):
-                    gr.Markdown("### 📝 **Manual Text Input**")
-                    gr.Markdown("*Send text messages directly to the agent (bypasses voice processing)*")
-                    
-                    with gr.Row():
-                        text_input = gr.Textbox(
-                            label="",
-                            placeholder="Type your message here and press Enter or click Send...",
-                            scale=4,
-                            lines=1,
-                            max_lines=3
-                        )
-                        send_btn = gr.Button("📤 Send", variant="primary", size="sm", scale=1)
-                    
-                    text_status = gr.Textbox(
-                        label="Text Status",
-                        value="Ready to send text messages",
-                        interactive=False,
-                        lines=1
-                    )
-                    
-                    # Hidden audio component for text chat TTS output
-                    text_chat_audio = gr.Audio(
-                        label="", 
-                        autoplay=True,
-                        visible=False,
-                        interactive=False,
-                        streaming=True,
-                        elem_id="response-audio"
                     )
                     
                     
@@ -719,6 +618,8 @@ def create_voice_chat_test_app():
                     elem_classes=["mandate-info"],
                     container=True
                 )
+            
+            
         
         # Real-time updates with proper error handling
         def update_console_realtime():
@@ -802,19 +703,6 @@ def create_voice_chat_test_app():
             
             return client_info, mandate_history, status
         
-        def send_text_message(text_input_value, thread_id):
-            """Send text message through the voice handler with audio streaming."""
-            if not text_input_value or not text_input_value.strip():
-                yield "", "❌ Please enter a message", None
-                return
-            
-            try:
-                for result in interface.process_text_input(text_input_value.strip(), thread_id):
-                    cleared_input, status, audio_chunk = result
-                    yield cleared_input, status, audio_chunk
-            except Exception as e:
-                yield text_input_value, f"❌ Error: {str(e)}", None
-        
         # Connect events
         load_btn.click(
             fn=load_client_data,
@@ -835,19 +723,6 @@ def create_voice_chat_test_app():
             fn=refresh_client_data_only,
             inputs=[current_user_id],
             outputs=[client_info_display, mandate_history_display, status_display]
-        )
-        
-        # Text input handlers - now with streaming audio support
-        send_btn.click(
-            fn=send_text_message,
-            inputs=[text_input, current_thread_id],
-            outputs=[text_input, text_status, text_chat_audio]
-        )
-        
-        text_input.submit(
-            fn=send_text_message,
-            inputs=[text_input, current_thread_id],
-            outputs=[text_input, text_status, text_chat_audio]
         )
         
         # New conversation handler - now clears conversation
@@ -890,6 +765,11 @@ def create_voice_chat_test_app():
             outputs=[conversation_output]
         )
         
+        # refresh_btn.click(
+        #     fn=lambda: console_capture.get_output(),
+        #     outputs=[console_output]
+        # )
+        
         # Initialize app
         def initialize():
             console_capture.write(f"🚀 Voice Chat Test Console Initialized\n")
@@ -897,13 +777,9 @@ def create_voice_chat_test_app():
             console_capture.write(f"⚡ Using fast concurrent data fetcher\n")
             console_capture.write(f"📍 Live call step tracking enabled\n")
             console_capture.write(f"🔄 Refresh data button added (preserves workflow)\n")
-            console_capture.write(f"🔧 Tool message display enabled\n")
-            console_capture.write(f"📝 Text input feature added with audio streaming\n")
-            console_capture.write(f"🧵 Session Thread ID: {session_thread_id}\n")
             console_capture.write(f"{'='*60}\n\n")
             
-            # Use the session thread ID that was created at page load
-            interface.current_thread_id = session_thread_id
+            initial_thread_id = str(uuid.uuid4())
             
             # Load initial client data and determine script type
             client_data = get_client_data("28173")
@@ -920,17 +796,20 @@ def create_voice_chat_test_app():
                     console_capture.write(f"⚠️ Initial script type determination failed: {e}\n")
                     script_display = "Script determination failed"
             
+            # Set initial thread_id for live tracking
+            interface.current_thread_id = initial_thread_id
+            
             client_info = get_client_info_display("28173")
             mandate_history = get_mandate_history("28173")
             status = interface.update_client_data("28173")
             
             return (client_info, mandate_history, status, "28173", 
-                   session_thread_id, script_display, "Introduction", "Ready to send text messages")
+                   initial_thread_id, script_display, "Introduction")
         
         app.load(
             fn=initialize,
             outputs=[client_info_display, mandate_history_display, status_display, 
-                    current_user_id, current_thread_id, script_type_display, call_step_display, text_status]
+                    current_user_id, current_thread_id, script_type_display, call_step_display]
         )
     
     return app
