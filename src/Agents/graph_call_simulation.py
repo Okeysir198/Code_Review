@@ -25,7 +25,7 @@ class SimulationState(MessagesState):
     ended: bool = False
     
     # Agent state persistence
-    agent_current_step: str = "introduction"
+    current_step: str = "introduction"
     name_verification_status: str = "INSUFFICIENT_INFO"
     details_verification_status: str = "INSUFFICIENT_INFO"
     name_verification_attempts: int = 0
@@ -68,7 +68,7 @@ def create_call_simulation(
         # Build persistent agent state from simulation state
         agent_state = {
             "messages": state["messages"],
-            "current_step": state.get("agent_current_step", "introduction"),
+            "current_step": state.get("current_step", "introduction"),
             "name_verification_status": state.get("name_verification_status", "INSUFFICIENT_INFO"),
             "details_verification_status": state.get("details_verification_status", "INSUFFICIENT_INFO"),
             "name_verification_attempts": state.get("name_verification_attempts", 0),
@@ -127,7 +127,7 @@ def create_call_simulation(
             
             # Extract updated agent state
             updated_agent_state = {
-                "agent_current_step": result.get("current_step", state.get("agent_current_step", "introduction")),
+                "current_step": result.get("current_step", state.get("current_step", "introduction")),
                 "name_verification_status": result.get("name_verification_status", state.get("name_verification_status", "INSUFFICIENT_INFO")),
                 "details_verification_status": result.get("details_verification_status", state.get("details_verification_status", "INSUFFICIENT_INFO")),
                 "name_verification_attempts": result.get("name_verification_attempts", state.get("name_verification_attempts", 0)),

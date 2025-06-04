@@ -4,20 +4,8 @@
   ],
   "graphs": {
 
-    "graph_agent_with_tool"                : "./test_graph/test_langgraph_flow.py:agent_with_tools",
-
-    "simulation_cooperative"               : "./src/Agents/graph_test_call_center.py:simulation_cooperative",
-    "simulation_difficult"                 : "./src/Agents/graph_test_call_center.py:simulation_difficult",
-    "simulation_confused"                  : "./src/Agents/graph_test_call_center.py:simulation_confused",
-    "simulation_busy"                      : "./src/Agents/graph_test_call_center.py:simulation_busy",
-    "simulation_suspicious"                : "./src/Agents/graph_test_call_center.py:simulation_suspicious",
-    "simulation_wrong_person"              : "./src/Agents/graph_test_call_center.py:simulation_wrong_person",
-    "simulation_third_party_spouse"        : "./src/Agents/graph_test_call_center.py:simulation_third_party_spouse",
-    "simulation_third_party_parent"        : "./src/Agents/graph_test_call_center.py:simulation_third_party_parent",
-    "simulation_third_party_assistant"     : "./src/Agents/graph_test_call_center.py:simulation_third_party_assistant",
-    "simulation_third_party_employee"      : "./src/Agents/graph_test_call_center.py:simulation_third_party_employee",
-    "simulation_third_party"               : "./src/Agents/graph_test_call_center.py:simulation_third_party_spouse",
-
+    "graph_agent_with_tool"                   : "./test_graph/test_langgraph_flow.py:agent_with_tools",
+    "call_simulation"               : "./src/Agents/graph_test_call_center.py:call_simulation",
     "graph_call_center_agent"              : "./src/Agents/graph_test_call_center.py:graph_call_center_agent1"
 
   },

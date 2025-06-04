@@ -40,7 +40,12 @@ class ClientNameVerificationResult(BaseModel):
 @lru_cache(maxsize=1)
 def get_llm_instance():
     """Returns a cached LLM instance to avoid recreation on each call."""
-    return ChatOllama(model="qwen2.5:3b-instruct", temperature=0)
+    # model_name = "qwen2.5:7b-instruct"
+    # model_name = "qwen3:8b"
+    # model_name = "qwen3:4b"
+    # model_name = "qwen3:1.7b-fp16"
+    model_name = "qwen3:4b-q4_K_M"
+    return ChatOllama(model=model_name, temperature=0)
 
 def flush_llm_cache_if_needed():
     """Flushes the LLM cache if the counter exceeds the threshold."""

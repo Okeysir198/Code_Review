@@ -326,15 +326,15 @@ def create_basic_agent(
             # Store the final system prompt in state for debugging
             system_prompt = next((m.content for m in messages if isinstance(m, SystemMessage)), None)
             
-            # # Log the final prompt if verbose mode is enabled
-            # if verbose:
-            #     logger.info(f"Final prompt to LLM: {system_prompt}")
+            # Log the final prompt if verbose mode is enabled
+            if verbose:
+                logger.info(f"Final prompt to LLM: {system_prompt}")
                 # logger.info(f"Messages content as below:")
                 # for msg in messages:
                 #     if not isinstance(msg, SystemMessage):
                 #         logger.info(f"{msg.type.upper()}: {msg.content}")
                 
-                # logger.info(f"Len of Messages: {len(messages)}")
+                logger.info(f"Len of Messages: {len(messages)}")
             
             # Get response from LLM (with tools if available)
             if model_with_tools and tool_classes:

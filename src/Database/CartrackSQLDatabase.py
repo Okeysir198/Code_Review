@@ -8,51 +8,415 @@ from contextlib import contextmanager
 from decimal import Decimal
 import datetime
 from langchain_core.tools import tool
-
+import time
+import threading
+import queue
 logger = logging.getLogger(__name__)
 
 # =====================================================
 # PostgresDatabase
 # =====================================================
-class PostgresDatabase:
-    """Enhanced PostgreSQL database connection with advanced query and function capabilities."""
+class PostgresConnectionPool:
+    """
+    Thread-safe PostgreSQL connection pool for concurrent operations with keep-alive.
+    Each thread gets its own connection to eliminate locking bottlenecks.
+    """
     
-    def __init__(self, connection_string: Optional[str] = None):
-        """
-        Initialize a PostgreSQL database connection.
-        
-        Args:
-            connection_string: PostgreSQL connection string. If None, uses POSTGRES_URL environment variable.
-        """
-        self.connection_string = connection_string or os.environ.get("POSTGRES_URL")
-        self.connection = None
+    def __init__(self, connection_string: str, min_connections: int = 5, max_connections: int = 20, 
+                 keepalive_interval: int = 300, connection_timeout: int = 1800):
+        self.connection_string = connection_string
+        self.min_connections = min_connections
+        self.max_connections = max_connections
+        self.pool = queue.Queue(maxsize=max_connections)
+        self.active_connections = 0
+        self.pool_lock = threading.Lock()
         self.logger = logging.getLogger(__name__)
-        self.connect()
-       
-    def connect(self):
-        """Establish connection to the PostgreSQL database."""
-        try:
-            self.connection = psycopg2.connect(self.connection_string)
-            self.logger.info("Database connection established successfully")
-        except Exception as e:
-            self.logger.error(f"Error connecting to database: {e}")
-            raise
+        
+        # Keep-alive settings
+        self.keepalive_interval = keepalive_interval
+        self.connection_timeout = connection_timeout
+        self.stop_keepalive = threading.Event()
+        self.keepalive_thread = None
+        
+        # Track connection usage times
+        self.connection_last_used = {}
+        self.usage_lock = threading.Lock()
+        
+        # Initialize minimum connections
+        self._initialize_pool()
+        self._start_keepalive_thread()
+    
+    def _initialize_pool(self):
+        """Initialize the connection pool with minimum connections."""
+        for _ in range(self.min_connections):
+            try:
+                conn = self._create_connection()
+                conn_id = id(conn)
+                self.pool.put(conn)
+                self.active_connections += 1
+                
+                # Track connection creation time
+                with self.usage_lock:
+                    self.connection_last_used[conn_id] = time.time()
+                    
+            except Exception as e:
+                self.logger.error(f"Failed to initialize connection: {e}")
+    
+    def _create_connection(self):
+        """Create a new database connection with keep-alive settings."""
+        return psycopg2.connect(
+            self.connection_string,
+            keepalives_idle=600,        # Start keep-alive after 10 minutes
+            keepalives_interval=30,     # Keep-alive probe every 30 seconds  
+            keepalives_count=3,         # 3 failed probes = dead connection
+            connect_timeout=10
+        )
+    
+    def _start_keepalive_thread(self):
+        """Start the background keep-alive thread for the pool."""
+        def keepalive_worker():
+            while not self.stop_keepalive.is_set():
+                try:
+                    # Wait for the interval or until stop signal
+                    if self.stop_keepalive.wait(self.keepalive_interval):
+                        break  # Stop signal received
+                    
+                    self._maintain_pool_health()
+                    
+                except Exception as e:
+                    self.logger.error(f"Keep-alive thread error: {e}")
+        
+        self.keepalive_thread = threading.Thread(target=keepalive_worker, daemon=True)
+        self.keepalive_thread.start()
+        self.logger.info(f"Connection pool keep-alive thread started (interval: {self.keepalive_interval}s)")
+    
+    def _maintain_pool_health(self):
+        """Check and maintain health of connections in the pool."""
+        current_time = time.time()
+        connections_to_check = []
+        
+        # Temporarily drain the pool to check connections
+        while not self.pool.empty():
+            try:
+                conn = self.pool.get_nowait()
+                connections_to_check.append(conn)
+            except queue.Empty:
+                break
+        
+        healthy_connections = []
+        
+        for conn in connections_to_check:
+            conn_id = id(conn)
             
-    def disconnect(self):
-        """Close the database connection."""
-        if self.connection:
-            self.connection.close()
-            self.logger.info("Database connection closed")
-            self.connection = None
+            try:
+                # Check if connection is too old
+                with self.usage_lock:
+                    last_used = self.connection_last_used.get(conn_id, current_time)
+                
+                if current_time - last_used > self.connection_timeout:
+                    self.logger.info(f"Closing idle connection (idle for {current_time - last_used:.0f}s)")
+                    conn.close()
+                    with self.pool_lock:
+                        self.active_connections -= 1
+                    with self.usage_lock:
+                        self.connection_last_used.pop(conn_id, None)
+                    continue
+                
+                # Test connection health with ping
+                if conn.closed:
+                    self.logger.info("Closing dead connection")
+                    conn.close()
+                    with self.pool_lock:
+                        self.active_connections -= 1
+                    with self.usage_lock:
+                        self.connection_last_used.pop(conn_id, None)
+                    continue
+                
+                # Ping the connection
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT 1")
+                    cursor.fetchone()
+                
+                # Connection is healthy
+                healthy_connections.append(conn)
+                self.logger.debug(f"Connection {conn_id} health check passed")
+                
+            except (psycopg2.OperationalError, psycopg2.InterfaceError) as e:
+                self.logger.warning(f"Unhealthy connection detected, removing: {e}")
+                try:
+                    conn.close()
+                except:
+                    pass
+                with self.pool_lock:
+                    self.active_connections -= 1
+                with self.usage_lock:
+                    self.connection_last_used.pop(conn_id, None)
+            except Exception as e:
+                self.logger.error(f"Unexpected error during health check: {e}")
+                healthy_connections.append(conn)  # Keep it, might be temporary issue
+        
+        # Return healthy connections to pool
+        for conn in healthy_connections:
+            try:
+                self.pool.put_nowait(conn)
+            except queue.Full:
+                # Pool somehow got full, close this connection
+                conn.close()
+                with self.pool_lock:
+                    self.active_connections -= 1
+                with self.usage_lock:
+                    self.connection_last_used.pop(id(conn), None)
+        
+        # Ensure we have minimum connections
+        self._ensure_minimum_connections()
+    
+    def _ensure_minimum_connections(self):
+        """Ensure the pool has at least the minimum number of connections."""
+        with self.pool_lock:
+            current_in_pool = self.pool.qsize()
+            needed = self.min_connections - current_in_pool
+            
+            if needed > 0 and self.active_connections < self.max_connections:
+                for _ in range(min(needed, self.max_connections - self.active_connections)):
+                    try:
+                        conn = self._create_connection()
+                        conn_id = id(conn)
+                        self.pool.put_nowait(conn)
+                        self.active_connections += 1
+                        
+                        with self.usage_lock:
+                            self.connection_last_used[conn_id] = time.time()
+                            
+                        self.logger.debug("Added new connection to maintain minimum pool size")
+                    except Exception as e:
+                        self.logger.error(f"Failed to create replacement connection: {e}")
+                        break
     
     @contextmanager
-    def _handle_errors(self, operation_name: str):
-        """Context manager for consistent error handling."""
+    def get_connection(self):
+        """Get a connection from the pool (context manager)."""
+        conn = None
+        conn_id = None
         try:
-            yield
+            # Try to get existing connection
+            try:
+                conn = self.pool.get_nowait()
+                conn_id = id(conn)
+            except queue.Empty:
+                # Create new connection if under max limit
+                with self.pool_lock:
+                    if self.active_connections < self.max_connections:
+                        conn = self._create_connection()
+                        conn_id = id(conn)
+                        self.active_connections += 1
+                        with self.usage_lock:
+                            self.connection_last_used[conn_id] = time.time()
+                    else:
+                        # Wait for available connection
+                        conn = self.pool.get(timeout=30)
+                        conn_id = id(conn)
+            
+            # Test connection health
+            if conn.closed:
+                self.logger.info("Connection was closed, creating new one")
+                old_conn_id = conn_id
+                conn = self._create_connection()
+                conn_id = id(conn)
+                
+                # Update tracking
+                with self.usage_lock:
+                    self.connection_last_used.pop(old_conn_id, None)
+                    self.connection_last_used[conn_id] = time.time()
+            
+            # Update last used time
+            with self.usage_lock:
+                self.connection_last_used[conn_id] = time.time()
+            
+            yield conn
+            
         except Exception as e:
-            self.logger.error(f"Error in {operation_name}: {e}")
+            self.logger.error(f"Connection error: {e}")
+            if conn and not conn.closed:
+                try:
+                    conn.rollback()
+                except:
+                    pass
             raise
+        finally:
+            # Return connection to pool
+            if conn and not conn.closed:
+                try:
+                    conn.rollback()  # Reset state
+                    # Update usage time
+                    if conn_id:
+                        with self.usage_lock:
+                            self.connection_last_used[conn_id] = time.time()
+                    self.pool.put_nowait(conn)
+                except queue.Full:
+                    # Pool is full, close this connection
+                    conn.close()
+                    with self.pool_lock:
+                        self.active_connections -= 1
+                    if conn_id:
+                        with self.usage_lock:
+                            self.connection_last_used.pop(conn_id, None)
+                except:
+                    conn.close()
+                    with self.pool_lock:
+                        self.active_connections -= 1
+                    if conn_id:
+                        with self.usage_lock:
+                            self.connection_last_used.pop(conn_id, None)
+
+    def close_all(self):
+        """Close all connections in the pool and stop keep-alive."""
+        # Stop the keep-alive thread
+        if self.keepalive_thread and self.keepalive_thread.is_alive():
+            self.stop_keepalive.set()
+            self.keepalive_thread.join(timeout=5)
+            self.logger.info("Keep-alive thread stopped")
+        
+        # Close all connections
+        while not self.pool.empty():
+            try:
+                conn = self.pool.get_nowait()
+                conn.close()
+            except queue.Empty:
+                break
+        
+        self.active_connections = 0
+        self.connection_last_used.clear()
+        self.logger.info("All connections closed")
+    
+    def get_pool_status(self) -> Dict[str, Any]:
+        """Get current pool statistics."""
+        with self.usage_lock:
+            current_time = time.time()
+            connection_ages = [
+                current_time - last_used 
+                for last_used in self.connection_last_used.values()
+            ]
+        
+        return {
+            "total_connections": self.active_connections,
+            "available_connections": self.pool.qsize(),
+            "min_connections": self.min_connections,
+            "max_connections": self.max_connections,
+            "keepalive_active": self.keepalive_thread and self.keepalive_thread.is_alive(),
+            "keepalive_interval": self.keepalive_interval,
+            "connection_timeout": self.connection_timeout,
+            "oldest_connection_age": max(connection_ages) if connection_ages else 0,
+            "newest_connection_age": min(connection_ages) if connection_ages else 0
+        }
+
+
+# Modified PostgresDatabase class for concurrent operations
+class ConcurrentPostgresDatabase:
+    """
+    Concurrent-friendly version of PostgresDatabase using connection pooling.
+    """
+    
+    def __init__(self, connection_string: str = None):
+        self.connection_string = connection_string or os.environ.get("POSTGRES_URL")
+        self.logger = logging.getLogger(__name__)
+        self.pool = PostgresConnectionPool(self.connection_string)
+    
+    def execute_query(self, query: str, params: tuple = None) -> List[Dict[str, Any]]:
+        """Execute a SQL query using a pooled connection."""
+        with self.pool.get_connection() as conn:
+            try:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(query, params)
+                    if cursor.description:  # Check if query returns data
+                        result = cursor.fetchall()
+                        conn.commit()
+                        return self._serialize_data([dict(row) for row in result])
+                    else:
+                        conn.commit()
+                        return []
+            except Exception as e:
+                conn.rollback()
+                self.logger.error(f"Error executing query: {e}")
+                raise
+    
+    def execute_function_and_extract_output(
+        self,
+        schema_name: str,
+        function_name: str,
+        argument_value: str,
+        include_argument_type: bool = False,
+    ) -> Optional[List[Dict[str, str]]]:
+        """Execute a function using a pooled connection."""
+        with self.pool.get_connection() as conn:
+            try:
+                # Get function parameters (you'll need to implement caching here)
+                function_arguments = self._get_function_parameters_concurrent(
+                    conn, schema_name, function_name
+                )
+                
+                if not function_arguments:
+                    self.logger.warning(f"No parameters found for function {schema_name}.{function_name}")
+                    return None
+                    
+                # Extract output parameter names
+                parameter_names = [
+                    arg.split(" ")[1].replace("out_", "")
+                    + (f" ({arg.split(' ')[2]})" if len(arg.split(" ")) > 2 and include_argument_type else "")
+                    for arg in function_arguments
+                    if "out_" in arg or "OUT" in arg
+                ]
+                
+                if not parameter_names:
+                    self.logger.warning(f"No output parameters found for function {schema_name}.{function_name}")
+                    return None
+                
+                # Execute the database function
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(f"SELECT {schema_name}.{function_name}({argument_value});")
+                    result_data = cursor.fetchall()
+                    conn.commit()
+                
+                if not result_data:
+                    return None
+                
+                results = []
+                for row in result_data:
+                    output_str = next(iter(dict(row).values()), None)
+                    if not output_str:
+                        results.append(None)
+                        continue
+                    
+                    output_values = self._split_quoted_string(output_str[1:-1])
+                    results.append(dict(zip(parameter_names, output_values)))
+
+                return results
+                
+            except Exception as e:
+                conn.rollback()
+                self.logger.error(f"Error executing function {schema_name}.{function_name}: {e}")
+                raise
+    
+    def _get_function_parameters_concurrent(self, conn, schema_name: str, function_name: str) -> List[str]:
+        """Get function parameters using the provided connection."""
+        function_info_query = f"""
+            SELECT pg_get_function_arguments(p.oid) AS function_arguments 
+            FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace 
+            WHERE p.proname = '{function_name}' AND n.nspname = '{schema_name}';
+        """
+        
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(function_info_query)
+            result = cursor.fetchall()
+        
+        if not result or not result[0]:
+            return []
+            
+        function_arguments_str = dict(result[0]).get("function_arguments")
+        if not function_arguments_str:
+            return []
+            
+        function_arguments = function_arguments_str.split(", ")
+        return function_arguments
     
     @staticmethod
     def _split_quoted_string(input_string: str) -> List[str]:
@@ -75,12 +439,11 @@ class PostgresDatabase:
     
     @staticmethod
     def _serialize_data(data: List[Dict[Any, Any]]) -> List[Dict[Any, str]]:
-        """Converts datetime, date and Decimal values to strings with improved type handling."""
+        """Converts datetime, date and Decimal values to strings."""
         if not data:
             return []
             
         def serialize_value(value: Any) -> Any:
-            """Converts datetime and Decimal to strings."""
             if value is None:
                 return None
             elif isinstance(value, datetime.datetime):
@@ -98,110 +461,9 @@ class PostgresDatabase:
 
         return result
     
-    @lru_cache(maxsize=128)
-    def _get_function_parameters(self, schema_name: str, function_name: str) -> List[str]:
-        """Cached retrieval of function output parameter names."""
-        function_info_query = f"""
-            SELECT pg_get_function_arguments(p.oid) AS function_arguments 
-            FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace 
-            WHERE p.proname = '{function_name}' AND n.nspname = '{schema_name}';
-        """
-        function_info_result = self.execute_query(function_info_query)
-        
-        if not function_info_result or not function_info_result[0]:
-            return []
-            
-        function_arguments_str = function_info_result[0].get("function_arguments")
-        if not function_arguments_str:
-            return []
-            
-        function_arguments = function_arguments_str.split(", ")
-        return function_arguments
-            
-    def execute_query(self, query: str, params: tuple = None) -> List[Dict[str, Any]]:
-        """
-        Execute a SQL query and return results as a list of dictionaries.
-        
-        Args:
-            query: SQL query to execute
-            params: Parameters to pass to the query
-            
-        Returns:
-            List of dictionaries where each dictionary represents a row
-        """
-        with self._handle_errors("execute_query"):
-            if not self.connection:
-                self.connect()
-                
-            try:
-                with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                    cursor.execute(query, params)
-                    if cursor.description:  # Check if query returns data
-                        result = cursor.fetchall()
-                        self.connection.commit()
-                        return self._serialize_data([dict(row) for row in result])
-                    else:
-                        self.connection.commit()
-                        return []
-            except Exception as e:
-                self.connection.rollback()
-                self.logger.error(f"Error executing query: {e}")
-                raise
-    
-    def execute_function_and_extract_output(
-        self,
-        schema_name: str,
-        function_name: str,
-        argument_value: str,
-        include_argument_type: bool = False,
-    ) -> Optional[List[Dict[str, str]]]:
-        """Executes a function and returns output as a list of dictionaries with improved error handling."""
-        with self._handle_errors(f"execute_function_{schema_name}.{function_name}"):
-            # Get function parameters (cached)
-            function_arguments = self._get_function_parameters(schema_name, function_name)
-            if not function_arguments:
-                self.logger.warning(f"No parameters found for function {schema_name}.{function_name}")
-                return None
-                
-            # Extract output parameter names
-            parameter_names = [
-                arg.split(" ")[1].replace("out_", "")
-                + (f" ({arg.split(' ')[2]})" if len(arg.split(" ")) > 2 and include_argument_type else "")
-                for arg in function_arguments
-                if "out_" in arg or "OUT" in arg
-            ]
-            
-            if not parameter_names:
-                self.logger.warning(f"No output parameters found for function {schema_name}.{function_name}")
-                return None
-            
-            # Execute the database function
-            result_data = self.execute_query(f"SELECT {schema_name}.{function_name}({argument_value});")
-            if not result_data:
-                return None
-            
-            results = []
-            for row in result_data:
-                output_str = next(iter(row.values()), None)
-                if not output_str:
-                    results.append(None)
-                    continue
-                
-                output_values = self._split_quoted_string(output_str[1:-1])
-                results.append(dict(zip(parameter_names, output_values)))
-
-            return results
-    
-    
-            
-    def __enter__(self):
-        """Context manager entry - connects to database."""
-        self.connect()
-        return self
-        
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit - disconnects from database."""
-        self.disconnect()
+    def close(self):
+        """Close the connection pool."""
+        self.pool.close_all()
 
 
 # =====================================================
@@ -241,7 +503,7 @@ connection = database[2]
 
 POSTGRES_URL = f"postgresql://{connection['user']}:{connection['password']}@{connection['host']}:{connection['port']}/{connection['database_name']}"
 
-db = PostgresDatabase(POSTGRES_URL)
+db = ConcurrentPostgresDatabase(POSTGRES_URL)
 # =====================================================
 # Standalone Functions/Tools
 # =====================================================
