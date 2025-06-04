@@ -84,8 +84,8 @@ def create_call_center_agent(
         # Verification & negotiation - 7B models for better reasoning
         "name_verification": model_7b,       # Identity confirmation
         "details_verification": model_7b,    # Security verification
-        "negotiation": model_3b,            # Objection handling (changed to 3b)
-        
+        "negotiation": model_7b,            # Objection handling (changed to 7b)
+
         # Complex tool usage - 14B models for tool proficiency
         "promise_to_pay": model_14b,        # Payment arrangement tools
         "payment_portal": model_14b,        # Payment link generation
@@ -205,10 +205,6 @@ def create_call_center_agent(
         if next_step == CallStep.DETAILS_VERIFICATION.value:
             logger.info("Agent decided: move to details verification")
             return Command(update=result, goto=CallStep.DETAILS_VERIFICATION.value)
-
-        elif next_step == CallStep.CLOSING.value:
-            logger.info("Agent decided: end call")
-            return Command(update=result, goto=CallStep.CLOSING.value)
 
         else:
             # Continue name verification - wait for next human response
