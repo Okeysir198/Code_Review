@@ -161,7 +161,7 @@ def create_closing_agent(
         """Generate comprehensive closing prompt with tool guidance"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Add call outcome details
         params["call_outcome"] = state.get("call_outcome", "incomplete")

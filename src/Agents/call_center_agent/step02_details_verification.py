@@ -304,12 +304,11 @@ def create_details_verification_agent(
         """Generate enhanced conversational prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         params["matched_fields_display"] = _format_matched_fields(state.get("matched_fields", []))
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format enhanced prompt
         prompt_content = DETAILS_VERIFICATION_PROMPT.format(**params)

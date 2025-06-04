@@ -55,12 +55,14 @@ class CallCenterAgentState(MessagesState):
     is_call_ended: bool = False
     call_outcome: str = "in_progress"  # in_progress, completed, payment_secured, escalated, cancelled
     
+    # ===== ADAPTATION =====
+    urgency_category: str = "Standard/First Payment"  # Standard, Higher Urgency, Pre-Legal/Critical
+
     # ===== VERIFICATION STATE =====
     name_verification_status: str = VerificationStatus.INSUFFICIENT_INFO.value
     name_verification_attempts: int = 0
     details_verification_status: str = VerificationStatus.INSUFFICIENT_INFO.value
     details_verification_attempts: int = 0
-    verification_stage: str = "name_verification_needed"  
     matched_fields: List[str] = []
     field_to_verify: str = "ID number"  # Current field being verified
     

@@ -1,10 +1,6 @@
-# ===============================================================================
-# STEP 00: INTRODUCTION AGENT - Updated with Aging-Aware Prompts
-# ===============================================================================
-
 # src/Agents/call_center_agent/step00_introduction.py
 """
-Introduction Agent - Enhanced with aging-aware script integration
+Enhanced Introduction Agent - Context-aware professional greeting with engagement hooks
 """
 from typing import Dict, Any, Optional, List, Literal
 from langchain_core.language_models import BaseChatModel
@@ -16,89 +12,154 @@ from langgraph.types import Command
 from src.Agents.core.basic_agent import create_basic_agent
 from src.Agents.call_center_agent.state import CallCenterAgentState, CallStep
 from src.Agents.call_center_agent.data.client_data_fetcher import get_safe_value
+from src.Agents.call_center_agent.parameter_helper import prepare_parameters
 from src.Agents.call_center_agent.call_scripts import ScriptManager, CallStep as ScriptCallStep
 
-def get_introduction_prompt(client_data: Dict[str, Any], agent_name: str, state: Dict[str, Any] = None) -> str:
-    """Generate aging-aware introduction prompt."""
-    
-    # Determine script type from aging
-    account_aging = client_data.get("account_aging", {})
-    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
-    
-    # Get client info
-    client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
-    client_title = get_safe_value(client_data, "profile.client_info.title", "Mr/Ms")
-    
-    # Base prompt
-    base_prompt = """<role>
-You are a professional debt collection specialist at Cartrack's Accounts Department. Your name is {agent_name}.
-</role>
+import logging
+logger = logging.getLogger(__name__)
 
-<task>
-Deliver professional greeting and request specific client. MAXIMUM 15 words.
-</task>
+# Enhanced engagement-focused prompt
+INTRODUCTION_PROMPT = """You are {agent_name}, a professional debt collection specialist from Cartrack's Accounts Department making an outbound call about a {outstanding_amount} overdue account.
 
-<response>
-"Good day, you are speaking to {agent_name} from Cartrack Accounts Department. May I speak to {client_title} {client_full_name}, please?"
-</response>
+<context>
+Today: {current_date} | Account: {aging_category} | Urgency: {urgency_level}
+Purpose: Lock debtor into conversation while requesting specific person
+</context>
 
-<style>
-- Professional and confident
-- Clear company identification
-- Direct request for specific person
-- RESPOND MAX in 30 words
-</style>"""
+<engagement_greetings>
+Standard/First Payment: 
+"Good day, this is {agent_name} from Cartrack Accounts Department. May I speak to {client_title} {client_full_name} about their Cartrack account, please?"
 
-    # Enhance with script content
-    return ScriptManager.get_script_enhanced_prompt(
-        base_prompt=base_prompt,
-        script_type=script_type,
-        step=ScriptCallStep.INTRODUCTION,
-        client_data=client_data,
-        state=state or {}
-    )
+Higher Urgency/Failed PTP:
+"Good day, {agent_name} from Cartrack Accounts calling {client_title} {client_full_name} about an urgent account matter."
+
+Pre-Legal/Critical:
+"Good day, this is {agent_name} from Cartrack Accounts Department. I need to speak to {client_title} {client_full_name} about their account immediately."
+</engagement_greetings>
+
+<engagement_strategy>
+Each greeting includes an engagement hook that makes it harder to dismiss:
+
+- "about their Cartrack account" - creates curiosity about what's wrong
+- "urgent account matter" - implies time-sensitivity requiring attention  
+- "need to speak...immediately" - creates urgency and importance
+
+The word "account" signals this is serious business they need to address, not a sales call they can easily reject.
+</engagement_strategy>
+
+<authority_building>
+Use confident, business-like delivery that implies:
+- This is official business requiring attention
+- You have legitimate authority to make this call
+- The matter is important enough to warrant immediate discussion
+- Dismissing the call would be inappropriate
+
+Higher urgency accounts get more direct, authoritative language that's harder to brush off.
+</authority_building>
+
+<outcome>
+Create immediate engagement where they feel compelled to either confirm identity or ask what this is about - both responses allow the next agent to begin verification and explanation.
+</outcome>
+
+Lock them in with professional urgency while maintaining courtesy. Aging approach: {aging_approach}
+"""
 
 def create_introduction_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = None,  # Auto-determined from aging
+    script_type: str,
     agent_name: str = "AI Agent",
     tools: Optional[List[BaseTool]] = None,
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create an introduction agent with aging-aware scripts."""
+    """Create enhanced introduction agent with engagement-focused greetings"""
     
-    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["__end__"]]:
-        client_full_name = get_safe_value(client_data, "profile.client_info.client_full_name", "Client")
-        client_title = get_safe_value(client_data, "profile.client_info.title", "Mr/Ms")
-
-        messages = AIMessage(content=f"Good day, you are speaking to {agent_name} from Cartrack Accounts Department. May I speak to {client_title} {client_full_name}, please?")
+    def _determine_urgency_level(script_type: str) -> str:
+        """Determine urgency level for appropriate greeting selection"""
+        aging_context = ScriptManager.get_aging_context(script_type)
+        urgency = aging_context.get('urgency', 'Medium')
         
-        return Command(
-            update={
-                "messages": [messages],
-                "current_step": CallStep.NAME_VERIFICATION.value,
-            },
-            goto="__end__"
-        )
+        # Map urgency to greeting categories
+        if urgency in ['Critical', 'Very High']:
+            return "Pre-Legal/Critical"
+        elif urgency == 'High':
+            return "Higher Urgency/Failed PTP"
+        else:
+            return "Standard/First Payment"
+    
+    def _select_appropriate_greeting(params: Dict[str, str], urgency_category: str) -> str:
+        """Select the appropriate greeting based on urgency level"""
+        greetings = {
+            "Standard/First Payment": 
+                f"Good day, this is {params['agent_name']} from Cartrack Accounts Department. May I speak to {params['client_title']} {params['client_full_name']} about their Cartrack account, please?",
+            
+            "Higher Urgency/Failed PTP":
+                f"Good day, {params['agent_name']} from Cartrack Accounts calling {params['client_title']} {params['client_full_name']} about an urgent account matter.",
+            
+            "Pre-Legal/Critical":
+                f"Good day, this is {params['agent_name']} from Cartrack Accounts Department. I need to speak to {params['client_title']} {params['client_full_name']} about their account immediately."
+        }
+        
+        return greetings.get(urgency_category, greetings["Standard/First Payment"])
+    
+
+    
+    def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent", "__end__"]]:
+        """Enhanced preprocessing with engagement-focused greeting delivery"""
+        
+        messages = state.get("messages", [])
+        
+        # Prepare for greeting delivery
+        urgency_category = _determine_urgency_level(script_type)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
+        selected_greeting = _select_appropriate_greeting(params, urgency_category)
+        
+        # Option 1: Deliver greeting immediately via preprocessing (faster)
+        if config.get("immediate_greeting", True):
+            greeting_message = AIMessage(content=selected_greeting)
+            
+            logger.info(f"Immediate greeting delivered: {urgency_category}")
+            return Command(
+                update={
+                    "messages": [greeting_message],
+                    "current_step": CallStep.NAME_VERIFICATION.value,
+                    "urgency_category": urgency_category
+                },
+                goto="__end__"
+            )
+        
+        # Option 2: Let agent generate greeting (more flexible)
+        else:
+            return Command(
+                update={
+                    "current_step": CallStep.NAME_VERIFICATION.value,
+                    "urgency_category": urgency_category
+                },
+                goto="agent"
+            )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        prompt_content = get_introduction_prompt(client_data, agent_name, state.to_dict() if hasattr(state, 'to_dict') else state)
-        return [SystemMessage(content=prompt_content)] + state['messages']
+        """Generate enhanced engagement-focused introduction prompt"""
+        
+        # Prepare parameters
+        params = prepare_parameters(client_data, state, script_type, agent_name)
+        
+        # Format prompt
+        prompt_content = INTRODUCTION_PROMPT.format(**params)
+        
+        if verbose:
+            print(f"Enhanced Introduction Prompt: {prompt_content}")
+        
+        return [SystemMessage(content=prompt_content)] + state.get('messages', [])
     
-    kwargs = {
-        "model": model,
-        "prompt": dynamic_prompt,
-        "tools": tools or [],
-        "pre_processing_node": pre_processing_node,
-        "state_schema": CallCenterAgentState,
-        "verbose": verbose,
-        "name": "IntroductionAgent"
-    }
-    
-    if config and config.get('configurable', {}).get('use_memory'):
-        from langgraph.checkpoint.memory import MemorySaver
-        kwargs["checkpointer"] = MemorySaver()
-    
-    return create_basic_agent(**kwargs)
+    return create_basic_agent(
+        model=model,
+        prompt=dynamic_prompt,
+        tools=tools or [],
+        pre_processing_node=pre_processing_node,
+        state_schema=CallCenterAgentState,
+        verbose=verbose,
+        config=config,
+        name="EnhancedIntroductionAgent"
+    )

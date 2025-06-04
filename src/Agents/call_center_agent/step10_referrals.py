@@ -144,7 +144,7 @@ def create_referrals_agent(
         """Generate context-aware referral prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Determine referral appropriateness
         messages = state.get("messages", [])
@@ -154,8 +154,7 @@ def create_referrals_agent(
         params["payment_secured"] = "Yes" if state.get("payment_secured") else "No"
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = REFERRALS_PROMPT.format(**params)

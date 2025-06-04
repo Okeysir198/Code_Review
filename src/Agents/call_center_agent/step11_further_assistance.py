@@ -209,7 +209,7 @@ def create_further_assistance_agent(
         """Generate context-aware further assistance prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Get conversation context
         messages = state.get("messages", [])
@@ -221,8 +221,7 @@ def create_further_assistance_agent(
         params["assistance_instruction"] = _determine_assistance_approach(state, messages)
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = FURTHER_ASSISTANCE_PROMPT.format(**params)

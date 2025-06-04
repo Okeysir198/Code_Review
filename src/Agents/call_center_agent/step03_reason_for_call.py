@@ -104,11 +104,9 @@ def create_reason_for_call_agent(
         """Generate enhanced reason for call prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
-        # Get aging-specific approach and consequences
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = REASON_FOR_CALL_PROMPT.format(**params)

@@ -96,11 +96,10 @@ def create_subscription_reminder_agent(
         """Generate enhanced subscription reminder prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = SUBSCRIPTION_REMINDER_PROMPT.format(**params)

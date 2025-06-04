@@ -122,11 +122,10 @@ def create_client_details_update_agent(
         """Generate tool-guided client update prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = CLIENT_DETAILS_UPDATE_PROMPT.format(**params)

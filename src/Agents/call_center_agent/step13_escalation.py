@@ -210,7 +210,7 @@ def create_escalation_agent(
         """Generate authority-appropriate escalation prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Add escalation-specific context
         messages = state.get("messages", [])
@@ -221,8 +221,7 @@ def create_escalation_agent(
         params["response_timeline"] = state.get("response_timeline", "24-48 hours")
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = ESCALATION_PROMPT.format(**params)

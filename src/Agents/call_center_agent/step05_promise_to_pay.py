@@ -201,12 +201,11 @@ def create_promise_to_pay_agent(
         """Generate enhanced tool-guided prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
-        params["has_banking_details"] = "Yes" if _check_banking_details(client_data) else "No"
+        params = prepare_parameters(client_data, state, script_type, agent_name)
+        
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format enhanced prompt
         prompt_content = PROMISE_TO_PAY_PROMPT.format(**params)

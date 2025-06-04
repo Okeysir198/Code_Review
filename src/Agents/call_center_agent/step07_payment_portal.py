@@ -127,11 +127,10 @@ def create_payment_portal_agent(
         """Generate tool-guided payment portal prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = PAYMENT_PORTAL_PROMPT.format(**params)

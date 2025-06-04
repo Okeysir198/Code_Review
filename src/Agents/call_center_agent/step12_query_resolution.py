@@ -172,14 +172,13 @@ def create_query_resolution_agent(
         """Generate verification-aware query resolution prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Add query-specific context
         params["last_client_question"] = state.get("last_client_question", "")
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = QUERY_RESOLUTION_PROMPT.format(**params)

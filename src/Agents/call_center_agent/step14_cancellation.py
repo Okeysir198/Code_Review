@@ -193,7 +193,7 @@ def create_cancellation_agent(
         """Generate settlement-focused cancellation prompt"""
         
         # Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Add cancellation-specific context
         messages = state.get("messages", [])
@@ -209,8 +209,7 @@ def create_cancellation_agent(
             params["outstanding_amount"] = state.get("outstanding_amount")
         
         # Get aging-specific approach
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
+        
         
         # Format prompt
         prompt_content = CANCELLATION_PROMPT.format(**params)

@@ -102,16 +102,12 @@ def create_name_verification_agent(
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
         """Generate concise name verification prompt"""
         # Step 1: Prepare parameters
-        params = prepare_parameters(client_data, state, agent_name)
+        params = prepare_parameters(client_data, state, script_type, agent_name)
         
         # Step 2: Format script
         script_template = ScriptManager.get_script_content(script_type, ScriptCallStep.NAME_VERIFICATION)
         formatted_script = script_template.format(**params) if script_template else f"Are you {params['client_full_name']}?"
         params["formatted_script"] = formatted_script
-        
-        # Step 3: Format prompt
-        aging_context = ScriptManager.get_aging_context(script_type)
-        params["aging_approach"] = aging_context['approach']
         
         prompt_content = NAME_VERIFICATION_PROMPT.format(**params)
         
