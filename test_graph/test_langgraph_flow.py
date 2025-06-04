@@ -32,10 +32,10 @@ llm = ChatOllama(model="qwen2.5:14b-instruct", temperature=0, num_ctx=40000)
 from src.Agents.core.basic_agent import create_basic_agent, BasicAgentState, DEFAULT_TOOLS
 from src.Agents.call_center_agent.tools.verify_client_name import verify_client_name
 from src.Agents.call_center_agent.state import VerificationStatus, CallCenterAgentState
-from test_graph.client_data import client_data
+from test_graph.client_data_samples import client_data_set
 
 system_prompt = "You are AI Agent from Cartrack Accountant Department"
-
+client_data = client_data_set[0] 
 
 # Simple agent
 graph_basic_agent = create_basic_agent(
@@ -49,7 +49,7 @@ graph_basic_agent = create_basic_agent(
 #     tools=DEFAULT_TOOLS,
 #     prompt=system_prompt
 # )
-
+ # Use the first client data sample
 class AgentState(CallCenterAgentState):
     client_full_name: Optional[str]
     client_profile: Optional[Dict[str, Any]] = None
@@ -211,55 +211,3 @@ agent_with_tools = create_react_agent(
     debug = True,
     # checkpointer=checkpointer
 )
-#########################################################################################
-# Call Center Agents
-#########################################################################################
-# from test_graph.client_data import client_data
-# from src.Agents.call_center_agent.call_scripts import ScriptType
-# from src.Agents.agent00_callcenter_simulation import  AGENT_CONFIG
-# from src.Agents.graph_debtor_call_center_agent import CallCenterAgent
-
-# from src.Agents.call_center_agent.introduction import create_introduction_agent
-# from src.Agents.call_center_agent.name_verification import NameVerificationAgent
-# from src.Agents.call_center_agent.details_verification import DetailsVerificationAgent
-
-
-# from app_config import CONFIG
-
-# # Client information
-# config = CONFIG.copy()
-# client_info = config["client_details"]
-# call_center_graph = CallCenterAgent(config).workflow
-
-
-# # simulation
-# AGENT_CONFIG['configurable']['use_memory'] = False
-# AGENT_CONFIG['configurable']['enable_stt_model'] = False
-# AGENT_CONFIG['configurable']['enable_tts_model'] = False
-# client_info = AGENT_CONFIG["client_details"]
-
-# enable_similation = True
-# debtor_profile = "wrong_person" # wrong_person, difficult, hesitant, cooperative, third_party
-# call_center_simulation = CallCenterAgent(AGENT_CONFIG, simulate_debtor=enable_similation, debtor_profile=debtor_profile).workflow
-
-
-
-# introduction_graph = IntroductionAgent(
-#     model=llm, 
-#     client_info=client_info,
-#     script_type=ScriptType.RATIO_1_INFLOW,
-# ).workflow
-
-# name_verification_graph = NameVerificationAgent(
-#     llm=llm, 
-#     client_info=client_info,
-#     script_type=ScriptType.RATIO_1_INFLOW,
-#     config=config
-# ).workflow
-
-# details_verification_graph = DetailsVerificationAgent(
-#     llm=llm, 
-#     client_info=client_info,
-#     script_type=ScriptType.RATIO_1_INFLOW,
-#     config=config
-# ).workflow

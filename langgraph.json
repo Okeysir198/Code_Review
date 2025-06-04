@@ -5,8 +5,10 @@
   "graphs": {
 
     "graph_agent_with_tool"                   : "./test_graph/test_langgraph_flow.py:agent_with_tools",
-    "call_simulation"               : "./src/Agents/graph_test_call_center.py:call_simulation",
-    "graph_call_center_agent"              : "./src/Agents/graph_test_call_center.py:graph_call_center_agent1"
+    "call_simulation"                         : "./src/Agents/graph_test_call_center.py:call_simulation",
+    "graph_call_center_agent_ratio_1"         : "./src/Agents/graph_test_call_center.py:graph_call_center_agent_ratio_1",
+    "graph_call_center_agent_ratio_2_3"       : "./src/Agents/graph_test_call_center.py:graph_call_center_agent_ratio_2_3",
+    "graph_call_center_agent_ratio_4_5"       : "./src/Agents/graph_test_call_center.py:graph_call_center_agent_ratio_4_5"
 
   },
   "env": ".env"

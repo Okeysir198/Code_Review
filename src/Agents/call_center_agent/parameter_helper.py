@@ -6,7 +6,6 @@ Added current_date and removed redundant conversation context
 import logging
 from datetime import datetime
 from typing import Dict, Any, List
-from src.Agents.call_center_agent.call_scripts import ScriptManager
 from src.Agents.call_center_agent.call_scripts import ScriptManager, ScriptType
 
 from app_config import CONFIG
@@ -17,7 +16,7 @@ def prepare_parameters(
     client_data: Dict[str, Any], 
     state: Dict[str, Any], 
     script_type: str = ScriptType.RATIO_1_INFLOW.value,
-    agent_name: str = "AI Agent"
+    agent_name: str = "AI Agent",
 ) -> Dict[str, str]:
     """
     Enhanced parameter preparation with current date and cleaned structure.
@@ -32,7 +31,8 @@ def prepare_parameters(
         Dict with all formatted parameters including current_date
     """
     params = {}
-    
+    script_enum = ScriptType(script_type)
+
     # === CORE IDENTIFIERS ===
     params["user_id"] = _get_safe_value(client_data, "profile.user_id", "")
     params["agent_name"] = agent_name
@@ -47,11 +47,6 @@ def prepare_parameters(
     params["client_name"] = client_info.get("first_name", params["client_full_name"])
     params["salutation"] = f"Good day, {params['client_title']}"
     
-    # === AGING CONTEXT ===
-    aging_context = ScriptManager.get_aging_context(script_type)
-    params["aging_approach"] = aging_context['approach']
-    params["aging_category"] = aging_context['category']
-
     # === FINANCIAL INFO ===
     account_aging = client_data.get("account_aging", {})
     account_overview = client_data.get("account_overview", {})
@@ -87,9 +82,8 @@ def prepare_parameters(
         })
     
     # === AGING CONTEXT ===
-    script_type = ScriptManager.determine_script_type_from_aging(account_aging, client_data)
-    aging_context = ScriptManager.get_aging_context(script_type)
-    
+    aging_context = ScriptManager.get_aging_context(script_enum)
+    params["aging_approach"] = aging_context['approach']
     params["aging_category"] = aging_context['category']
     params["urgency_level"] = aging_context['urgency']
     

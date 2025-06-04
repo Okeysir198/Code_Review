@@ -41,7 +41,6 @@ logger = logging.getLogger(__name__)
 def create_call_center_agent(
     model: BaseChatModel,
     client_data: Dict[str, Any],
-    script_type: str = None,
     agent_name: str = "AI Agent",
     config: Optional[Dict[str, Any]] = None,
     verbose: bool = False
@@ -54,10 +53,10 @@ def create_call_center_agent(
     """
     
     # Auto-determine script type if not provided
-    if not script_type:
-        account_aging = client_data.get("account_aging", {})
-        script_type = determine_script_type_from_aging(account_aging, client_data)
-        logger.info(f"Auto-determined script type: {script_type}")
+
+    account_aging = client_data.get("account_aging", {})
+    script_type = determine_script_type_from_aging(account_aging, client_data)
+    logger.info(f"Auto-determined script type: {script_type}")
 
     # ========================================================================
     # MODEL ASSIGNMENT CONFIGURATION

@@ -328,7 +328,7 @@ def create_basic_agent(
             
             # Log the final prompt if verbose mode is enabled
             if verbose:
-                logger.info(f"Final prompt to LLM: {system_prompt}")
+                # logger.info(f"Final prompt to LLM: {system_prompt}")
                 # logger.info(f"Messages content as below:")
                 # for msg in messages:
                 #     if not isinstance(msg, SystemMessage):

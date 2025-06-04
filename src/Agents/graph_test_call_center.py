@@ -18,6 +18,7 @@ from src.Agents.call_center_agent.state import CallCenterAgentState
 from src.Agents.graph_call_center_agent import create_call_center_agent
 from src.Agents.graph_call_simulation import *
 from src.Agents.graph_debtor_simulator import create_debtor_simulator, DebtorPersonality
+from test_graph.client_data_samples import client_data_set
 
 logger.info("✅ All imports successful")
 
@@ -46,12 +47,26 @@ logger.info("✅ LLM initialized successfully")
 ################################################################################
 # Complete Call Center Agent with Optimized Router
 user_id = "1489698"
+# client_data = get_client_data(user_id)
 
-client_data = get_client_data(user_id)
+client_data = client_data_set[0]
 
-graph_call_center_agent1 = create_call_center_agent(
+
+graph_call_center_agent_ratio_1 = create_call_center_agent(
     model=llm,
-    client_data=client_data,
+    client_data=client_data_set[0],
+    config=config,
+    verbose=True,
+)
+graph_call_center_agent_ratio_2_3 = create_call_center_agent(
+    model=llm,
+    client_data=client_data_set[1],
+    config=config,
+    verbose=True,
+)
+graph_call_center_agent_ratio_4_5 = create_call_center_agent(
+    model=llm,
+    client_data=client_data_set[2],
     config=config,
     verbose=True,
 )
