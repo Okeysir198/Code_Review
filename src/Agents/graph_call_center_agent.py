@@ -71,7 +71,7 @@ def create_call_center_agent(
     # Model assignment strategy by step complexity
     STEP_MODEL_ASSIGNMENT = {
         # Simple conversation - 3B models for efficiency
-        "introduction": model_3b,           # Simple greeting
+        "introduction": model_7b,           # Simple greeting
         "reason_for_call": model_3b,        # Account explanation
         "subscription_reminder": model_3b,   # Billing clarification
         "referrals": model_3b,              # Referral offer
