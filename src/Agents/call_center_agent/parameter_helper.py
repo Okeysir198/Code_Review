@@ -43,8 +43,8 @@ def prepare_parameters(
     # === CLIENT INFO ===
     client_info = client_data.get("profile", {}).get("client_info", {})
     params["client_title"] = client_info.get("title", "Mr/Ms")
-    params["client_full_name"] = client_info.get("client_full_name", "Valued Client") 
-    params["client_name"] = client_info.get("first_name", params["client_full_name"])
+    params["client_full_name"] = client_info.get("client_full_name", "Valued Client").title() 
+    params["client_name"] = client_info.get("first_name", params["client_full_name"]).title()
     params["salutation"] = f"Good day, {params['client_title']}"
     
     # === FINANCIAL INFO ===

@@ -6,7 +6,7 @@ UPDATED VERSION: Added tool message display and text input for manual messaging
 """
 
 import gradio as gr
-import sys
+import sys,os
 import logging
 import io
 import uuid
@@ -21,7 +21,14 @@ from src.VoiceHandler import VoiceInteractionHandler
 from src.Agents.graph_call_center_agent import create_call_center_agent
 from langchain_ollama import ChatOllama
 from app_config import CONFIG
+from fastrtc import Stream, get_cloudflare_turn_credentials_async, get_cloudflare_turn_credentials
+from dotenv import find_dotenv, load_dotenv
 
+_ = load_dotenv(find_dotenv())
+TOKEN = os.environ.get("HF_TOKEN")
+
+async def get_credentials():
+    return await get_cloudflare_turn_credentials_async(hf_token=TOKEN)
 
 class ConsoleCapture:
     """Captures console output and conversation logs separately with deduplication and tool message support."""
@@ -504,7 +511,7 @@ def create_voice_chat_test_app():
     """Create voice chat test app with live call step updates and text input."""
     
     interface = VoiceTestInterface()
-    
+    user_id = "1489698"
     # Clean CSS for better UI
     app_css = """
     .client-info {
@@ -590,7 +597,10 @@ def create_voice_chat_test_app():
                     mode="send-receive",
                     modality="audio",
                     button_labels={"start": "🎙️ Start", "stop": "⏹️ Stop"},
-                    track_constraints=enhanced_constraints
+                    track_constraints=enhanced_constraints,
+                    rtc_configuration=get_credentials,
+                    server_rtc_configuration=get_cloudflare_turn_credentials(ttl=360_000),
+                    min_width=80,
                 )
 
             
@@ -620,7 +630,7 @@ def create_voice_chat_test_app():
                     user_id_input = gr.Textbox(
                         label="🆔 Client ID",
                         placeholder="Enter client ID",
-                        value="28173",
+                        value=user_id,
                         scale=3
                     )
                        
@@ -906,7 +916,7 @@ def create_voice_chat_test_app():
             interface.current_thread_id = session_thread_id
             
             # Load initial client data and determine script type
-            client_data = get_client_data("28173")
+            client_data = get_client_data(user_id)
             script_display = "Not determined"
             
             if client_data:
@@ -920,11 +930,11 @@ def create_voice_chat_test_app():
                     console_capture.write(f"⚠️ Initial script type determination failed: {e}\n")
                     script_display = "Script determination failed"
             
-            client_info = get_client_info_display("28173")
-            mandate_history = get_mandate_history("28173")
-            status = interface.update_client_data("28173")
+            client_info = get_client_info_display(user_id)
+            mandate_history = get_mandate_history(user_id)
+            status = interface.update_client_data(user_id)
             
-            return (client_info, mandate_history, status, "28173", 
+            return (client_info, mandate_history, status, user_id, 
                    session_thread_id, script_display, "Introduction", "Ready to send text messages")
         
         app.load(
@@ -942,5 +952,6 @@ if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
-        show_error=True
+        show_error=True,
+        share=False
     )

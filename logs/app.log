@@ -1,0 +1,75 @@
+2025-06-13 13:53:58 - root - INFO - Logging configured with level: INFO
+2025-06-13 13:53:58 - __main__ - INFO - Initializing STT model...
+2025-06-13 13:53:58 - src.STT.stt_model_provider - INFO - Creating nvidia/parakeet-tdt-0.6b-v2 STT model with config: {'timestamp_prediction': True, 'decoding_type': 'tdt', 'show_logs': True}
+2025-06-13 13:53:58 - src.STT.stt_nvidia_model - INFO - Device set to use cuda:0
+2025-06-13 13:53:58 - src.STT.stt_nvidia_model - INFO - Using checkpoint name directly: nvidia/parakeet-tdt-0.6b-v2
+2025-06-13 13:54:05 - src.STT.stt_nvidia_model - INFO - NVIDIA Parakeet-TDT model loaded successfully
+2025-06-13 13:54:05 - __main__ - INFO - Warming up STT model with dummy input
+2025-06-13 13:54:05 - __main__ - INFO - Model warmup complete
+2025-06-13 13:54:06 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-13 13:54:07 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-13 13:54:07 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-06-13 13:54:36 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-13 13:54:36 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-13 13:54:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52142) -> ('192.168.190.120', 58015)) State.FROZEN -> State.WAITING
+2025-06-13 13:54:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 60004) -> ('192.168.190.120', 58015)) State.FROZEN -> State.WAITING
+2025-06-13 13:54:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 58055) -> ('192.168.190.120', 58015)) State.FROZEN -> State.WAITING
+2025-06-13 13:54:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 49478) -> ('192.168.190.120', 58015)) State.FROZEN -> State.WAITING
+2025-06-13 13:54:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52142) -> ('192.168.190.120', 58015)) State.WAITING -> State.IN_PROGRESS
+2025-06-13 13:54:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 60004) -> ('192.168.190.120', 58015)) State.WAITING -> State.IN_PROGRESS
+2025-06-13 13:54:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 58055) -> ('192.168.190.120', 58015)) State.WAITING -> State.IN_PROGRESS
+2025-06-13 13:54:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 49478) -> ('192.168.190.120', 58015)) State.WAITING -> State.IN_PROGRESS
+2025-06-13 13:54:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52142) -> ('192.168.190.120', 58015)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-13 13:54:37 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-13 13:54:45 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16
+2025-06-13 13:54:45 - __main__ - INFO - Transcription: 'I knew the'
+2025-06-13 13:54:46 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16
+2025-06-13 13:54:46 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-13 13:54:52 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16
+2025-06-13 13:54:53 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-13 13:54:58 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16
+2025-06-13 13:54:58 - __main__ - INFO - Transcription: 'Hi.'
+2025-06-13 13:54:59 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16
+2025-06-13 13:54:59 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-13 13:55:02 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16
+2025-06-13 13:55:02 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-13 13:55:07 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800), Type: int16
+2025-06-13 13:55:07 - __main__ - INFO - Transcription: 'Gotten Skynet.'
+2025-06-13 13:55:19 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46718) -> ('192.168.190.120', 50151)) State.FROZEN -> State.IN_PROGRESS
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46543) -> ('192.168.190.120', 50151)) State.FROZEN -> State.IN_PROGRESS
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46718) -> ('192.168.190.120', 50151)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 35913) -> ('192.168.190.120', 50151)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 56230) -> ('192.168.190.120', 50151)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46718) -> ('118.69.244.141', 50151)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46543) -> ('118.69.244.141', 50151)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 35913) -> ('118.69.244.141', 50151)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:19 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 56230) -> ('118.69.244.141', 50151)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46718) -> ('104.30.149.219', 42165)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46543) -> ('104.30.149.219', 42165)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 35913) -> ('104.30.149.219', 42165)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 56230) -> ('104.30.149.219', 42165)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46718) -> ('104.30.147.148', 42703)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46543) -> ('104.30.147.148', 42703)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 35913) -> ('104.30.147.148', 42703)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 56230) -> ('104.30.147.148', 42703)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46718) -> ('104.30.149.114', 29349)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46543) -> ('104.30.149.114', 29349)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 35913) -> ('104.30.149.114', 29349)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 56230) -> ('104.30.149.114', 29349)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46718) -> ('104.30.147.145', 41934)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46543) -> ('104.30.147.145', 41934)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 35913) -> ('104.30.147.145', 41934)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:20 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 56230) -> ('104.30.147.145', 41934)) State.FROZEN -> State.FAILED
+2025-06-13 13:55:26 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400), Type: int16
+2025-06-13 13:55:26 - __main__ - INFO - Transcription: 'I don't know, could you hear me well?'
+2025-06-13 13:55:33 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400), Type: int16
+2025-06-13 13:55:33 - __main__ - INFO - Transcription: 'Twenty him well.'

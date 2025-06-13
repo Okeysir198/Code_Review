@@ -103,7 +103,7 @@ def create_name_verification_agent(
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent", "__end__"]]:
         """Process name verification with tool verification"""
         
-        client_full_name = client_data.get("profile", {}).get("client_info", {}).get("client_full_name", "Client")
+        client_full_name = client_data.get("profile", {}).get("client_info", {}).get("client_full_name", "Client").title()
         attempts = state.get("name_verification_attempts", 0) + 1
         max_attempts = config.get("verification", {}).get("max_name_verification_attempts", 5)
         

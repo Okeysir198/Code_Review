@@ -37,6 +37,16 @@ CONFIG = {
         }
     },
 
+    "turn_detection": {
+        "enabled": True,
+        "model_name": "multilingual",  # or "eou" for End-of-Utterance
+        "confidence_threshold": 0.7,
+        "min_speech_duration": 0.5,  # Minimum speech duration before considering turn
+        "max_silence_duration": 2.0, # Maximum silence before forcing turn
+        "fallback_to_vad": True, 
+        "context_window_turns": 4 # Number of previous turns to consider
+    },
+
     # Ollama chat model config
     "llm": {
         "model_name": "qwen2.5:14b-instruct", #"qwen2.5:7b-instruct-q5_K_M", #phi4-mini:latest, cogito:3b-v1-preview-llama-q4_K_M, qwen2.5:7b-instruct, qwen2.5:3b-instruct
@@ -92,7 +102,7 @@ CONFIG = {
             "cuda_device_id": 1,
             "chunk_length_s": 30,
             "compute_type": "float16",  # Computation precision (float16, int8)
-            "beam_size": 3  # Beam search size for better transcription accuracy
+            "beam_size": 4  # Beam search size for better transcription accuracy
         },
 
         # Model-specific configuration

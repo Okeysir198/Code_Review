@@ -336,7 +336,7 @@ PAYMENT RESPONSES:
     return create_react_agent(
         llm,
         tools=[],  # No tools needed for basic simulation
-        state_modifier=SystemMessage(content=system_prompt)
+        prompt=SystemMessage(content=system_prompt)
     )
 
 

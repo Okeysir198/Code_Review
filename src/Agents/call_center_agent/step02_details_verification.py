@@ -1,6 +1,6 @@
 # src/Agents/call_center_agent/step02_details_verification.py
 """
-Enhanced Details Verification Agent - Natural phone conversation with security verification and fuzzy matching
+Enhanced Details Verification Agent - Natural conversation with fast ID verification
 """
 import random
 import logging
@@ -20,85 +20,73 @@ from src.Agents.call_center_agent.tools.verify_client_details import verify_clie
 
 logger = logging.getLogger(__name__)
 
-# Natural conversation prompt for details verification
-DETAILS_VERIFICATION_PROMPT = """You are {agent_name} from Cartrack Accounts Department on an OUTBOUND PHONE CALL to {client_title} {client_full_name} about their {outstanding_amount} overdue account.
-
-<phone_conversation_rules>
-- This is a LIVE OUTBOUND PHONE CALL - you initiated this call to them about their debt
-- Each agent handles ONE conversation turn, then waits for the client's response  
-- Keep responses conversational length - not too brief (robotic) or too long (overwhelming)
-- Match your tone to the client's cooperation level and the account urgency
-- Listen to what they're actually saying and respond appropriately
-- Don't assume their mood or intent - respond to their actual words
-- If they ask questions, acknowledge briefly but stay focused on your step's objective
-- Remember: phone conversations flow naturally - avoid scripted, mechanical responses
-- End your turn when you've accomplished your step's goal or need their input
-</phone_conversation_rules>
-
+# Enhanced conversational prompt for details verification
+DETAILS_VERIFICATION_PROMPT = """
+<role>
+You are an AI debt collection specialist, named {agent_name} from Cartrack Accounts Department. 
+You are making an OUTBOUND call to a debtor about their overdue account.
+Today's date: {current_date}
+</role>
+                                                               
 <context>
-Today: {current_date} | Account: {aging_category} ({urgency_level} urgency)
-Verification attempt: {details_verification_attempts}/{max_details_verification_attempts}
-Currently verified: {matched_fields_display} | Need to verify: {field_to_verify}
-Verification status: {details_verification_status}
-Your goal: Get {field_to_verify} to complete security verification before discussing account
+Target client: {client_full_name} | Outstanding amount: {outstanding_amount} | Details Verification Status: {details_verification_status}
+Verification Attempt: {details_verification_attempts}/{max_details_verification_attempts} 
+Need to verify: {field_to_verify} | Verified items: {matched_fields}
+Urgency: {urgency_level} | Category: {aging_category} 
+user_id: {user_id}
+CALL TYPE: Outbound debt collection call
 </context>
 
 <verification_requirements>
-Security requires EITHER:
-- ID number or passport number (most secure - single item sufficient)
-OR  
-- Three account details: username, vehicle info (registration/make/model/color), email
-Currently verified: {matched_fields_display}
+Client must provide EITHER:
+- Full ID number or passport number (single item is sufficient)
+OR
+- THREE items from: username, vehicle registration, make, model, color, email
 </verification_requirements>
 
-<security_approach>
-First attempt (with recording notice):
-Standard urgency: "This call is recorded for security. I need to verify your {field_to_verify} before we discuss your account"
-High urgency: "This call is recorded for security. I need your {field_to_verify} immediately to discuss your urgent account matter"
-Critical urgency: "This call is recorded for security. I must verify your {field_to_verify} now for this critical account matter"
+<task>
+You are calling the debtor about their overdue account. Get {field_to_verify} for verification. Match urgency to account severity.
+DO NOT introduce yourself or greet the client again - assume introductions already completed.
+REMEMBER: You initiated this call - be direct about the purpose.
+</task>
 
-Follow-up attempts (no recording notice):
-Standard urgency: "I still need your {field_to_verify} to proceed securely"
-High urgency: "Your {field_to_verify} is required for this urgent account matter"
-Critical urgency: "Provide your {field_to_verify} immediately - this is urgent"
+<approach_by_urgency>
+**Standard/Medium Urgency**: 
+- First attempt: "This call is recorded for security. I'm calling about your overdue Cartrack account - please provide your {field_to_verify}"
+- Follow-up: "I need your {field_to_verify} to proceed with your account"
+- If Resistant: "This verification protects your account information"
 
-Near match retry (when close but not exact):
-"I have {field_to_verify} as something similar - can you repeat that clearly?"
-"Can you give me your {field_to_verify} again, with all the digits clearly?"
-"Let me get that {field_to_verify} one more time to make sure I have it right"
+**High Urgency**: 
+- First attempt: "This call is recorded. I'm calling about your urgent overdue account - I need your {field_to_verify} immediately"
+- Follow-up: "Your account requires immediate attention - provide your {field_to_verify}"
+- If Resistant: "Security verification is mandatory for overdue accounts"
 
-If resistant:
-Standard: "This protects your account information - your {field_to_verify} please"
-High/Critical: "Security verification is mandatory for overdue accounts"
-</security_approach>
+**Legal/Critical Urgency**:
+- First attempt: "This is a recorded legal matter call. I must verify your identity regarding your account - provide your {field_to_verify} now"
+- Follow-up: "This is urgent legal business - provide your {field_to_verify} immediately"
+- If Resistant: "Legal proceedings require proper identification verification"
+</approach_by_urgency>
 
-<conversation_adaptation>
-If they ask why: "It's standard security before discussing account details"
-If they're concerned about sharing: "This verifies you're the account holder"
-If they ask what happens next: "Once verified, we'll discuss your account situation"
-If they seem confused: "I just need your {field_to_verify} to confirm your identity"
+<rules>
+- You initiated this outbound call about their debt
+- Request ONE field only: {field_to_verify}
+- NO account details until verification complete
+- Match tone to {urgency_level} urgency
+- Security verification non-negotiable
+- For attempt 1: Always include call recording notice
+- For attempts 2+: Skip recording notice, go direct to request
+- Be authoritative - you're calling them about money they owe
+</rules>
 
-For ID number specifically: "Your 13-digit ID number please"
-For birth date specifically: "Your date of birth please"
-For vehicle details: "Your vehicle registration number" or "What make is your tracked vehicle?"
-For email: "The email address on your account"
+<response_style>
+CRITICAL: Keep responses under 25 words. Be direct and assertive - this is YOUR call to THEM about THEIR debt.
 
-For near matches (retry scenarios):
-- If close but not exact: "I have {field_to_verify} as something similar - can you repeat that clearly?"
-- If formatting issue: "Can you give me your {field_to_verify} again, with all the digits/letters?"
-- If unclear: "Let me get that {field_to_verify} one more time to make sure"
-</conversation_adaptation>
-
-<natural_conversation_rules>
-- Speak naturally like a real phone conversation
-- NO brackets [ ], asterisks *, or placeholder formatting
-- NO internal system variables or markdown in your response
-- Use actual names or speak generally if you don't know specifics
-- Just natural spoken words as if talking to a real person
-- Be professional but human - you're helping them access their account securely
-</natural_conversation_rules>
-
-
+Examples by attempt:
+✓ First attempt: "This call is recorded. I'm calling about your overdue account - your ID number please"
+✓ Follow-up: "I need your email address to proceed with your account"
+✓ Resistance: "Verification is required for overdue accounts"
+✗ Never: "For security purposes and to ensure I'm speaking with the right person, could you please provide..."
+</response_style>
 """
 
 def create_details_verification_agent(
@@ -110,13 +98,13 @@ def create_details_verification_agent(
     verbose: bool = False,
     config: Optional[Dict[str, Any]] = None
 ) -> CompiledGraph:
-    """Create enhanced details verification agent with natural conversation flow and fuzzy matching"""
+    """Create enhanced details verification agent with fast ID detection"""
     
-    FIELD_PRIORITY = ["id_number", "passport_number", "birth_date", "vehicle_registration", 
+    FIELD_PRIORITY = ["id_number", "passport_number", "vehicle_registration", 
                      "vehicle_make", "vehicle_model", "vehicle_color", "email", "username"]
     
     def _get_available_fields(client_data: Dict[str, Any]) -> Dict[str, str]:
-        """Extract verification fields from client data"""
+        """Extract verification fields"""
         profile = client_data.get("profile", {})
         client_info = profile.get("client_info", {})
         vehicles = profile.get("vehicles", [])
@@ -124,13 +112,6 @@ def create_details_verification_agent(
         fields = {}
         if client_info.get("id_number"): 
             fields["id_number"] = client_info["id_number"]
-        if client_info.get("passport_number"):
-            fields["passport_number"] = client_info["passport_number"]
-        if client_info.get("birth_date") or client_info.get("date_of_birth"):
-            # Handle different possible field names for birth date
-            birth_date = client_info.get("birth_date") or client_info.get("date_of_birth")
-            if birth_date:
-                fields["birth_date"] = str(birth_date)
         if profile.get("user_name"): 
             fields["username"] = profile["user_name"]
         if client_info.get("email_address"): 
@@ -150,264 +131,84 @@ def create_details_verification_agent(
         return fields
     
     def _select_next_field(available_fields: Dict[str, str], matched_fields: List[str]) -> str:
-        """Select next verification field with strategic priority and randomization"""
+        """Select next verification field with priority"""
         remaining = [f for f in FIELD_PRIORITY if f in available_fields and f not in matched_fields]
         if not remaining: 
             return "id_number"
         
-        # Tier 1: ID/Passport (single verification sufficient) - always prioritize
-        tier1 = [f for f in ["id_number", "passport_number"] if f in remaining]
-        if tier1:
-            return random.choice(tier1)  # Random if both available
+        # Prioritize ID number and passport
+        high_priority = [f for f in FIELD_PRIORITY[:2] if f in remaining]
+        if high_priority: 
+            return high_priority[0]
         
-        # Tier 2: Birth date (highly secure, memorable) - high priority
-        if "birth_date" in remaining:
-            return "birth_date"
+        # Then vehicle details
+        vehicle_fields = [f for f in remaining if f.startswith("vehicle_")]
+        if vehicle_fields:
+            random.shuffle(vehicle_fields)
+            return vehicle_fields[0]
         
-        # Tier 3: Vehicle registration (concrete, memorable) - high priority
-        if "vehicle_registration" in remaining:
-            return "vehicle_registration"
-        
-        # Tier 4: Other vehicle details - randomize within tier
-        tier4 = [f for f in ["vehicle_make", "vehicle_model", "vehicle_color"] if f in remaining]
-        if tier4:
-            return random.choice(tier4)
-        
-        # Tier 5: Email/username - randomize within tier
-        tier5 = [f for f in ["email", "username"] if f in remaining]
-        if tier5:
-            return random.choice(tier5)
+        # Then other fields
+        other_fields = [f for f in remaining if not f.startswith("vehicle_")]
+        if other_fields:
+            random.shuffle(other_fields)
+            return other_fields[0]
             
         return "id_number"
     
-    def _fuzzy_match_field(client_input: str, system_value: str, field_type: str) -> tuple[bool, float]:
-        """
-        Fuzzy matching for verification fields with confidence score
-        Returns (is_match, confidence_score)
-        """
-        if not client_input or not system_value:
-            return False, 0.0
-        
-        # Normalize inputs
-        client_clean = client_input.strip().lower()
-        system_clean = system_value.strip().lower()
-        
-        # Exact match
-        if client_clean == system_clean:
-            return True, 1.0
-        
-        # Field-specific fuzzy matching
-        if field_type == "id_number":
-            # Remove common formatting (spaces, dashes)
-            client_digits = ''.join(filter(str.isdigit, client_clean))
-            system_digits = ''.join(filter(str.isdigit, system_clean))
-            
-            if client_digits == system_digits:
-                return True, 0.95  # High confidence for format difference
-            
-            # Check if only 1-2 digit differences (typos)
-            if len(client_digits) == len(system_digits) == 13:
-                differences = sum(c != s for c, s in zip(client_digits, system_digits))
-                if differences <= 2:
-                    return True, 0.7  # Medium confidence for typos
-        
-        elif field_type == "birth_date":
-            # Try to parse different date formats
-            import re
-            from datetime import datetime
-            
-            date_patterns = [
-                (r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})', '%d/%m/%Y'),  # DD/MM/YYYY
-                (r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})', '%Y/%m/%d'),  # YYYY/MM/DD
-                (r'(\d{1,2})\s+(\w+)\s+(\d{4})', '%d %B %Y'),        # DD Month YYYY
-            ]
-            
-            def parse_date(date_str):
-                for pattern, fmt in date_patterns:
-                    match = re.search(pattern, date_str)
-                    if match:
-                        try:
-                            if 'B' in fmt:  # Month name
-                                return datetime.strptime(date_str, fmt).date()
-                            else:
-                                return datetime.strptime('/'.join(match.groups()), fmt.replace('-', '/')).date()
-                        except:
-                            continue
-                return None
-            
-            client_date = parse_date(client_input)
-            system_date = parse_date(system_value)
-            
-            if client_date and system_date and client_date == system_date:
-                return True, 0.9  # High confidence for date format difference
-        
-        elif field_type in ["vehicle_registration", "vehicle_make", "vehicle_model", "vehicle_color"]:
-            # Remove spaces and common formatting
-            client_alpha = ''.join(filter(str.isalnum, client_clean))
-            system_alpha = ''.join(filter(str.isalnum, system_clean))
-            
-            if client_alpha == system_alpha:
-                return True, 0.9  # High confidence for formatting difference
-            
-            # Partial match for vehicle details
-            if len(client_alpha) >= 3 and len(system_alpha) >= 3:
-                if client_alpha in system_alpha or system_alpha in client_alpha:
-                    return True, 0.75  # Medium-high confidence for partial match
-        
-        elif field_type == "email":
-            # Remove common variations
-            client_email = client_clean.replace('.', '').replace('-', '').replace('_', '')
-            system_email = system_clean.replace('.', '').replace('-', '').replace('_', '')
-            
-            if client_email == system_email:
-                return True, 0.8  # Good confidence for formatting difference
-        
-        return False, 0.0
+    def _get_last_client_message(messages: List) -> str:
+        """Extract last human message"""
+        for message in reversed(messages):
+            if hasattr(message, 'type') and message.type == 'human':
+                return message.content.strip()
+            elif hasattr(message, 'content') and not hasattr(message, 'type'):
+                return message.content.strip()
+        return ""
     
-    def _enhanced_verification_check(messages: List, available_fields: Dict[str, str]) -> Dict[str, Any]:
-        """
-        Enhanced verification with fuzzy matching and retry logic
-        Returns detailed verification results
-        """
-        if not messages:
-            return {"has_details": False, "matches": [], "near_matches": [], "confidence": 0.0}
-        
-        # Get last client message
-        last_msg = ""
-        for message in reversed(messages):
-            if hasattr(message, 'type') and message.type == 'human':
-                last_msg = message.content.strip()
-                break
-            elif hasattr(message, 'content') and not hasattr(message, 'type'):
-                last_msg = message.content.strip()
-                break
-        
-        if not last_msg:
-            return {"has_details": False, "matches": [], "near_matches": [], "confidence": 0.0}
-        
-        matches = []
-        near_matches = []
-        max_confidence = 0.0
-        
-        # Check each available field for matches
-        for field_name, field_value in available_fields.items():
-            is_match, confidence = _fuzzy_match_field(last_msg, field_value, field_name)
-            
-            if is_match:
-                if confidence >= 0.85:  # High confidence threshold
-                    matches.append({
-                        "field": field_name,
-                        "confidence": confidence,
-                        "type": "exact" if confidence == 1.0 else "high_fuzzy"
-                    })
-                elif confidence >= 0.6:  # Medium confidence threshold
-                    near_matches.append({
-                        "field": field_name,
-                        "confidence": confidence,
-                        "client_input": last_msg,
-                        "expected_value": field_value,
-                        "type": "medium_fuzzy"
-                    })
-                
-                max_confidence = max(max_confidence, confidence)
-        
-        # Also check for pattern matches (fallback)
-        has_pattern_match = _quick_details_check(messages, available_fields)
-        
-        return {
-            "has_details": len(matches) > 0 or len(near_matches) > 0 or has_pattern_match,
-            "matches": matches,
-            "near_matches": near_matches,
-            "confidence": max_confidence,
-            "pattern_detected": has_pattern_match
-        }
-
     def _quick_details_check(messages: List, available_fields: Dict[str, str]) -> bool:
-        """Fast pattern detection for common verification info"""
-        if not messages:
-            return False
-            
-        # Get last client message
-        last_msg = ""
-        for message in reversed(messages):
-            if hasattr(message, 'type') and message.type == 'human':
-                last_msg = message.content.strip()
-                break
-            elif hasattr(message, 'content') and not hasattr(message, 'type'):
-                last_msg = message.content.strip()
-                break
+        """Fast check if client provided verification details"""
+        last_msg = _get_last_client_message(messages)
         
         if not last_msg:
             return False
         
-        # Check for common patterns
+        # Check for ID number patterns (13 digits for SA ID)
         import re
-        
-        # ID number patterns (13 digits for SA ID)
-        if re.search(r'\b\d{13}\b', last_msg):
+        id_pattern = r'\b\d{13}\b'
+        if re.search(id_pattern, last_msg):
             return True
         
-        # Date patterns (birth date)
-        date_patterns = [
-            r'\b\d{1,2}[/-]\d{1,2}[/-]\d{4}\b',  # DD/MM/YYYY or DD-MM-YYYY
-            r'\b\d{4}[/-]\d{1,2}[/-]\d{1,2}\b',  # YYYY/MM/DD or YYYY-MM-DD
-            r'\b\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+\d{4}\b'  # DD Month YYYY
-        ]
-        if any(re.search(pattern, last_msg, re.IGNORECASE) for pattern in date_patterns):
-            return True
-        
-        # Vehicle registration patterns
+        # Check for vehicle registration patterns
         reg_patterns = [r'\b[A-Z]{2,3}[\s\-]?\d{3,4}[\s\-]?[A-Z]{2,3}\b', r'\b\d{3}[\s\-]?\d{3}[\s\-]?\d{3}\b']
         if any(re.search(pattern, last_msg.upper()) for pattern in reg_patterns):
             return True
         
-        # Email patterns
-        if re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', last_msg):
+        # Check for email patterns
+        email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        if re.search(email_pattern, last_msg):
             return True
         
-        # Vehicle details mentioned
+        # Check if they mentioned specific vehicle details
         for field, value in available_fields.items():
-            if field.startswith("vehicle_") and value and value.lower() in last_msg.lower():
+            if field.startswith("vehicle_") and value.lower() in last_msg.lower():
                 return True
         
         return False
     
     def _format_matched_fields(matched_fields: List[str]) -> str:
-        """Format matched fields for natural display"""
+        """Format matched fields for display"""
         if not matched_fields:
             return "None yet"
         
         field_names = {
-            "id_number": "ID Number", 
-            "passport_number": "Passport Number",
-            "birth_date": "Birth Date",
-            "email": "Email", 
-            "username": "Username",
-            "vehicle_registration": "Vehicle Registration", 
-            "vehicle_make": "Vehicle Make",
-            "vehicle_model": "Vehicle Model", 
-            "vehicle_color": "Vehicle Color"
+            "id_number": "ID Number", "email": "Email", "username": "Username",
+            "vehicle_registration": "Vehicle Registration", "vehicle_make": "Vehicle Make",
+            "vehicle_model": "Vehicle Model", "vehicle_color": "Vehicle Color"
         }
         
         return ", ".join([field_names.get(field, field.title()) for field in matched_fields])
     
-    def _format_field_request(field: str) -> str:
-        """Format field name for natural conversation"""
-        field_names = {
-            "id_number": "ID number", 
-            "passport_number": "passport number",
-            "birth_date": "date of birth",
-            "username": "username", 
-            "email": "email address",
-            "vehicle_registration": "vehicle registration number", 
-            "vehicle_make": "vehicle make",
-            "vehicle_model": "vehicle model", 
-            "vehicle_color": "vehicle color"
-        }
-        return field_names.get(field, field.replace("_", " "))
-    
     def pre_processing_node(state: CallCenterAgentState) -> Command[Literal["agent", "__end__"]]:
-        """Enhanced preprocessing with natural conversation flow and fuzzy matching"""
+        """Enhanced preprocessing with fast details detection"""
         
         attempts = state.get("details_verification_attempts", 0) + 1
         max_attempts = config.get("verification", {}).get("max_details_verification_attempts", 5)
@@ -422,12 +223,10 @@ def create_details_verification_agent(
         
         messages = state.get("messages", [])
         
-        # Enhanced verification check with fuzzy matching
-        verification_result = _enhanced_verification_check(messages, available_fields)
-        
-        if verification_result["has_details"]:
+        # Fast check if client provided details
+        if len(messages) >= 2 and _quick_details_check(messages, available_fields):
             try:
-                # Use verification tool for comprehensive analysis
+                # Use existing verification tool for accuracy
                 result = verify_client_details.invoke({
                     "client_details": available_fields,
                     "messages": messages,
@@ -439,51 +238,34 @@ def create_details_verification_agent(
                 all_matched = list(set(matched_fields + new_matched))
                 verification_status = result.get("classification", VerificationStatus.INSUFFICIENT_INFO.value)
                 
-                # Handle near matches that need clarification
-                if (verification_status == VerificationStatus.INSUFFICIENT_INFO.value and 
-                    verification_result["near_matches"] and 
-                    attempts < max_attempts):
-                    
-                    # Add retry context for near matches
-                    near_match = verification_result["near_matches"][0]  # Take the best near match
-                    field_to_verify = near_match["field"]
-                    
-                    # Set state for retry with clarification
-                    return Command(
-                        update={
-                            "details_verification_attempts": attempts,
-                            "details_verification_status": "NEAR_MATCH_RETRY",
-                            "matched_fields": all_matched,
-                            "field_to_verify": _format_field_request(field_to_verify),
-                            "near_match_info": near_match,
-                            "current_step": CallStep.DETAILS_VERIFICATION.value
-                        },
-                        goto="agent"
-                    )
-                
-                if verbose:
-                    logger.info(f"Verification tool result: {verification_status}, matched: {all_matched}")
-                
             except Exception as e:
                 if verbose: 
-                    logger.error(f"Verification tool error: {e}")
+                    logger.error(f"Verification error: {e}")
         
-        # Auto-fail if max attempts reached without success
+        # Auto-fail if max attempts reached
         if attempts >= max_attempts and verification_status == VerificationStatus.INSUFFICIENT_INFO.value:
             verification_status = VerificationStatus.VERIFICATION_FAILED.value
         
-        # Route based on verification outcome
+        # Format field name for display
+        field_names = {
+            "id_number": "ID number", "passport_number": "passport number",
+            "username": "username", "email": "email address",
+            "vehicle_registration": "vehicle registration", "vehicle_make": "vehicle make",
+            "vehicle_model": "vehicle model", "vehicle_color": "vehicle color"
+        }
+        
+        # Determine next action
         if verification_status == VerificationStatus.VERIFIED.value:
-            logger.info("Details verification VERIFIED - moving to reason for call")
+            logger.info("Details verification VERIFIED - jumping to reason for call")
             return Command(
                 update={
                     "details_verification_attempts": attempts,
                     "details_verification_status": verification_status,
                     "matched_fields": all_matched,
-                    "field_to_verify": _format_field_request(field_to_verify),
+                    "field_to_verify": field_names.get(field_to_verify, field_to_verify),
                     "current_step": CallStep.REASON_FOR_CALL.value
                 },
-                goto="__end__"
+                goto="__end__"  # Direct jump!
             )
         
         elif verification_status in [
@@ -506,26 +288,29 @@ def create_details_verification_agent(
         
         else:
             # Continue verification
-            logger.info(f"Details verification continuing - attempt {attempts}/{max_attempts}")
+            logger.info(f"Details verification continuing - attempt {attempts}")
             return Command(
                 update={
                     "details_verification_attempts": attempts,
                     "details_verification_status": verification_status,
                     "matched_fields": all_matched,
-                    "field_to_verify": _format_field_request(field_to_verify),
+                    "field_to_verify": field_names.get(field_to_verify, field_to_verify),
                     "current_step": CallStep.DETAILS_VERIFICATION.value
                 },
                 goto="agent"
             )
 
     def dynamic_prompt(state: CallCenterAgentState) -> SystemMessage:
-        """Generate natural conversation prompt for security verification"""
+        """Generate enhanced conversational prompt"""
         
         # Prepare parameters
         params = prepare_parameters(client_data, state, script_type, agent_name)
         params["matched_fields_display"] = _format_matched_fields(state.get("matched_fields", []))
         
-        # Format prompt for natural conversation
+        # Get aging-specific approach
+        
+        
+        # Format enhanced prompt
         prompt_content = DETAILS_VERIFICATION_PROMPT.format(**params)
         
         if verbose:
@@ -536,7 +321,7 @@ def create_details_verification_agent(
     return create_basic_agent(
         model=model,
         prompt=dynamic_prompt,
-        tools=[],  # Verification logic handled in preprocessing
+        tools=[],  # No tools needed - verification logic handles details
         pre_processing_node=pre_processing_node,
         state_schema=CallCenterAgentState,
         verbose=verbose,
