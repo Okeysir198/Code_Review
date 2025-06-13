@@ -1,21 +1,21 @@
+## src/STT/__init__.py
 """
-STT package for Call Center AI Agent.
-
-This package provides Speech-to-Text functionality for the Call Center AI Agent.
+Optimized STT package for Call Center AI Agent.
+High-performance Speech-to-Text functionality with optimal configurations.
 """
 
 from .stt_base_model import BaseSTTModel, STTConfig
-from .stt_hf_model import HFSTTModel, HFSTTConfig
-from .stt_nvidia_model import NVIDIAParakeetModel, NVIDIAParakeetConfig
-from .stt_model_provider import create_stt_model, register_stt_model
+from .stt_whisper_large_v3_turbo import OPENAIWhisperV3TurboModel, OPENAIWhisperV3TurboConfig  
+from .stt_parakeet_tdt_06b_v2 import NVIDIAParakeetModel, NVIDIAParakeetConfig
+from .stt_model_provider import create_stt_model, get_optimal_config
 
 __all__ = [
     "BaseSTTModel", 
     "STTConfig",
-    "HFSTTModel", 
-    "HFSTTConfig",
+    "OPENAIWhisperV3TurboModel", 
+    "OPENAIWhisperV3TurboConfig",
     "NVIDIAParakeetModel",
-    "NVIDIAParakeetConfig",
+    "NVIDIAParakeetConfig", 
     "create_stt_model",
-    "register_stt_model"
+    "get_optimal_config"
 ]

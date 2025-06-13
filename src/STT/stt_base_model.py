@@ -1,94 +1,74 @@
+## src/STT/stt_base_model.py
 """
-Base STT model interface.
-
-This module defines the abstract base class for all STT implementations,
-ensuring a consistent interface regardless of the underlying model.
+Base STT model interface with optimized configuration defaults.
 """
 
-import abc
-from typing import Dict, Any, Optional, Union, Iterator
-import numpy as np
+import logging
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Iterator, Optional, Union
+from dataclasses import dataclass, field
 
+logger = logging.getLogger(__name__)
 
+@dataclass
 class STTConfig:
-    """Base configuration class for STT models."""
+    """Base configuration for STT models with optimal defaults."""
     
-    def __init__(self, **kwargs):
-        """Initialize with arbitrary configuration parameters."""
-        # Extract common parameters
-        self.show_logs = kwargs.get("show_logs", True)
-        
-        # Store all parameters on the instance
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-            
-    def __repr__(self) -> str:
-        """Return a string representation of the configuration."""
-        # Filter out potentially large attributes
-        safe_attrs = {k: v for k, v in self.__dict__.items() 
-                     if not k.startswith('_') and not isinstance(v, (dict, list)) 
-                     or k == 'show_logs'}
-        return f"{self.__class__.__name__}({', '.join([f'{k}={v!r}' for k, v in safe_attrs.items()])})"
+    # Core settings
+    show_logs: bool = False  # Disabled by default for performance
+    checkpoint: str = None
+
+    # Audio processing settings (optimized for real-time)
+    sampling_rate: int = 16000  # Standard for ASR models
+    audio_format: str = "mono"  # Single channel for efficiency
+    
+    # Performance settings
+    use_gpu: bool = True
+    cuda_device_id: int = 0
+    batch_size: int = None
+    
+    # Memory optimization
+    low_memory_mode: bool = True
+    cache_enabled: bool = True
+    
+    # Additional optimizations
+    preprocessing_enabled: bool = True
+    normalization_enabled: bool = True
 
 
-class BaseSTTModel(abc.ABC):
-    """Abstract base class for all STT model implementations.
+class BaseSTTModel(ABC):
+    """Optimized base class for Speech-to-Text models."""
     
-    All STT model implementations must inherit from this class and
-    implement its abstract methods to ensure consistent interface.
-    """
-    
-    @abc.abstractmethod
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize the STT model with configuration.
+        """Initialize with configuration validation."""
+        self._raw_config = config or {}  # Store raw config
+        self._setup_logging()
         
-        Args:
-            config: Dictionary with model-specific configuration options
-        """
+    # In _setup_logging method, change:
+    def _setup_logging(self) -> None:
+        """Configure optimized logging."""
+        show_logs = self._raw_config.get('show_logs', False)  # Get from raw config
+        level = logging.INFO if show_logs else logging.WARNING
+        logger.setLevel(level)
+        
+        if not show_logs:
+            for framework_logger in ["transformers", "torch", "nemo"]:
+                logging.getLogger(framework_logger).setLevel(logging.WARNING)
+    
+    @abstractmethod
+    def transcribe(self, audio_data: Any, **kwargs) -> Union[str, Dict[str, Any]]:
+        """Transcribe audio to text with optimal settings."""
         pass
-        
-    @abc.abstractmethod
+    
+    @abstractmethod  
+    def transcribe_stream(self, audio_stream, **kwargs) -> Iterator[Union[str, Dict[str, Any]]]:
+        """Stream transcription with real-time optimization."""
+        pass
+    
     def update_config(self, **kwargs) -> None:
-        """Update model configuration parameters.
-        
-        Args:
-            **kwargs: Configuration parameters to update
-        """
-        pass
-    
-    @abc.abstractmethod
-    def transcribe(self, audio_data: Any, task: str = "transcribe") -> Union[str, Dict[str, Any]]:
-        """Transcribe audio data to text.
-        
-        Args:
-            audio_data: Audio data to transcribe, can be:
-                - File path (str)
-                - Audio array (numpy.ndarray)
-                - Tuple of (sample_rate, audio_array)
-            task: Either 'transcribe' (same language) or 'translate' (to English)
-            
-        Returns:
-            Transcribed text as string or dictionary with text and metadata
-        """
-        pass
-
-    @abc.abstractmethod
-    def transcribe_stream(self, audio_stream, task: str = "transcribe") -> Iterator[Union[str, Dict[str, Any]]]:
-        """Transcribe streaming audio data.
-        
-        Args:
-            audio_stream: Stream of audio chunks
-            task: Either 'transcribe' (same language) or 'translate' (to English)
-            
-        Yields:
-            Transcribed text segments or dictionaries with text and metadata
-        """
-        pass
-    
-    def configure_logging(self) -> None:
-        """Configure logging based on show_logs configuration.
-        
-        This method should be implemented by subclasses to handle
-        setting appropriate logging levels.
-        """
-        pass
+        """Update configuration with validation."""
+        for key, value in kwargs.items():
+            if hasattr(self.config, key):
+                setattr(self.config, key, value)
+                if self.config.show_logs:
+                    logger.info(f"Updated config: {key} = {value}")

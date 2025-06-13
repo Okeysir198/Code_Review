@@ -90,25 +90,39 @@ CONFIG = {
 
     # STT model config with model-specific settings
     "stt": {
-        "model_name": "whisper-large-v3-turbo",  # Main selector for which STT model to use
-        # "model_name": "nvidia/parakeet-tdt-0.6b-v2",
-
-        # Hugging Face model settings
-        "whisper-large-v3-turbo": {
-            "checkpoint": "whisper-large-v3-turbo",
-            # "model_folder_path": "/media/ct-dev/newSATA_2tb/langgraph/HF_models",
-            "model_folder_path": "/home/ct-admin/Documents/Langgraph/HF_models/",
-            "batch_size": 8,
+        # Use Parakeet-TDT as default (currently top ASR leaderboard)
+        "model_name": "nvidia/parakeet-tdt-0.6b-v2",
+        "show_logs": False,  # Performance optimization
+        
+        # Whisper-large-v3-turbo optimized settings
+        "openai/whisper-large-v3-turbo": {
+            "checkpoint": "openai/whisper-large-v3-turbo",
+            # "model_folder_path": "",
+            "batch_size": 4,  # Optimal balance
             "cuda_device_id": 1,
-            "chunk_length_s": 30,
-            "compute_type": "float16",  # Computation precision (float16, int8)
-            "beam_size": 4  # Beam search size for better transcription accuracy
+            "chunk_length_s": 30,  # Whisper native
+            "compute_type": "float16",
+            "beam_size": 1,  # Greedy for speed
+            "condition_on_prev_tokens": False,  # Reduce hallucinations
+            "compression_ratio_threshold": 2.4,
+            "logprob_threshold": -1.0,
+            "no_speech_threshold": 0.6,
+            "return_timestamps": True,
+            "low_cpu_mem_usage": True,
+            "use_safetensors": True,
         },
-
-        # Model-specific configuration
+        
+        # NVIDIA Parakeet-TDT optimized settings
         "nvidia/parakeet-tdt-0.6b-v2": {
+            "checkpoint": "nvidia/parakeet-tdt-0.6b-v2",
+            # "model_folder_path": "",
+            "batch_size": 32,  # Optimal for RTFx 3380
+            "cuda_device_id": 1,
+            "chunk_length_s": 24 * 60,  # 24 minutes max
+            "sampling_rate": 16000,  # Native rate
             "timestamp_prediction": True,
-            "decoding_type": "tdt"  # Use TDT decoder for faster transcription
+            "decoding_type": "tdt",  # Use TDT decoder
+            "compute_timestamps": True,
         }
     },
 

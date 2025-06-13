@@ -1,132 +1,102 @@
+## src/STT/stt_model_provider.py
 """
-STT model provider module.
-
-This module provides functionality to create and manage STT model instances
-based on configuration, abstracting the specific implementation details.
+Optimized STT model provider with best-practice configurations.
 """
 
 import logging
 from typing import Dict, Any, Type, Optional
 
 from .stt_base_model import BaseSTTModel
-from .stt_hf_model import HFSTTModel
-from .stt_nvidia_model import NVIDIAParakeetModel
+from .stt_whisper_large_v3_turbo import OPENAIWhisperV3TurboModel, OPENAIWhisperV3TurboConfig
+from .stt_parakeet_tdt_06b_v2 import NVIDIAParakeetModel, NVIDIAParakeetConfig
 
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Registry of available STT models
+# Registry with optimized models
 STT_MODELS = {
-    "whisper-large-v3-turbo": HFSTTModel,
+    "openai/whisper-large-v3-turbo": OPENAIWhisperV3TurboModel,
     "nvidia/parakeet-tdt-0.6b-v2": NVIDIAParakeetModel,
+}
 
+# Optimal configurations based on benchmarks and best practices
+OPTIMAL_CONFIGS = {
+    "whisper-large-v3-turbo": {
+        "checkpoint": "openai/whisper-large-v3-turbo",
+        "batch_size": 4,  # Optimal for RTF
+        "chunk_length_s": 30,  # Native Whisper chunk size
+        "compute_type": "float16",
+        "beam_size": 3,  # Greedy decoding for speed
+        "condition_on_prev_tokens": False,  # Reduces hallucinations
+        "compression_ratio_threshold": 2.4,
+        "logprob_threshold": -1.0,
+        "no_speech_threshold": 0.6,
+        "return_timestamps": True,
+        "low_cpu_mem_usage": True,
+        "use_safetensors": True,
+    },
+    
+    "nvidia/parakeet-tdt-0.6b-v2": {
+        "checkpoint": "nvidia/parakeet-tdt-0.6b-v2", 
+        "batch_size": 32,  # Optimal for RTFx 3380 performance
+        "chunk_length_s": 24 * 60,  # Max 24 minutes
+        "sampling_rate": 16000,  # Native sampling rate
+        "timestamp_prediction": True,
+        "decoding_type": "tdt",  # Use TDT decoder
+        "compute_timestamps": True,
+    }
 }
 
 
+def get_optimal_config(model_name: str) -> Dict[str, Any]:
+    """Get optimal configuration for specified model."""
+    if model_name in OPTIMAL_CONFIGS:
+        return OPTIMAL_CONFIGS[model_name].copy()
+    
+    logger.warning(f"No optimal config for {model_name}, using defaults")
+    return {}
+
+
 def create_stt_model(config: Dict[str, Any]) -> BaseSTTModel:
-    """
-    Create and return an STT model based on configuration.
+    """Create optimized STT model with best-practice settings."""
     
-    Args:
-        config: Dictionary containing STT configuration with a structure like:
-               {
-                   "model_name": "whisper-large-v3-turbo",
-                   "show_logs": True,
-                   "whisper-large-v3-turbo": { ... model-specific settings ... },
-               }
-               
-    Returns:
-        Initialized STT model instance
-        
-    Raises:
-        ValueError: If model_name is not supported
-    """
-    # Extract model name and logging preference from config
-    model_name = config.get("model_name", "whisper-large-v3-turbo")
-    show_logs = config.get("show_logs", True)
+    model_name = config.get("model_name", "nvidia/parakeet-tdt-0.6b-v2")  # Default to Parakeet
+    show_logs = config.get("show_logs", False)  # Default to quiet
     
-    # Check if model is supported
+    # Validate model support
     if model_name not in STT_MODELS:
         supported_models = ", ".join(STT_MODELS.keys())
-        if show_logs:
-            logger.warning(f"Unsupported STT model: {model_name}. Falling back to 'whisper-large-v3-turbo'. "
-                          f"Supported models: {supported_models}")
-        model_name = "whisper-large-v3-turbo"
+        logger.warning(f"Unsupported model: {model_name}. Defaulting to nvidia/parakeet-tdt-0.6b-v2")
+        logger.info(f"Supported models: {supported_models}")
+        model_name = "nvidia/parakeet-tdt-0.6b-v2"
     
-    # Get model-specific settings
-    if model_name not in config:
-        if show_logs:
-            logger.warning(f"No configuration found for {model_name}. Using default settings.")
-        model_config = {}
-    else:
-        model_config = config[model_name].copy()  # Create a copy to avoid modifying the original
+    # Get optimal configuration
+    optimal_config = get_optimal_config(model_name)
     
-    # Add show_logs parameter to model config
+    # Merge user config with optimal defaults
+    model_config = optimal_config.copy()
+    if model_name in config:
+        model_config.update(config[model_name])
+    
+    # Add global settings
     model_config["show_logs"] = show_logs
     
-    # Log configuration if logs are enabled
+    # Log configuration if enabled
     if show_logs:
-        # Log only non-sensitive configuration parameters
         safe_config = {k: v for k, v in model_config.items() 
                       if not isinstance(v, dict) and not k.startswith('_')}
-        logger.info(f"Creating {model_name} STT model with config: {safe_config}")
+        logger.info(f"Creating {model_name} with optimal config: {safe_config}")
     
-    # Get model class and create instance
+    # Create model instance
     model_class = STT_MODELS[model_name]
     return model_class(model_config)
 
 
-def register_stt_model(name: str, model_class: Type[BaseSTTModel]) -> None:
-    """
-    Register a new STT model implementation.
-    
-    Args:
-        name: Name to register the model under
-        model_class: STT model class (must inherit from BaseSTTModel)
-        
-    Raises:
-        TypeError: If model_class does not inherit from BaseSTTModel
-    """
-    # Check if model class inherits from BaseSTTModel
-    if not issubclass(model_class, BaseSTTModel):
-        raise TypeError(f"Model class must inherit from BaseSTTModel, got {model_class.__name__}")
-    
-    # Register model
+def register_stt_model(name: str, model_class: Type[BaseSTTModel], 
+                      optimal_config: Optional[Dict[str, Any]] = None) -> None:
+    """Register new STT model with optional optimal configuration."""
     STT_MODELS[name] = model_class
+    
+    if optimal_config:
+        OPTIMAL_CONFIGS[name] = optimal_config
+    
     logger.info(f"Registered STT model: {name}")
-
-
-def get_available_models() -> Dict[str, Type[BaseSTTModel]]:
-    """
-    Get dictionary of available STT models.
-    
-    Returns:
-        Dictionary mapping model names to model classes
-    """
-    return STT_MODELS.copy()
-
-
-def get_model_info(model_name: str) -> Optional[Dict[str, Any]]:
-    """
-    Get information about a specific STT model.
-    
-    Args:
-        model_name: Name of the model to get information for
-        
-    Returns:
-        Dictionary with model information or None if model not found
-    """
-    if model_name not in STT_MODELS:
-        return None
-        
-    model_class = STT_MODELS[model_name]
-    
-    # Get model info from docstring and class attributes
-    return {
-        "name": model_name,
-        "class": model_class.__name__,
-        "description": model_class.__doc__.strip().split('\n')[0] if model_class.__doc__ else "No description available",
-        "capabilities": getattr(model_class, "CAPABILITIES", []),
-    }

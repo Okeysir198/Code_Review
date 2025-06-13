@@ -3,6 +3,7 @@ import sys
 from dotenv import load_dotenv, find_dotenv
 from langgraph.prebuilt import create_react_agent
 from langchain.chat_models import init_chat_model
+from langchain_ollama import ChatOllama
 from langchain_tavily import TavilySearch  # type: ignore[import-not-found]
 from langgraph.checkpoint.memory import MemorySaver
 
@@ -22,7 +23,7 @@ TEMPERATURE = 0
 # Initialize components
 search = TavilySearch(max_results=MAX_SEARCH_RESULTS)
 tools = [search]
-model = init_chat_model(MODEL_NAME, temperature=TEMPERATURE)
+model = ChatOllama(model=MODEL_NAME, temperature=TEMPERATURE)
 checkpointer = MemorySaver()
 
 # Create the agent
