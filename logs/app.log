@@ -1357,3 +1357,853 @@ AttributeError: 'NoneType' object has no attribute 'media'
 2025-06-16 12:15:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
 2025-06-16 12:15:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
 2025-06-16 12:15:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-16 13:03:24 - root - INFO - Logging configured with level: INFO
+2025-06-16 13:03:29 - __main__ - INFO - STT model initialized
+2025-06-16 13:03:29 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'sample_rate': 24000, 'show_logs': True}
+2025-06-16 13:03:29 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 13:03:29 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 13:03:31 - __main__ - INFO - TTS model initialized
+2025-06-16 13:03:31 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 13:03:31 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 13:03:31 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 13:03:31 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': device(type='cuda', index=0)}
+2025-06-16 13:11:45 - root - INFO - Logging configured with level: INFO
+2025-06-16 13:11:45 - __main__ - INFO - Initializing LLM and agent...
+2025-06-16 13:11:45 - __main__ - INFO - LLM and agent initialized successfully
+2025-06-16 13:11:45 - __main__ - INFO - Initializing STT model...
+2025-06-16 13:11:50 - __main__ - INFO - Warming up STT model...
+2025-06-16 13:11:51 - __main__ - INFO - STT model warmup complete
+2025-06-16 13:11:51 - __main__ - INFO - Initializing TTS model...
+2025-06-16 13:11:51 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 13:11:51 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 13:11:51 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 13:11:53 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 13:11:53 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 13:11:54 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 13:11:54 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 13:11:54 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 13:11:54 - __main__ - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': device(type='cuda', index=0)}
+2025-06-16 13:11:54 - __main__ - INFO - EnhancedReplyOnPause initialized - Noise reduction: True
+2025-06-16 13:11:54 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 13:11:54 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 13:12:05 - __main__ - INFO - Started new conversation with thread ID: 1b2c6e62-dd21-4cb6-b316-1e5781a2aa7d
+2025-06-16 13:12:21 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 43255) -> ('192.168.190.121', 50209)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 51505) -> ('192.168.190.121', 50209)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 43255) -> ('192.168.190.121', 50209)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42290) -> ('192.168.190.121', 50209)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 53609) -> ('192.168.190.121', 50209)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 43255) -> ('118.69.244.141', 50209)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 51505) -> ('118.69.244.141', 50209)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42290) -> ('118.69.244.141', 50209)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 53609) -> ('118.69.244.141', 50209)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 43255) -> ('104.30.149.218', 58731)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 51505) -> ('104.30.149.218', 58731)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42290) -> ('104.30.149.218', 58731)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 53609) -> ('104.30.149.218', 58731)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 43255) -> ('104.30.147.149', 20794)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 51505) -> ('104.30.147.149', 20794)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42290) -> ('104.30.147.149', 20794)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 53609) -> ('104.30.147.149', 20794)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 43255) -> ('104.30.149.118', 61639)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 51505) -> ('104.30.149.118', 61639)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42290) -> ('104.30.149.118', 61639)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 53609) -> ('104.30.149.118', 61639)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 43255) -> ('104.30.149.116', 63039)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 51505) -> ('104.30.149.116', 63039)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42290) -> ('104.30.149.116', 63039)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:22 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 53609) -> ('104.30.149.116', 63039)) State.FROZEN -> State.FAILED
+2025-06-16 13:12:29 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 13:12:29 - __main__ - INFO - Transcription: 'Yes, me, can you hear me?'
+2025-06-16 13:12:31 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:12:31 - __main__ - INFO - AI Response: 'Yes, I can hear you. How can I assist you with your account?'
+2025-06-16 13:12:59 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 13:12:59 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-16 13:12:59 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:12:59 - __main__ - INFO - AI Response: 'Do you need help with payment or an invoice?'
+2025-06-16 13:13:05 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 13:13:06 - __main__ - INFO - Transcription: 'I'm talking to you.'
+2025-06-16 13:13:06 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:13:06 - __main__ - INFO - AI Response: 'Understood. What assistance do you need today?'
+2025-06-16 13:13:15 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400)
+2025-06-16 13:13:15 - __main__ - INFO - Transcription: 'hid a noise in the background.'
+2025-06-16 13:13:15 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:13:15 - __main__ - INFO - AI Response: 'Is it affecting your call? We can pause if needed.'
+2025-06-16 13:13:38 - __main__ - INFO - Started new conversation with thread ID: ac9488fe-d37f-4c62-9817-eb48b0a83d11
+2025-06-16 13:15:00 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 13:15:00 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: 9o1tnzfeywl
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('118.69.244.141', 63885)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('118.69.244.141', 63885)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 43190) -> ('118.69.244.141', 63885)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 44634) -> ('118.69.244.141', 63885)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('104.30.149.116', 47626)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('104.30.149.116', 47626)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 43190) -> ('104.30.149.116', 47626)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('104.30.147.216', 61750)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('104.30.149.116', 47626)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('104.30.147.216', 61750)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 43190) -> ('104.30.147.216', 61750)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 44634) -> ('104.30.147.216', 61750)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 44634) -> ('104.30.149.116', 47626)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('104.30.149.116', 47626)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('104.30.147.144', 50358)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 43190) -> ('104.30.149.116', 47626)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('104.30.147.144', 50358)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 43190) -> ('104.30.147.144', 50358)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('104.30.147.216', 61750)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 44634) -> ('104.30.147.144', 50358)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('104.30.149.218', 40130)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('104.30.149.218', 40130)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 43190) -> ('104.30.149.218', 40130)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 44634) -> ('104.30.149.218', 40130)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('104.30.147.216', 61750)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('104.30.149.236', 13017)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('104.30.149.236', 13017)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 43190) -> ('104.30.149.236', 13017)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 44634) -> ('104.30.149.236', 13017)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 39310) -> ('104.30.144.245', 41615)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 44251) -> ('104.30.144.245', 41615)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 43190) -> ('104.30.144.245', 41615)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:00 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 44634) -> ('104.30.144.245', 41615)) State.FROZEN -> State.FAILED
+2025-06-16 13:15:25 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 13:15:25 - __main__ - INFO - Transcription: 'Hello, are you there?'
+2025-06-16 13:15:25 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:15:25 - __main__ - INFO - AI Response: 'Yes, I'm here. How can I assist you with your account?'
+2025-06-16 13:15:30 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 13:15:31 - __main__ - INFO - Transcription: 'he cry once.'
+2025-06-16 13:15:31 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:15:31 - __main__ - INFO - AI Response: 'I'm sorry to hear that. Can you provide more details about the issue?'
+2025-06-16 13:15:37 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 13:15:37 - __main__ - INFO - Transcription: 'Do you please?'
+2025-06-16 13:15:37 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:15:38 - __main__ - INFO - AI Response: 'Could you clarify what you need help with?'
+2025-06-16 13:15:46 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 48000)
+2025-06-16 13:15:46 - __main__ - INFO - Transcription: 'Do you do you hear clearly what I'm saying?'
+2025-06-16 13:15:46 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:15:46 - __main__ - INFO - AI Response: 'Yes, I can hear you clearly. Please proceed.'
+2025-06-16 13:28:27 - root - INFO - Logging configured with level: INFO
+2025-06-16 13:28:27 - __main__ - INFO - Initializing LLM and agent...
+2025-06-16 13:28:27 - __main__ - INFO - LLM and agent initialized successfully
+2025-06-16 13:28:27 - __main__ - INFO - Initializing STT model...
+2025-06-16 13:28:32 - __main__ - INFO - Warming up STT model...
+2025-06-16 13:28:32 - __main__ - INFO - STT model warmup complete
+2025-06-16 13:28:32 - __main__ - INFO - Initializing TTS model...
+2025-06-16 13:28:32 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 13:28:32 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 13:28:32 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 13:28:34 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 13:28:35 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 13:28:36 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 13:28:36 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 13:28:36 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 13:28:36 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': device(type='cuda', index=0)}
+2025-06-16 13:31:46 - root - INFO - Logging configured with level: INFO
+2025-06-16 13:31:46 - __main__ - INFO - Initializing LLM and agent...
+2025-06-16 13:31:46 - __main__ - INFO - LLM and agent initialized successfully
+2025-06-16 13:31:46 - __main__ - INFO - Initializing STT model...
+2025-06-16 13:31:51 - __main__ - INFO - Warming up STT model...
+2025-06-16 13:31:51 - __main__ - INFO - STT model warmup complete
+2025-06-16 13:31:51 - __main__ - INFO - Initializing TTS model...
+2025-06-16 13:31:51 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 13:31:51 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 13:31:51 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 13:31:53 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 13:31:54 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 13:31:54 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 13:31:54 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 13:31:54 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 13:31:54 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': device(type='cuda', index=0)}
+2025-06-16 13:31:54 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized - Noise reduction: True
+2025-06-16 13:31:54 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 13:31:54 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 13:32:02 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 13:32:02 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: k7jo3o7z1i
+2025-06-16 13:32:02 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('118.69.244.141', 62908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 38712) -> ('118.69.244.141', 62908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55187) -> ('118.69.244.141', 62908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 39114) -> ('118.69.244.141', 62908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('104.30.149.216', 34682)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 38712) -> ('104.30.149.216', 34682)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55187) -> ('104.30.149.216', 34682)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 39114) -> ('104.30.149.216', 34682)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('104.30.149.216', 34682)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 38712) -> ('104.30.149.216', 34682)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55187) -> ('104.30.149.216', 34682)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 39114) -> ('104.30.149.216', 34682)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('104.30.147.152', 56987)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 38712) -> ('104.30.147.152', 56987)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55187) -> ('104.30.147.152', 56987)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 39114) -> ('104.30.147.152', 56987)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('104.30.147.152', 56987)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('104.30.149.243', 33113)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 38712) -> ('104.30.149.243', 33113)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55187) -> ('104.30.149.243', 33113)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('118.69.244.141', 62908)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 39114) -> ('104.30.149.243', 33113)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:03 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('104.30.149.215', 62715)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 38712) -> ('104.30.149.215', 62715)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55187) -> ('104.30.149.215', 62715)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 39114) -> ('104.30.149.215', 62715)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('104.30.149.242', 18785)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 38712) -> ('104.30.149.242', 18785)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55187) -> ('104.30.149.242', 18785)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 39114) -> ('104.30.149.242', 18785)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 47273) -> ('104.30.149.220', 19802)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 38712) -> ('104.30.149.220', 19802)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55187) -> ('104.30.149.220', 19802)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 39114) -> ('104.30.149.220', 19802)) State.FROZEN -> State.FAILED
+2025-06-16 13:32:06 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 13:32:06 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-16 13:32:08 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:32:08 - __main__ - INFO - AI Response: 'Can you provide more details about your account?'
+2025-06-16 13:32:14 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400)
+2025-06-16 13:32:15 - __main__ - INFO - Transcription: 'to hear the noise in the background.'
+2025-06-16 13:32:15 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:32:15 - __main__ - INFO - AI Response: 'I'm focused on your account. Can you clarify any issues?'
+2025-06-16 13:32:43 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 67200)
+2025-06-16 13:32:43 - __main__ - INFO - Transcription: 'Cassim the Noises feature renowned cricket.'
+2025-06-16 13:32:43 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:32:43 - __main__ - INFO - AI Response: 'Can you check your payment status or specific issues?'
+2025-06-16 13:32:47 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 13:32:47 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-16 13:32:47 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:32:47 - __main__ - INFO - AI Response: 'Are you facing any collection issues or have a query?'
+2025-06-16 13:32:54 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 13:32:55 - __main__ - INFO - Transcription: 'I did that.'
+2025-06-16 13:32:55 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:32:55 - __main__ - INFO - AI Response: 'Could you specify the problem or detail needed?'
+2025-06-16 13:33:00 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 13:33:00 - __main__ - INFO - Transcription: 'Have to be a lot.'
+2025-06-16 13:33:00 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 13:33:00 - __main__ - INFO - AI Response: 'Please provide specific details for assistance.'
+2025-06-16 13:35:57 - __main__ - INFO - Started new conversation with thread ID: 6b449816-8244-4901-9c8a-158e6231acc6
+2025-06-16 13:35:59 - __main__ - INFO - Started new conversation with thread ID: a0d3ce2b-fe77-4980-b92e-195ad76aa0cf
+2025-06-16 13:36:00 - __main__ - INFO - Started new conversation with thread ID: 5ff14a84-69a4-42e9-975e-50b3a102e6fb
+2025-06-16 13:36:01 - __main__ - INFO - Started new conversation with thread ID: 0a12ab92-987f-4137-aeed-31173d5551b0
+2025-06-16 13:36:02 - __main__ - INFO - Started new conversation with thread ID: c013aff2-fed4-465c-a600-e7c0eb56d1bc
+2025-06-16 13:36:26 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 13:36:26 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: tvt3lthdve
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40029) -> ('118.69.244.141', 55643)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 51182) -> ('118.69.244.141', 55643)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46205) -> ('118.69.244.141', 55643)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42680) -> ('118.69.244.141', 55643)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40029) -> ('104.30.147.148', 42399)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 51182) -> ('104.30.147.148', 42399)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46205) -> ('104.30.147.148', 42399)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42680) -> ('104.30.147.148', 42399)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40029) -> ('104.30.147.148', 42399)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40029) -> ('104.30.149.216', 61804)) State.FROZEN -> State.WAITING
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40029) -> ('104.30.149.216', 61804)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 51182) -> ('104.30.149.216', 61804)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46205) -> ('104.30.149.216', 61804)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42680) -> ('104.30.149.216', 61804)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40029) -> ('104.30.149.217', 52170)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 51182) -> ('104.30.149.217', 52170)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46205) -> ('104.30.149.217', 52170)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42680) -> ('104.30.149.217', 52170)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40029) -> ('104.30.149.243', 10400)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 51182) -> ('104.30.149.243', 10400)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46205) -> ('104.30.149.243', 10400)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:27 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42680) -> ('104.30.149.243', 10400)) State.FROZEN -> State.FAILED
+2025-06-16 13:36:45 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 13:36:45 - __main__ - INFO - No transcription detected
+2025-06-16 14:00:58 - root - INFO - Logging configured with level: INFO
+2025-06-16 14:00:58 - __main__ - INFO - Initializing LLM...
+2025-06-16 14:00:58 - __main__ - INFO - LLM initialized successfully
+2025-06-16 14:00:58 - __main__ - INFO - Initializing custom STT model...
+2025-06-16 14:01:04 - __main__ - INFO - Initializing FastRTC STT model...
+2025-06-16 14:01:07 - __main__ - INFO - STT models initialized and warmed up
+2025-06-16 14:01:07 - __main__ - INFO - Initializing TTS model...
+2025-06-16 14:01:07 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'sample_rate': 24000, 'show_logs': True}
+2025-06-16 14:01:07 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 14:01:07 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 14:01:09 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 14:01:09 - __main__ - INFO - All models initialized successfully
+2025-06-16 14:01:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 14:01:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 14:01:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 14:01:10 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: deepfilternet3
+2025-06-16 14:01:10 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 14:01:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized
+2025-06-16 14:01:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 14:01:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True
+2025-06-16 14:01:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True
+2025-06-16 14:01:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 14:01:11 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 14:01:11 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 14:01:34 - __main__ - INFO - New conversation started: 088c9700-ae25-4a2b-9932-7985c0acf66b
+2025-06-16 14:01:49 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 14:01:50 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ab10n9ig6u
+2025-06-16 14:01:50 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 14:01:50 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 14:01:50 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 14:01:50 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: deepfilternet3
+2025-06-16 14:01:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized
+2025-06-16 14:01:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 14:01:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True
+2025-06-16 14:01:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True
+2025-06-16 14:01:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('118.69.244.141', 49704)) State.FROZEN -> State.WAITING
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('118.69.244.141', 49704)) State.FROZEN -> State.WAITING
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42463) -> ('118.69.244.141', 49704)) State.FROZEN -> State.WAITING
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 41350) -> ('118.69.244.141', 49704)) State.FROZEN -> State.WAITING
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('118.69.244.141', 49704)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('118.69.244.141', 49704)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42463) -> ('118.69.244.141', 49704)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 41350) -> ('118.69.244.141', 49704)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.149.215', 61123)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.149.215', 61123)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42463) -> ('104.30.149.215', 61123)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 41350) -> ('104.30.149.215', 61123)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.149.116', 42340)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.149.116', 42340)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42463) -> ('104.30.149.116', 42340)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:51 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 41350) -> ('104.30.149.116', 42340)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.147.153', 28780)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.147.153', 28780)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42463) -> ('104.30.147.153', 28780)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 41350) -> ('104.30.147.153', 28780)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.149.118', 45525)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.149.118', 45525)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.147.153', 28780)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.147.217', 46547)) State.FROZEN -> State.WAITING
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.149.113', 36607)) State.FROZEN -> State.WAITING
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.147.153', 28780)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.147.217', 46547)) State.FROZEN -> State.WAITING
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.149.113', 36607)) State.FROZEN -> State.WAITING
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42463) -> ('104.30.149.118', 45525)) State.FROZEN -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 41350) -> ('104.30.149.118', 45525)) State.FROZEN -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.147.217', 46547)) State.WAITING -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.147.217', 46547)) State.WAITING -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42463) -> ('104.30.147.217', 46547)) State.FROZEN -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 41350) -> ('104.30.147.217', 46547)) State.FROZEN -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 52967) -> ('104.30.149.113', 36607)) State.WAITING -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 59679) -> ('104.30.149.113', 36607)) State.WAITING -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42463) -> ('104.30.149.113', 36607)) State.FROZEN -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 41350) -> ('104.30.149.113', 36607)) State.FROZEN -> State.FAILED
+2025-06-16 14:01:52 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 14:01:55 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:55 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:55 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:55 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:55 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:56 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:57 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:58 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:58 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:58 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:58 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:58 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:58 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:58 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:58 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:59 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:59 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:59 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:59 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:59 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:59 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:59 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:01:59 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:00 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:00 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:00 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:00 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:00 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:00 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:00 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:01 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:01 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:01 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:01 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:01 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:01 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:01 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:02 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:02 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:02 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:02 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:02 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:02 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:02 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:03 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:03 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:03 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:03 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:03 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:03 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:04 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:04 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:04 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:04 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:04 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:04 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:06 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:06 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:06 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:06 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:06 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:07 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:07 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:07 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:07 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:07 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:08 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:08 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:08 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:08 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:08 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:08 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:10 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:10 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:10 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:10 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:10 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:12 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:12 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:12 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:12 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:12 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:19 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:19 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:19 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:02:19 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:07:05 - root - INFO - Logging configured with level: INFO
+2025-06-16 14:07:05 - __main__ - INFO - Initializing LLM...
+2025-06-16 14:07:05 - __main__ - INFO - LLM initialized successfully
+2025-06-16 14:07:05 - __main__ - INFO - Initializing custom STT model...
+2025-06-16 14:07:10 - __main__ - INFO - Initializing FastRTC STT model...
+2025-06-16 14:07:12 - __main__ - INFO - STT models initialized and warmed up
+2025-06-16 14:07:12 - __main__ - INFO - Initializing TTS model...
+2025-06-16 14:07:12 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'sample_rate': 24000, 'show_logs': True}
+2025-06-16 14:07:12 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 14:07:12 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 14:07:14 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 14:07:14 - __main__ - INFO - All models initialized successfully
+2025-06-16 14:07:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 14:07:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 14:07:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 14:07:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: deepfilternet3
+2025-06-16 14:07:15 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 14:07:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized
+2025-06-16 14:07:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 14:07:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True
+2025-06-16 14:07:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True
+2025-06-16 14:07:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 14:07:17 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 14:07:17 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 14:08:01 - __main__ - INFO - New conversation started: 1947c091-5be9-42e3-93c2-39e74fe0b78d
+2025-06-16 14:08:07 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 14:08:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 14:08:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 14:08:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 14:08:07 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: deepfilternet3
+2025-06-16 14:08:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized
+2025-06-16 14:08:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 14:08:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True
+2025-06-16 14:08:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True
+2025-06-16 14:08:09 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 14:08:09 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('192.168.190.121', 56785)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('192.168.190.121', 56785)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('192.168.190.121', 56785)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('192.168.190.121', 56785)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('118.69.244.141', 56785)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('192.168.190.121', 56785)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('192.168.190.121', 56785)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('192.168.190.121', 56785)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('192.168.190.121', 56785)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('118.69.244.141', 56785)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('118.69.244.141', 56785)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('118.69.244.141', 56785)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('118.69.244.141', 56785)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.149.217', 40079)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.149.217', 40079)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.149.217', 40079)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.149.217', 40079)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.149.217', 40079)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.144.244', 58462)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.149.217', 17721)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.144.243', 61646)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.147.218', 30186)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.147.209', 64695)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.144.244', 58462)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.149.217', 40079)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.144.244', 58462)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.149.217', 17721)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.144.243', 61646)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.147.218', 30186)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.147.209', 64695)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.144.244', 58462)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.149.217', 40079)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.144.244', 58462)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.149.217', 17721)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.144.243', 61646)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.147.218', 30186)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.147.209', 64695)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.144.244', 58462)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.149.217', 40079)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.144.244', 58462)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.149.217', 17721)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.144.243', 61646)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.147.218', 30186)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.147.209', 64695)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.144.244', 58462)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.149.217', 17721)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.149.217', 17721)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.149.217', 17721)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.149.217', 17721)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.149.217', 17721)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.144.243', 61646)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.149.217', 17721)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.144.243', 61646)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.149.217', 17721)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.144.243', 61646)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.144.243', 61646)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.149.217', 17721)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.144.243', 61646)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.147.218', 30186)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.144.243', 61646)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.147.218', 30186)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('192.168.190.121', 56785)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.147.218', 30186)) State.WAITING -> State.FAILED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.147.218', 30186)) State.WAITING -> State.FAILED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 53823) -> ('104.30.147.209', 64695)) State.WAITING -> State.FAILED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 34712) -> ('104.30.147.209', 64695)) State.WAITING -> State.FAILED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46339) -> ('104.30.147.209', 64695)) State.WAITING -> State.FAILED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 55853) -> ('104.30.147.209', 64695)) State.WAITING -> State.FAILED
+2025-06-16 14:08:09 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 14:08:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:13 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:18 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:08:41 - __main__ - INFO - New conversation started: 58ed2852-99d2-466a-8829-c00aca0ccec1
+2025-06-16 14:08:45 - __main__ - INFO - New conversation started: 02471ec5-eefe-4334-9ccc-c4db52e6eb87
+2025-06-16 14:08:49 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 14:08:49 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: b67pxtx7fsw
+2025-06-16 14:08:49 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 14:08:49 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 14:08:49 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 14:08:49 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: deepfilternet3
+2025-06-16 14:08:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized
+2025-06-16 14:08:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 14:08:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True
+2025-06-16 14:08:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True
+2025-06-16 14:08:51 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 44049) -> ('118.69.244.141', 59591)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 50384) -> ('118.69.244.141', 59591)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46057) -> ('118.69.244.141', 59591)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('118.69.244.141', 59591)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 44049) -> ('118.69.244.141', 59591)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 50384) -> ('118.69.244.141', 59591)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46057) -> ('118.69.244.141', 59591)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('118.69.244.141', 59591)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 44049) -> ('104.30.149.112', 11146)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 50384) -> ('104.30.149.112', 11146)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46057) -> ('104.30.149.112', 11146)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.112', 11146)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 44049) -> ('104.30.149.116', 31695)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 50384) -> ('104.30.149.116', 31695)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46057) -> ('104.30.149.116', 31695)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.116', 31695)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.112', 11146)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.111', 44375)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.147.211', 27382)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.116', 57349)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.216', 29171)) State.FROZEN -> State.WAITING
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 44049) -> ('104.30.149.111', 44375)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 50384) -> ('104.30.149.111', 44375)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46057) -> ('104.30.149.111', 44375)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.111', 44375)) State.WAITING -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 44049) -> ('104.30.147.211', 27382)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 50384) -> ('104.30.147.211', 27382)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46057) -> ('104.30.147.211', 27382)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.147.211', 27382)) State.WAITING -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 44049) -> ('104.30.149.116', 57349)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 50384) -> ('104.30.149.116', 57349)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46057) -> ('104.30.149.116', 57349)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.116', 57349)) State.WAITING -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 44049) -> ('104.30.149.216', 29171)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 50384) -> ('104.30.149.216', 29171)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46057) -> ('104.30.149.216', 29171)) State.FROZEN -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 38149) -> ('104.30.149.216', 29171)) State.WAITING -> State.FAILED
+2025-06-16 14:08:51 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-16 14:08:55 - src.VAD_TurnDectection.enhanced_reply_on_pause - ERROR - Semantic turn detection failed: 'LiveKitTurnDetector' object has no attribute 'determine_turn_end'
+2025-06-16 14:36:05 - root - INFO - Logging configured with level: INFO
+2025-06-16 14:36:05 - __main__ - INFO - Initializing LLM...
+2025-06-16 14:36:05 - __main__ - INFO - LLM initialized successfully
+2025-06-16 14:36:05 - __main__ - INFO - Initializing custom STT model...
+2025-06-16 14:36:10 - __main__ - INFO - Initializing FastRTC STT model...
+2025-06-16 14:36:12 - __main__ - INFO - STT models initialized and warmed up
+2025-06-16 14:36:12 - __main__ - INFO - Initializing TTS model...
+2025-06-16 14:36:12 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'sample_rate': 24000, 'show_logs': True}
+2025-06-16 14:36:12 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 14:36:12 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 14:36:14 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 14:36:14 - __main__ - INFO - All models initialized successfully
+2025-06-16 14:36:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 14:36:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 14:36:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 14:36:15 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': device(type='cuda', index=0)}
+2025-06-16 14:36:15 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 14:36:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized (multilingual)
+2025-06-16 14:36:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 14:36:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True (deepfilternet3)
+2025-06-16 14:36:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True (livekit)
+2025-06-16 14:36:17 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 14:36:17 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 14:36:17 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 14:36:21 - __main__ - INFO - New conversation started: c9531e38-1fb5-4388-b54a-89e505fa3b4e
+2025-06-16 14:36:24 - __main__ - INFO - New conversation started: c2b3db11-d03f-40bc-a87f-55237edf06bf
+2025-06-16 14:36:29 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 14:36:29 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ln0g11t2d2a
+2025-06-16 14:36:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 14:36:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 14:36:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 14:36:29 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': device(type='cuda', index=0)}
+2025-06-16 14:36:31 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized (multilingual)
+2025-06-16 14:36:31 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 14:36:31 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True (deepfilternet3)
+2025-06-16 14:36:31 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True (livekit)
+2025-06-16 14:36:31 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48366) -> ('118.69.244.141', 56558)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 33123) -> ('118.69.244.141', 56558)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57316) -> ('118.69.244.141', 56558)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('118.69.244.141', 56558)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48366) -> ('118.69.244.141', 56558)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 33123) -> ('118.69.244.141', 56558)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57316) -> ('118.69.244.141', 56558)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('118.69.244.141', 56558)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48366) -> ('104.30.149.111', 29382)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 33123) -> ('104.30.149.111', 29382)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57316) -> ('104.30.149.111', 29382)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.149.111', 29382)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48366) -> ('104.30.147.215', 17929)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 33123) -> ('104.30.147.215', 17929)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57316) -> ('104.30.147.215', 17929)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.149.111', 29382)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.147.215', 17929)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.149.218', 60945)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.147.149', 51485)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.149.220', 10622)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.147.216', 64708)) State.FROZEN -> State.WAITING
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.147.215', 17929)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48366) -> ('104.30.149.218', 60945)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 33123) -> ('104.30.149.218', 60945)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57316) -> ('104.30.149.218', 60945)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.149.218', 60945)) State.WAITING -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48366) -> ('104.30.147.149', 51485)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 33123) -> ('104.30.147.149', 51485)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57316) -> ('104.30.147.149', 51485)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.147.149', 51485)) State.WAITING -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48366) -> ('104.30.149.220', 10622)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 33123) -> ('104.30.149.220', 10622)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57316) -> ('104.30.149.220', 10622)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.149.220', 10622)) State.WAITING -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48366) -> ('104.30.147.216', 64708)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 33123) -> ('104.30.147.216', 64708)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57316) -> ('104.30.147.216', 64708)) State.FROZEN -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 51572) -> ('104.30.147.216', 64708)) State.WAITING -> State.FAILED
+2025-06-16 14:36:31 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 14:36:34 - __main__ - INFO - Processing audio: 16000Hz, (1, 48960)
+2025-06-16 14:36:35 - __main__ - INFO - No transcription detected
+2025-06-16 14:36:56 - __main__ - INFO - Processing audio: 16000Hz, (1, 0)
+2025-06-16 14:36:56 - __main__ - ERROR - Audio processing error: Transcription error: Your audio file /tmp/tmpq4ukdf6e.mp3 could not be decoded. We tried using soundfile, and pydub.
+2025-06-16 14:37:14 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 14:37:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 14:37:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 14:37:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 14:37:14 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': device(type='cuda', index=0)}
+2025-06-16 14:37:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized (multilingual)
+2025-06-16 14:37:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 14:37:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True (deepfilternet3)
+2025-06-16 14:37:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True (livekit)
+2025-06-16 14:37:16 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('192.168.190.121', 60362)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('192.168.190.121', 60362)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('192.168.190.121', 60362)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('192.168.190.121', 60362)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('118.69.244.141', 60362)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('192.168.190.121', 60362)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('192.168.190.121', 60362)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('192.168.190.121', 60362)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('192.168.190.121', 60362)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('118.69.244.141', 60362)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('118.69.244.141', 60362)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('118.69.244.141', 60362)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('118.69.244.141', 60362)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.149.218', 21564)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.149.218', 21564)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.218', 21564)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.149.218', 21564)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.149.218', 21564)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.149.243', 41408)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.144.242', 57684)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.149.117', 30507)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.147.147', 13337)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.147.145', 31569)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.149.243', 41408)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.149.218', 21564)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.149.243', 41408)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.144.242', 57684)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.149.117', 30507)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.147.147', 13337)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.147.145', 31569)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.149.243', 41408)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.218', 21564)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.243', 41408)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.144.242', 57684)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.117', 30507)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.147.147', 13337)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.147.145', 31569)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.243', 41408)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.149.218', 21564)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.149.243', 41408)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.144.242', 57684)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.149.117', 30507)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.147.147', 13337)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.147.145', 31569)) State.FROZEN -> State.WAITING
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.149.243', 41408)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.149.243', 41408)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.144.242', 57684)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.149.243', 41408)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.144.242', 57684)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.144.242', 57684)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.243', 41408)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.144.242', 57684)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.149.243', 41408)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.149.117', 30507)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.144.242', 57684)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.144.242', 57684)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.149.117', 30507)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.144.242', 57684)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.117', 30507)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.144.242', 57684)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.149.117', 30507)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.149.117', 30507)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:16 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.147.147', 13337)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.147.147', 13337)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.149.117', 30507)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('192.168.190.121', 60362)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.147.147', 13337)) State.WAITING -> State.FAILED
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.147.147', 13337)) State.WAITING -> State.FAILED
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 37418) -> ('104.30.147.145', 31569)) State.WAITING -> State.FAILED
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 38633) -> ('104.30.147.145', 31569)) State.WAITING -> State.FAILED
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.147.145', 31569)) State.WAITING -> State.FAILED
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47255) -> ('104.30.147.145', 31569)) State.WAITING -> State.FAILED
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.117', 30507)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 14:37:28 - __main__ - INFO - Processing audio: 16000Hz, (1, 138240)
+2025-06-16 14:37:28 - __main__ - INFO - No transcription detected

@@ -1,10 +1,10 @@
 """
-Optimized Gradio UI for testing FastRTC noise cancellation models
-Uses direct tensor processing for maximum performance
+Simplified Gradio UI for testing FastRTC noise cancellation models
 
-Tests: All ClearVoice models, DeepFilterNet3
+Tests: All ClearVoice models, DeepFilterNet3, and Spectral Subtraction
+
 Usage:
-    python optimized_noise_reduction_test_ui.py
+    python noise_reduction_test_ui.py
 
 Author: AI Assistant
 Date: 2025
@@ -18,15 +18,15 @@ from typing import Tuple, Optional
 import time
 import logging
 
-# Import our optimized FastRTC noise reduction module
+# Import our FastRTC noise reduction module
 from fastrtc_noise_reduction import FastRTCNoiseReduction
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class OptimizedFastRTCNoiseTester:
-    """Optimized test interface for FastRTC noise reduction models using direct tensor processing"""
+class FastRTCNoiseTester:
+    """Simplified test interface for FastRTC noise reduction models"""
     
     def __init__(self):
         self.models = {}
@@ -39,13 +39,13 @@ class OptimizedFastRTCNoiseTester:
                 return f"✅ {model_type} already loaded"
             
             print(f"Loading {model_type}...")
-            # Initialize with direct tensor processing
+            # Only try the requested model, no fallback
             noise_reducer = FastRTCNoiseReduction(model_type)
             
             if noise_reducer.model and noise_reducer.model.is_ready:
                 self.models[model_type] = noise_reducer
                 info = noise_reducer.get_model_info()
-                return f"✅ {model_type} loaded successfully! ({info['model_name']} @ {info['sample_rate']}Hz on {info['device']})"
+                return f"✅ {model_type} loaded successfully! ({info['model_name']} @ {info['sample_rate']}Hz)"
             else:
                 return f"❌ {model_type} failed to initialize"
                 
@@ -54,7 +54,7 @@ class OptimizedFastRTCNoiseTester:
             return f"❌ Error loading {model_type}: {str(e)}"
     
     def process_audio(self, audio_file, model_type: str) -> Tuple[Optional[Tuple], str]:
-        """Process audio with selected model using direct tensor processing"""
+        """Process audio with selected model"""
         if audio_file is None:
             return None, "Please upload an audio file"
         
@@ -69,8 +69,7 @@ class OptimizedFastRTCNoiseTester:
                 if "❌" in status:
                     return None, status
             
-            # Process audio using direct tensor processing (no file I/O)
-
+            # Process audio
             start_time = time.time()
             enhanced_audio = self.models[model_type].process_audio_chunk(audio, sr)
             processing_time = time.time() - start_time
@@ -81,9 +80,8 @@ class OptimizedFastRTCNoiseTester:
             # Calculate performance metrics
             rtf = processing_time / (original_length / sr)  # Real-time factor
             
-            
             status_msg = (
-                f"✅ Processed in {processing_time:.3f}s | "
+                f"✅ Processed in {processing_time:.2f}s | "
                 f"RTF: {rtf:.2f}x | "
                 f"Model: {info['model_name']} | "
                 f"SR: {info['sample_rate']}Hz | "
@@ -140,15 +138,15 @@ class OptimizedFastRTCNoiseTester:
             return None, f"❌ Error: {str(e)}"
 
 # Create tester
-tester = OptimizedFastRTCNoiseTester()
+tester = FastRTCNoiseTester()
 
-# Model configurations - Core FastRTC models
+# Model configurations - Core FastRTC models only
 MODELS = {
-    "deepfilternet3": "DeepFilterNet3 - Real-time 48kHz (Excellent & Fast)",
+    "deepfilternet3": "DeepFilterNet3 - Latest real-time 48kHz (Excellent)",
     "mossformer2_se_48k": "MossFormer2_SE_48K - SOTA Transformer 48kHz (Best Quality)",
     "frcrn_se_16k": "FRCRN_SE_16K - Real-time CNN 16kHz (Fast & Good)",
     "mossformergan_se_16k": "MossFormerGAN_SE_16K - GAN-based 16kHz (High Quality)",
-    # "mossformer2_ss_16k": "MossFormer2_SS_16K - Speech Separation 16kHz (Multi-speaker)",
+    
 }
 
 NOISE_TYPES = {
@@ -159,28 +157,21 @@ NOISE_TYPES = {
 
 def create_interface():
     """Create optimized Gradio interface"""
-    title = "FastRTC Noise Reduction Tester (Optimized)"
+    title="FastRTC Noise Reduction Tester",
     theme = gr.themes.Ocean()
-    css = """
+    css="""
         footer {
-            visibility: hidden;
-        }
-        .performance-metric {
-            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
-            color: white;
-            padding: 8px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
+  visibility: hidden;
+}
         """
-    
     with gr.Blocks(
         title=title, 
         theme=theme,
         css=css,
         fill_width=True) as demo:
         # Header
-        gr.Markdown("# 🚀 Noise Reduction Tester")
+        gr.Markdown("# 🎧 Noise Reduction Tester")
+        gr.Markdown("**Test core ClearVoice models + DeepFilterNet3 for real-time audio processing**")
         
         # Model info section
         with gr.Accordion("📋 Model Information", open=False):
@@ -195,17 +186,13 @@ def create_interface():
             1. **Upload speech audio** → See original
             2. **Add noise** (optional) → Test robustness  
             3. **Select model** → Choose quality vs speed
-            4. **Process** → Compare results & performance
+            4. **Process** → Compare results
             
-            ### 📊 Performance Metrics:
-            - **RTF < 0.3**: Excellent real-time performance ⚡
-            - **RTF < 1.0**: Real-time capable ✅  
+            ### 📊 Performance Guide:
+            - **RTF < 1.0**: Real-time capable ✅
             - **RTF > 1.0**: Too slow for real-time ❌
-                        
-            ### 🏆 Quality vs Speed:
-            - **Best Quality**: MossFormer2_SE_48K > MossFormerGAN > FRCRN
-            - **Best Speed**:  DeepFilterNet3 > FRCRN > MossFormerGAN > MossFormer2
-            - **Best Balance**: DeepFilterNet3 (recommended for most use cases)
+            - **Quality**: MossFormer2 > MossFormerGAN > FRCRN > DeepFilterNet3
+            - **Speed**: DeepFilterNet3 > FRCRN > MossFormerGAN > MossFormer2
             """)
         
         # Main control row
@@ -215,65 +202,62 @@ def create_interface():
                 choices=list(MODELS.keys()),
                 value="deepfilternet3",
                 label="🤖 Select Noise Reduction Model",
+                # info="Choose noise reduction model"
             )
             
             # Quick actions
             with gr.Column():
                 with gr.Row():
-                    with gr.Column():
-                        load_model_btn = gr.Button("📥 Load Model", variant="secondary", size="sm")
-                        process_btn = gr.Button("⚡ Process Audio", variant="primary", size="lg")
+                    load_model_btn = gr.Button("📥 Load Model", variant="secondary", size="sm")
+                    process_btn = gr.Button("🎯 Process Audio", variant="primary", size="lg")
                 
-                    # Status
-                    status_text = gr.Textbox(label="Status", interactive=False, lines=1)
+                # Status
+                status_text = gr.Textbox(label="Status", interactive=False, lines=1)
         
         # Audio section
         with gr.Row():
             # Input column
             with gr.Column():
+                
+                gr.Markdown("### 📤 Input")
                 with gr.Row():
-                    with gr.Column():
-                        gr.Markdown("### 📤 Input")
-                        audio_input = gr.Audio(
-                            label="📤 Original",
-                            type="filepath",
-                            show_download_button=True,
+                    audio_input = gr.Audio(
+                        label="📤 Original",
+                        type="filepath",
+                        show_download_button=True,
+                        scale=1
+                    )
+                    noisy_audio = gr.Audio(label="🔊 With Noise", scale=1)
+                # Examples section
+                with gr.Row():
+                    gr.Examples(
+                        examples=[
+                            ["./samples/krisp-original.wav"],
+                            ["./samples/vocal_noise_1.wav"]
+                        ],
+                        label="Examples of uploaded audios",
+                        inputs=audio_input,
+                        cache_examples=False,
+                    )
+                # Noise controls
+                with gr.Group():
+                    gr.Markdown("**Add Test Noise**")
+                    with gr.Row():
+                        noise_type = gr.Dropdown(
+                            choices=list(NOISE_TYPES.keys()),
+                            value="white",
+                            label="Type",
                             scale=1
                         )
-                        # Examples section
-                        with gr.Row():
-                            gr.Examples(
-                                examples=[
-                                    ["./samples/krisp-original.wav"],
-                                    ["./samples/vocal_noise_1.wav"]
-                                ],
-                                label="Sample Audio Files",
-                                inputs=audio_input,
-                                cache_examples=False,
-                            )
-                    with gr.Column():
-                        gr.Markdown("### 🔊 Add Noise")
-                        noisy_audio = gr.Audio(label="🔊 With Noise", scale=1)
-                
-                        # Noise controls
-                        with gr.Group():
-                            gr.Markdown("**Add Test Noise**")
-                            with gr.Row():
-                                noise_type = gr.Dropdown(
-                                    choices=list(NOISE_TYPES.keys()),
-                                    value="white",
-                                    label="Type",
-                                    scale=1
-                                )
-                                noise_level = gr.Slider(
-                                    minimum=0.01,
-                                    maximum=0.3,
-                                    value=0.1,
-                                    step=0.01,
-                                    label="Level",
-                                    scale=2
-                                )
-                            add_noise_btn = gr.Button("➕ Add Noise", variant="secondary", size="sm")
+                        noise_level = gr.Slider(
+                            minimum=0.01,
+                            maximum=0.3,
+                            value=0.1,
+                            step=0.01,
+                            label="Level",
+                            scale=2
+                        )
+                    add_noise_btn = gr.Button("➕ Add Noise", variant="secondary", size="sm")
             
             # Output column
             with gr.Column():
@@ -282,19 +266,17 @@ def create_interface():
                 
                 # Performance metrics
                 with gr.Group():
-                    gr.Markdown("**Performance Metrics**")
+                    gr.Markdown("**Performance**")
                     with gr.Row():
                         rtf_display = gr.Textbox(label="RTF", interactive=False, scale=1)
                         device_display = gr.Textbox(label="Device", interactive=False, scale=1)
-                        time_display = gr.Textbox(label="Time", interactive=False, scale=1)
         
-       
         
         # Event handlers with enhanced feedback
-        def original_change(audio_file):
+        def orginal_change(audio_file):
             if audio_file:
-                return None, None, "📤 Original audio loaded - ready for processing"
-            return None, None, "No audio file"
+                return None, None, "📤 Original audio loaded"
+            return  None, None, "No audio file"
         
         def preload_model(model_type):
             return tester.load_model(model_type)
@@ -305,41 +287,29 @@ def create_interface():
             # Parse status for metrics display
             rtf = "N/A"
             device = "N/A" 
-            time_taken = "N/A"
             
             if "RTF:" in status:
                 try:
                     rtf_part = status.split("RTF: ")[1].split("x")[0]
-                    rtf_val = float(rtf_part)
-                    rtf_color = "🟢" if rtf_val < 0.3 else "🟡" if rtf_val < 1.0 else "🔴"
-                    rtf = f"{rtf_color} {rtf_val:.3f}x"
+                    rtf = f"{float(rtf_part):.2f}x"
+                    rtf_color = "🟢" if float(rtf_part) < 1.0 else "🔴"
+                    rtf = f"{rtf_color} {rtf}"
                 except:
                     pass
-            
             
             if "Device:" in status:
                 try:
-                    device_part = status.split("Device: ")[1].split(" ")[0]
-                    device = f"🖥️ {device_part}"
+                    device = status.split("Device: ")[1].split(" ")[0]
+                    device = f"🖥️ {device}"
                 except:
                     pass
+                    
             
-            if "Processed in" in status:
-                try:
-                    time_part = status.split("Processed in ")[1].split("s")[0]
-                    time_taken = f"⏱️ {float(time_part):.3f}s"
-                except:
-                    pass
-            
-            return result, status, rtf, device, time_taken
-        
-        def add_noise_with_feedback(audio_file, noise_type, noise_level):
-            result, status = tester.add_noise(audio_file, noise_type, noise_level)
-            return result, status, None
+            return result, status, rtf, device
         
         # Auto-show original when uploaded
         audio_input.change(
-            fn=original_change,
+            fn=orginal_change,
             inputs=[audio_input],
             outputs=[noisy_audio, enhanced_audio, status_text]
         )
@@ -353,24 +323,22 @@ def create_interface():
         
         # Add noise button
         add_noise_btn.click(
-            fn=add_noise_with_feedback,
+            fn=tester.add_noise,
             inputs=[audio_input, noise_type, noise_level],
-            outputs=[noisy_audio, status_text, enhanced_audio]
+            outputs=[noisy_audio, status_text]
         )
         
-        # Process audio button with comprehensive metrics
+        # Process audio button with metrics
         process_btn.click(
             fn=process_with_metrics,
             inputs=[audio_input, model_selector],
-            outputs=[enhanced_audio, status_text, rtf_display, device_display, time_display]
+            outputs=[enhanced_audio, status_text, rtf_display, device_display]
         )
     
     return demo
 
 if __name__ == "__main__":
-    print("🚀 Starting Optimized FastRTC Noise Reduction Tester...")
-    print("⚡ Using direct tensor processing for maximum performance!")
-    print()
+    print("🚀 Starting FastRTC Noise Reduction Tester...")
     print("📋 Available models:")
     for key, desc in MODELS.items():
         print(f"  - {key}: {desc}")
@@ -378,12 +346,6 @@ if __name__ == "__main__":
     print("\n🔊 Available noise types:")
     for key, desc in NOISE_TYPES.items():
         print(f"  - {key}: {desc}")
-    
-    print("\n🎯 Performance Features:")
-    print("  - Direct tensor processing (no file I/O)")
-    print("  - Automatic GPU detection and usage")
-    print("  - Real-time performance monitoring")
-    print("  - Memory-efficient processing")
     
     demo = create_interface()
     
