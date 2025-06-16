@@ -19,7 +19,7 @@ import time
 import logging
 
 # Import our optimized FastRTC noise reduction module
-from fastrtc_noise_reduction import FastRTCNoiseReduction
+from src.NoiseCancelation.fastrtc_noise_reduction import FastRTCNoiseReduction
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -244,8 +244,8 @@ def create_interface():
                         with gr.Row():
                             gr.Examples(
                                 examples=[
-                                    ["./samples/krisp-original.wav"],
-                                    ["./samples/vocal_noise_1.wav"]
+                                    ["./src/NoiseCancelation/samples/krisp-original.wav"],
+                                    ["./src/NoiseCancelation/samples/vocal_noise_1.wav"]
                                 ],
                                 label="Sample Audio Files",
                                 inputs=audio_input,
@@ -391,7 +391,7 @@ if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0",
         server_port=7865,
-        share=False,
+        share=True,
         show_error=True,
         debug=True
     )

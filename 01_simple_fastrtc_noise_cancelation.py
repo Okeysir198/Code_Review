@@ -1,13 +1,12 @@
 """
-Real-time Audio Processing Application with Enhanced Features
-Uses updated EnhancedReplyOnPause with noise cancellation and turn detection
-Optimized UI with audio processing insights and conversation tracking
+Real-time Audio Processing Application with STT/TTS
+Uses FastRTC for WebRTC streaming and LangChain for AI responses
 """
 
 import os
 import logging
 import uuid
-from typing import Generator, Tuple, Dict, Any
+from typing import Generator, Tuple
 import numpy as np
 import gradio as gr
 from dotenv import find_dotenv, load_dotenv
@@ -15,17 +14,15 @@ from dotenv import find_dotenv, load_dotenv
 # FastRTC imports
 from fastrtc import (
     WebRTC, 
+    ReplyOnPause, 
     AlgoOptions,
     SileroVadOptions,
     AdditionalOutputs, 
     get_cloudflare_turn_credentials_async,
     audio_to_int16, 
-    audio_to_file,
-    get_stt_model
+    get_stt_model,
+    audio_to_file
 )
-
-# Enhanced imports - Updated to use new class structure
-from src.VAD_TurnDectection.enhanced_reply_on_pause import EnhancedReplyOnPause
 
 # Utils imports
 from src.utils.logger_config import setup_logging
@@ -50,23 +47,21 @@ TOKEN = os.environ.get("HF_TOKEN")
 if not TOKEN:
     logger.warning("HF_TOKEN not found in environment variables")
 
-# Enhanced configurations - Simplified for new class structure
-NOISE_CONFIG = {
-    "enabled": True,
-    "model": "deepfilternet3",
-    "fallback_enabled": True
-}
-
-TURN_CONFIG = {
-    "enabled": True,
-    "model": "livekit",
-    "confidence_threshold": 0.5,
-    "fallback_to_pause": True
-}
-
-# Model configurations (simplified)
+# Model configurations
 STT_CONFIG = {
-    "model_name": "nvidia/parakeet-tdt-0.6b-v2",
+    "model_name": "openai/whisper-large-v3-turbo",
+    
+    # Whisper configuration (alternative)
+    "openai/whisper-large-v3-turbo": {
+        "checkpoint": "openai/whisper-large-v3-turbo",
+        "batch_size": 4,
+        "cuda_device_id": 1,
+        "chunk_length_s": 30,
+        "compute_type": "float16",
+        "beam_size": 3
+    },
+    
+    # NVIDIA Parakeet configuration
     "nvidia/parakeet-tdt-0.6b-v2": {
         "timestamp_prediction": True,
         "decoding_type": "tdt"
@@ -75,545 +70,386 @@ STT_CONFIG = {
 
 TTS_CONFIG = {
     "model_name": "kokorov2",
+    
+    # Enhanced Kokoro V2 settings
     "kokorov2": {
-        "voice": "am_michael",
+        "voice": "am_michael",  # af_bella, af_heart, am_fenrir, am_michael
         "speed": 1.3,
-        "language": "a",
+        "language": "a",  # 'a' for US English, 'b' for UK English
         "use_gpu": True,
+        "fallback_to_cpu": True,
         "sample_rate": 24000,
+        "preload_voices": ["af_heart"],
+        "custom_pronunciations": {
+            "kokoro": {"a": "kˈOkəɹO", "b": "kˈQkəɹQ"},
+            "cartrack": {"a": "kˈɑɹtɹæk", "b": "kˈɑːtɹæk"}
+        }
     }
 }
 
-# WebRTC constraints
+# WebRTC audio constraints
 AUDIO_CONSTRAINTS = {
     "noiseSuppression": {"exact": True},
     "autoGainControl": {"exact": True},
     "sampleRate": {"ideal": 16000},
     "channelCount": {"exact": 1},
+    "googNoiseSuppression": {"exact": True},
+    "googEchoCancellation": {"exact": True},
+    "googHighpassFilter": {"exact": True}
 }
 
-# Audio processing options
+# Voice Activity Detection options
 VAD_OPTIONS = SileroVadOptions(
     threshold=0.5,
     min_speech_duration_ms=250,
     max_speech_duration_s=30,
     min_silence_duration_ms=500,
     window_size_samples=1024,
-    speech_pad_ms=50,
+    speech_pad_ms=400,
 )
 
+# Algorithm options for audio processing
 ALGO_OPTIONS = AlgoOptions(
-    audio_chunk_duration=3.0,  # Longer for semantic analysis
-    started_talking_threshold=0.2,
-    speech_threshold=0.1,
+    audio_chunk_duration=0.6,
+    started_talking_threshold=0.3,
+    speech_threshold=0.2,
 )
-
-# Mock configuration classes for compatibility
-class NoiseReductionConfig:
-    def __init__(self, enabled=True, model="deepfilternet3", fallback_enabled=True):
-        self.enabled = enabled
-        self.model = model
-        self.fallback_enabled = fallback_enabled
-
-class TurnDetectionConfig:
-    def __init__(self, enabled=True, model="livekit", confidence_threshold=0.5, fallback_to_pause=True):
-        self.enabled = enabled
-        self.model = model
-        self.confidence_threshold = confidence_threshold
-        self.fallback_to_pause = fallback_to_pause
-
 
 class AudioProcessor:
-    """Enhanced audio processor with conversation tracking and processing insights"""
+    """
+    Main class for processing audio input/output with STT, TTS, and AI conversation
+    """
     
     def __init__(self):
+        """Initialize all models and components"""
         self.stt_model = None
-        self.fastrtc_stt_model = None  # For turn detection
         self.tts_model = None
         self.llm_model = None
         self.agent: CompiledGraph = None
         self.checkpointer = MemorySaver()
         self.current_thread_id = str(uuid.uuid4())
-        self.conversation_history = []
-        self.enhanced_handler = None
         
         self._initialize_models()
     
     def _initialize_models(self):
-        """Initialize all models"""
+        """Initialize all AI models"""
         try:
             self._initialize_llm()
-            self._initialize_stt_models()
+            self._initialize_stt_model()
             self._initialize_tts_model()
-            logger.info("All models initialized successfully")
         except Exception as e:
-            logger.error(f"Model initialization failed: {e}")
+            logger.error(f"Failed to initialize models: {e}")
     
     def _initialize_llm(self):
-        """Initialize LLM and agent"""
+        """Initialize the language model and agent"""
         try:
-            logger.info("Initializing LLM...")
-            self.llm_model = init_chat_model("ollama:qwen2.5:7b-instruct", temperature=0.1)
-            
+            logger.info("Initializing LLM and agent...")
+            self.llm_model = init_chat_model(
+                "ollama:qwen2.5:14b-instruct", 
+                # "anthropic:claude-3-5-sonnet-20241022",
+                temperature=0.1
+            )
+            self.llm_model.invoke("") #Please keep responses concise (30 words or less). 
             self.agent = create_react_agent(
                 model=self.llm_model,
                 tools=[],
                 prompt=(
                     "You are a debt collection specialist from Cartrack Account Department. "
-                    "Your name is Trung. Keep responses concise (20 words or less). "
+                    "Your name is AI Agent. "
                     "Be professional and helpful."
                 ),
                 checkpointer=self.checkpointer
             )
-            logger.info("LLM initialized successfully")
+            logger.info("LLM and agent initialized successfully")
+            
         except Exception as e:
-            logger.error(f"LLM initialization failed: {e}")
+            logger.error(f"Failed to initialize LLM: {e}")
             self.llm_model = None
             self.agent = None
     
-    def _initialize_stt_models(self):
-        """Initialize STT models"""
+    def _initialize_stt_model(self):
+        """Initialize and warm up the Speech-to-Text model"""
         try:
-            # Your custom STT model
-            logger.info("Initializing custom STT model...")
+            logger.info("Initializing STT model...")
             self.stt_model = create_stt_model(STT_CONFIG)
+            # self.stt_model = get_stt_model(model="moonshine/base")
             
-            # FastRTC STT model for turn detection
-            logger.info("Initializing FastRTC STT model...")
-            self.fastrtc_stt_model = get_stt_model("moonshine/base")
-            
-            # Warm up
+            # Warm up with dummy input
+            logger.info("Warming up STT model...")
             warmup_audio = np.zeros((16000,), dtype=np.float32)
-            input_file = audio_to_file((16000, warmup_audio))
-            self.stt_model.transcribe(input_file)
-            logger.info("STT models initialized and warmed up")
+            # input_file = audio_to_file((16000, warmup_audio))
+            self.stt_model.transcribe((16000, warmup_audio))
+            # self.stt_model.stt((16000, warmup_audio))
+            logger.info("STT model warmup complete")
+            
         except Exception as e:
-            logger.error(f"STT initialization failed: {e}")
+            logger.error(f"Failed to initialize STT model: {e}")
             self.stt_model = None
-            self.fastrtc_stt_model = None
     
     def _initialize_tts_model(self):
-        """Initialize TTS model"""
+        """Initialize the Text-to-Speech model"""
         try:
             logger.info("Initializing TTS model...")
             self.tts_model = create_tts_model(TTS_CONFIG)
             logger.info("TTS model initialized successfully")
+            
         except Exception as e:
-            logger.error(f"TTS initialization failed: {e}")
+            logger.error(f"Failed to initialize TTS model: {e}")
             self.tts_model = None
     
-    def start_new_conversation(self) -> Tuple[str, str, str]:
-        """Start new conversation and reset history"""
+    def start_new_conversation(self) -> str:
+        """
+        Start a new conversation with a fresh thread ID
+        
+        Returns:
+            str: New thread ID
+        """
         self.current_thread_id = str(uuid.uuid4())
-        self.conversation_history = []
-        if self.enhanced_handler:
-            # Reset enhanced handler conversation history
-            self.enhanced_handler.enhanced_state.conversation_history = []
-        
-        logger.info(f"New conversation started: {self.current_thread_id}")
-        return self.current_thread_id, "", self._format_conversation()
+        logger.info(f"Started new conversation with thread ID: {self.current_thread_id}")
+        return self.current_thread_id
     
-    def _format_conversation(self) -> str:
-        """Format conversation history for display"""
-        if not self.conversation_history:
-            return "Conversation will appear here..."
-        
-        formatted = []
-        for entry in self.conversation_history:
-            role = "🗣️ **User**" if entry["role"] == "user" else "🤖 **AI Assistant**"
-            formatted.append(f"{role}: {entry['content']}")
-        
-        return "\n\n".join(formatted)
+    def get_current_thread_id(self) -> str:
+        """Get the current conversation thread ID"""
+        return self.current_thread_id
     
-    def process_audio_input(self, audio_input: Tuple[int, np.ndarray], transcript: str = "") -> Generator:
-        """Enhanced audio processing with insights from EnhancedReplyOnPause"""
+    def process_audio_input(
+        self, 
+        audio_input: Tuple[int, np.ndarray], 
+        transcript: str = "", 
+        thread_id: str = None
+    ) -> Generator:
+        """
+        Process audio input and return AI response
+        
+        Args:
+            audio_input: Tuple of (sample_rate, audio_array)
+            transcript: Current transcript text
+            thread_id: Conversation thread ID (uses current if None)
+            
+        Yields:
+            Audio chunks for TTS output and additional outputs
+        """
+        if thread_id is None:
+            thread_id = self.current_thread_id
+            
         sample_rate, audio_array = audio_input
-        logger.info(f"Processing audio: {sample_rate}Hz, {audio_array.shape}")
+        logger.info(f"Processing audio - SR: {sample_rate}Hz, Shape: {audio_array.shape}, Type: {audio_array.dtype}, Max. Value: {np.max(audio_array[0,:])}")
         
-        if not self.stt_model or not self.agent:
-            yield AdditionalOutputs(None, None, None, "Models not available")
+        # Check if models are available
+        if not self.stt_model:
+            logger.error("STT model not available")
+            yield AdditionalOutputs(None, None, "STT model not available")
+            return
+            
+        if not self.agent:
+            logger.error("AI agent not available")
+            yield AdditionalOutputs(None, None, "AI agent not available")
             return
         
+        # Process audio
         try:
-            # Create original audio file
-            original_file = audio_to_file((sample_rate, audio_array))
+            # Convert audio to appropriate format
+            input_audio_int16 = audio_to_int16(audio_array)
+            output_audio_int16 = audio_to_int16(audio_array.copy())
             
-            # Get debug info from enhanced handler if available
-            noise_reduced_file = None
-            vad_processed_file = None
+            input_file = audio_to_file(audio_input)
+            output_file = audio_to_file((sample_rate, output_audio_int16))
             
-            if self.enhanced_handler and hasattr(self.enhanced_handler, 'enhanced_state'):
-                debug_info = self.enhanced_handler.get_debug_audio_info(self.enhanced_handler.enhanced_state)
-                
-                # Create noise-reduced audio file if available
-                if debug_info.get('noise_reduced_audio') is not None:
-                    noise_reduced_audio = debug_info['noise_reduced_audio']
-                    noise_reduced_int16 = audio_to_int16(noise_reduced_audio)
-                    noise_reduced_file = audio_to_file((sample_rate, noise_reduced_int16))
-                
-                # Create VAD-processed audio file if available
-                if debug_info.get('vad_processed_audio') is not None:
-                    vad_audio = debug_info['vad_processed_audio']
-                    vad_int16 = audio_to_int16(vad_audio)
-                    vad_processed_file = audio_to_file((16000, vad_int16))  # VAD uses 16kHz
-            
-            # Transcribe using original STT model
-            transcription_result = self.stt_model.transcribe(original_file)
+            # Transcribe audio
+            transcription_result = self.stt_model.transcribe(audio_input)
             new_transcription = transcription_result.get('text', '').strip()
+
+            # new_transcription = self.stt_model.stt(audio_input)
             
             if new_transcription:
-                # Add to conversation history
-                self.conversation_history.append({
-                    "role": "user",
-                    "content": new_transcription,
-                    "timestamp": str(uuid.uuid4())[:8]
-                })
+                # Update combined transcript
+                combined_transcription = f"{transcript}{new_transcription}\n" if transcript else f"{new_transcription}\n"
+                logger.info(f"Transcription: '{new_transcription}'")
                 
                 # Generate AI response
                 workflow_input = {"messages": [HumanMessage(content=new_transcription)]}
-                config = {"configurable": {"thread_id": self.current_thread_id}}
+                config = {"configurable": {"thread_id": thread_id}}
                 
                 response = self.agent.invoke(workflow_input, config=config)['messages'][-1].content
+                logger.info(f"AI Response: '{response}'")
                 
-                # Add AI response to history
-                self.conversation_history.append({
-                    "role": "assistant", 
-                    "content": response,
-                    "timestamp": str(uuid.uuid4())[:8]
-                })
-                
-                # Update enhanced handler conversation history
-                if self.enhanced_handler:
-                    self.enhanced_handler.add_assistant_response(response)
-                
-                logger.info(f"User: '{new_transcription}' | AI: '{response}'")
-                
-                # Generate TTS
+                # Generate TTS audio chunks
                 if self.tts_model:
                     for audio_chunk in self.tts_model.stream_text_to_speech(response):
                         yield audio_chunk
+                else:
+                    logger.warning("TTS model not available")
                 
-                # Yield processing insights with all audio stages
-                yield AdditionalOutputs(
-                    original_file,                    # Original audio
-                    noise_reduced_file,              # Noise-reduced audio (or None)
-                    vad_processed_file,              # VAD-processed audio (or None)
-                    self._format_conversation()      # Formatted conversation
-                )
+                # Yield additional outputs
+                yield AdditionalOutputs(input_file, output_file, combined_transcription)
             else:
                 logger.info("No transcription detected")
-                yield AdditionalOutputs(original_file, noise_reduced_file, vad_processed_file, transcript)
+                yield AdditionalOutputs(input_file, output_file, transcript)
                 
         except Exception as e:
-            logger.error(f"Audio processing error: {e}")
-            yield AdditionalOutputs(None, None, None, f"Error: {str(e)}")
-    
-    def create_enhanced_handler(self) -> EnhancedReplyOnPause:
-        """Create enhanced handler with all features using new class structure"""
-        # Create configuration objects for backwards compatibility
-        noise_config = NoiseReductionConfig(
-            enabled=NOISE_CONFIG["enabled"],
-            model=NOISE_CONFIG["model"],
-            fallback_enabled=NOISE_CONFIG["fallback_enabled"]
-        )
-        
-        turn_config = TurnDetectionConfig(
-            enabled=TURN_CONFIG["enabled"],
-            model=TURN_CONFIG["model"],
-            confidence_threshold=TURN_CONFIG["confidence_threshold"],
-            fallback_to_pause=TURN_CONFIG["fallback_to_pause"]
-        )
-        
-        hum_vad_model = HumAwareVADModel()
-        
-        # Create enhanced handler with new simplified interface
-        self.enhanced_handler = EnhancedReplyOnPause(
-            fn=self.process_audio_input,
-            stt_model=self.fastrtc_stt_model,
-            noise_reduction_config=noise_config,
-            turn_detection_config=turn_config,
-            algo_options=ALGO_OPTIONS,
-            model_options=VAD_OPTIONS,
-            model=hum_vad_model,
-            input_sample_rate=16000,
-            can_interrupt=False,
-        )
-        
-        logger.info("Enhanced handler created with new class structure")
-        return self.enhanced_handler
-    
-    def get_system_status(self) -> str:
-        """Get comprehensive system status including enhanced handler info"""
-        status_items = [
-            f"🎙️ **STT Model**: {'✅ Ready' if self.stt_model else '❌ Failed'}",
-            f"🔊 **TTS Model**: {'✅ Ready' if self.tts_model else '❌ Failed'}",
-            f"🤖 **AI Agent**: {'✅ Ready' if self.agent else '❌ Failed'}",
-            f"🎯 **FastRTC STT**: {'✅ Ready' if self.fastrtc_stt_model else '❌ Failed'}",
-        ]
-        
-        if self.enhanced_handler:
-            handler_status = self.enhanced_handler.get_status()
-            noise_status = handler_status.get("noise_reduction", {})
-            turn_status = handler_status.get("turn_detection", {})
-            
-            # Enhanced status with more details
-            noise_model = noise_status.get('model', 'Unknown')
-            turn_model = turn_status.get('model', 'Unknown')
-            
-            status_items.extend([
-                f"🔇 **Noise Reduction**: {'✅ ' + noise_model if noise_status.get('enabled') else '❌ Disabled'}",
-                f"🔄 **Turn Detection**: {'✅ ' + turn_model if turn_status.get('enabled') else '❌ Disabled'}",
-                f"💬 **Conversation**: {len(self.conversation_history)} messages",
-                f"📊 **Audio Rate**: {handler_status.get('audio_processing', {}).get('input_sample_rate', 'Unknown')}Hz"
-            ])
-        else:
-            status_items.append("⚠️ **Enhanced Handler**: Not initialized")
-        
-        return "\n".join(status_items)
-    
-    def get_enhancement_stats(self) -> str:
-        """Get detailed enhancement statistics"""
-        if not self.enhanced_handler:
-            return "Enhanced handler not initialized"
-        
-        stats = self.enhanced_handler.get_enhancement_stats()
-        
-        formatted_stats = [
-            "🔧 **Enhancement Statistics**",
-            "",
-            f"🔇 **Noise Reduction**:",
-            f"  • Enabled: {stats['noise_reduction']['enabled']}",
-            f"  • Model: {stats['noise_reduction']['model']}",
-            f"  • Loaded: {stats['noise_reduction']['loaded']}",
-            "",
-            f"🔄 **Turn Detection**:",
-            f"  • Enabled: {stats['turn_detection']['enabled']}",
-            f"  • Model: {stats['turn_detection']['model']}",
-            f"  • Loaded: {stats['turn_detection']['loaded']}",
-            f"  • Threshold: {stats['turn_detection']['threshold']}",
-            "",
-            f"💬 **Conversation**:",
-            f"  • History Length: {stats['conversation']['history_length']}",
-            f"  • Last Transcript: {stats['conversation']['last_transcript'][:50]}..."
-        ]
-        
-        return "\n".join(formatted_stats)
+            logger.error(f"Error processing audio: {e}")
+            yield AdditionalOutputs(None, None, f"Error: {str(e)}")
 
-
-# Global processor instance
+# Global audio processor instance
 audio_processor = AudioProcessor()
 
 async def get_credentials():
-    """Get TURN credentials"""
+    """Get Cloudflare TURN credentials for WebRTC"""
     try:
         return await get_cloudflare_turn_credentials_async(hf_token=TOKEN)
     except Exception as e:
-        logger.error(f"TURN credentials failed: {e}")
-        return {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+        logger.error(f"Failed to get TURN credentials: {e}")
+        return None
+
+def handle_new_conversation() -> Tuple[str, str]:
+    """
+    Handle new conversation button click
+    
+    Returns:
+        Tuple of (new_thread_id, cleared_transcript)
+    """
+    new_thread_id = audio_processor.start_new_conversation()
+    return new_thread_id, ""  # Clear transcript
 
 def create_gradio_interface():
-    """Create optimized Gradio interface"""
+    """Create and configure the Gradio interface"""
     
     with gr.Blocks(
-        title="Enhanced FastRTC Audio Processing",
+        title="Real-time Audio Processing",
         theme=gr.themes.Ocean(),
         css="""
-        .gradio-container { max-width: 1400px !important; }
-        .conversation-box { background-color: #f8f9fa; border-radius: 8px; padding: 15px; }
-        .status-box { background-color: #e3f2fd; border-radius: 8px; padding: 10px; }
-        .stats-box { background-color: #f3e5f5; border-radius: 8px; padding: 10px; }
+        .gradio-container {
+            max-width: 1200px !important;
+        }
         """
     ) as demo:
         
         gr.HTML("""
-        <div style='text-align: center; margin-bottom: 20px;'>
-            <h1 style='color: #1565c0; margin-bottom: 10px;'>
-                🎤 Enhanced FastRTC Audio Processing v2.0
-            </h1>
-            <p style='color: #666; font-size: 16px;'>
-                Real-time conversation with noise cancellation and semantic turn detection
-            </p>
-        </div>
+        <h1 style='text-align: center; color: #2563eb;'>
+            🎤 Real-time Audio Processing with AI Conversation
+        </h1>
         """)
         
         with gr.Row():
-            # Left column - Controls and Status
+            # Left column - Audio streaming and controls
             with gr.Column(scale=1):
-                gr.Markdown("### 🎙️ **Audio Stream**")
+                gr.Markdown("### 🎙️ Live Audio Stream")
+                
+                # New conversation button
+                new_conversation_btn = gr.Button(
+                    "🔄 Start New Conversation",
+                    variant="secondary",
+                    size="sm"
+                )
+                
+                # Thread ID display
+                thread_id_display = gr.Textbox(
+                    label="Conversation ID",
+                    value=audio_processor.get_current_thread_id(),
+                    interactive=False,
+                    max_lines=1
+                )
+                
+                # Audio streaming component
                 audio_stream = WebRTC(
-                    label="Voice Chat",
+                    label="Record & Process Audio",
                     mode="send-receive",
                     modality="audio",
                     track_constraints=AUDIO_CONSTRAINTS,
                     rtc_configuration=get_credentials,
-                )
-                
-                new_conversation_btn = gr.Button(
-                    "🔄 Start New Conversation",
-                    variant="primary",
-                    size="lg"
-                )
-                
-                thread_id_display = gr.Textbox(
-                    label="🔗 Conversation ID",
-                    value=audio_processor.current_thread_id,
-                    interactive=False
-                )
-                
-                gr.Markdown("### 📊 **System Status**")
-                system_status = gr.Textbox(
-                    label="Status",
-                    value=audio_processor.get_system_status(),
-                    interactive=False,
-                    lines=7,
-                    elem_classes=["status-box"]
-                )
-                
-                refresh_status_btn = gr.Button(
-                    "🔄 Refresh Status",
-                    variant="secondary"
-                )
-                
-                gr.Markdown("### 🔧 **Enhancement Stats**")
-                enhancement_stats = gr.Textbox(
-                    label="Enhancement Statistics",
-                    value="Initialize handler to see stats",
-                    interactive=False,
-                    lines=10,
-                    elem_classes=["stats-box"]
-                )
-                
-                refresh_stats_btn = gr.Button(
-                    "📊 Refresh Stats",
-                    variant="secondary"
+                    min_width=80,
                 )
             
-            # Right column - Conversation and Audio Processing
-            with gr.Column(scale=2):
-                gr.Markdown("### 💬 **Conversation**")
-                conversation_display = gr.Textbox(
-                    label="Chat History",
-                    value=audio_processor._format_conversation(),
-                    lines=12,
-                    max_lines=20,
-                    show_copy_button=True,
-                    elem_classes=["conversation-box"]
+            # Right column - Results and audio files
+            with gr.Column(scale=1):
+                gr.Markdown("### 📝 Conversation Transcript")
+                transcript = gr.Textbox(
+                    label="Transcription",
+                    placeholder="Your conversation will appear here...",
+                    lines=8,
+                    max_lines=15,
+                    show_copy_button=True
                 )
                 
-                gr.Markdown("### 🔊 **Audio Processing Pipeline**")
-                gr.Markdown("Compare audio quality at each processing stage:")
+                gr.Markdown("### 🔊 Audio Files")
                 with gr.Row():
-                    original_audio = gr.Audio(
-                        label="🎵 Original Input",
+                    input_player = gr.Audio(
+                        label="Input Audio", 
                         interactive=False,
                         show_download_button=True
                     )
-                    noise_reduced_audio = gr.Audio(
-                        label="🔇 After Noise Reduction",
-                        interactive=False,
-                        show_download_button=True
-                    )
-                    vad_processed_audio = gr.Audio(
-                        label="🎯 After VAD Processing",
+                    output_player = gr.Audio(
+                        label="Processed Audio", 
                         interactive=False,
                         show_download_button=True
                     )
         
+       
         # Event handlers
-        def handle_new_conversation():
-            thread_id, _, conversation = audio_processor.start_new_conversation()
-            status = audio_processor.get_system_status()
-            return thread_id, conversation, status
-        
         new_conversation_btn.click(
             fn=handle_new_conversation,
-            outputs=[thread_id_display, conversation_display, system_status],
+            outputs=[thread_id_display, transcript],
             show_progress="hidden"
         )
         
-        refresh_status_btn.click(
-            fn=audio_processor.get_system_status,
-            outputs=system_status,
-            show_progress="hidden"
-        )
-        
-        refresh_stats_btn.click(
-            fn=audio_processor.get_enhancement_stats,
-            outputs=enhancement_stats,
-            show_progress="hidden"
-        )
-        
-        # Setup enhanced audio streaming
-        enhanced_handler = audio_processor.create_enhanced_handler()
-        
+        # Set up audio streaming with VAD
+        hum_vad_model = HumAwareVADModel()
         audio_stream.stream(
-            fn=enhanced_handler,
-            inputs=[audio_stream, conversation_display],
+            fn=ReplyOnPause(
+                fn=audio_processor.process_audio_input,
+                input_sample_rate=16000,
+                algo_options=ALGO_OPTIONS,
+                model_options=VAD_OPTIONS,
+                # model=hum_vad_model,
+                can_interrupt=True,
+            ),
+            inputs=[audio_stream, transcript],
             outputs=[audio_stream],
             time_limit=300,
-            concurrency_limit=3,
+            concurrency_limit=5,
         )
         
-        # Handle processing insights with proper audio stage handling
+        # Handle additional outputs (audio files and transcript updates)
         audio_stream.on_additional_outputs(
-            fn=lambda orig, noise_red, vad_proc, conv: (
-                orig if orig else None,           # Original audio
-                noise_red if noise_red else None, # Noise reduced audio (may be None)
-                vad_proc if vad_proc else None,   # VAD processed audio (may be None)
-                conv                              # Updated conversation
+            fn=lambda input_audio, output_audio, transcript_text: (
+                input_audio, 
+                output_audio, 
+                transcript_text
             ),
-            outputs=[
-                original_audio,
-                noise_reduced_audio, 
-                vad_processed_audio,
-                conversation_display
-            ],
-            queue=False,
+            outputs=[input_player, output_player, transcript],
+            queue=False, 
             show_progress="hidden"
-        )
-        
-        # Auto-refresh enhancement stats when handler is created
-        demo.load(
-            fn=audio_processor.get_enhancement_stats,
-            outputs=enhancement_stats
         )
     
     return demo
 
 def main():
-    """Main application entry point"""
-    print("🚀 Starting Enhanced FastRTC Audio Processing v2.0...")
+    """Main function to run the application"""
+    print("🚀 Starting Real-time Audio Processing Application...")
     
-    # Display initialization status
-    status_items = [
-        ("STT Model", audio_processor.stt_model is not None),
-        ("TTS Model", audio_processor.tts_model is not None), 
-        ("AI Agent", audio_processor.agent is not None),
-        ("FastRTC STT", audio_processor.fastrtc_stt_model is not None),
-    ]
+    # Check model initialization status
+    models_status = {
+        "STT": audio_processor.stt_model is not None,
+        "TTS": audio_processor.tts_model is not None,
+        "AI Agent": audio_processor.agent is not None
+    }
     
-    print("\n📊 Initialization Status:")
-    for name, status in status_items:
-        icon = "✅" if status else "❌"
-        print(f"  {icon} {name}: {'Ready' if status else 'Failed'}")
+    print("\n📊 Model Initialization Status:")
+    for model_name, status in models_status.items():
+        status_icon = "✅" if status else "❌"
+        print(f"  {status_icon} {model_name}: {'Ready' if status else 'Failed'}")
     
-    # Enhanced features status
-    print(f"\n🔧 Enhanced Features:")
-    print(f"  🔇 Noise Reduction: {NOISE_CONFIG['model']} ({'enabled' if NOISE_CONFIG['enabled'] else 'disabled'})")
-    print(f"  🔄 Turn Detection: {TURN_CONFIG['model']} ({'enabled' if TURN_CONFIG['enabled'] else 'disabled'})")
-    print(f"  🎯 Audio Pipeline: Original → Noise Reduction → VAD → Turn Detection")
-    print(f"  🎛️ Initial Thread: {audio_processor.current_thread_id}")
-    print(f"  📊 New Features: Enhanced conversation tracking, audio pipeline debugging")
-    
-    if not any(status for _, status in status_items):
-        print("\n⚠️  WARNING: Critical models failed to initialize!")
+    if not any(models_status.values()):
+        print("\n⚠️  WARNING: No models initialized successfully. Check logs for details.")
         return
     
-    # Launch interface
+    print(f"\n🎯 Initial conversation ID: {audio_processor.get_current_thread_id()}")
+    
+    # Create and launch the interface
     demo = create_gradio_interface()
     demo.launch(
         share=False,
-        server_port=7861,
+        server_port=7862,
         server_name="0.0.0.0",
         show_error=True
     )

@@ -20,6 +20,7 @@ from fastrtc import (
     AdditionalOutputs, 
     get_cloudflare_turn_credentials_async,
     audio_to_int16, 
+    get_stt_model,
     audio_to_file
 )
 
@@ -48,12 +49,11 @@ if not TOKEN:
 
 # Model configurations
 STT_CONFIG = {
-    "model_name": "nvidia/parakeet-tdt-0.6b-v2",
+    "model_name": "openai/whisper-large-v3-turbo",
     
     # Whisper configuration (alternative)
     "openai/whisper-large-v3-turbo": {
         "checkpoint": "openai/whisper-large-v3-turbo",
-        "model_folder_path": "/home/ct-admin/Documents/Langgraph/HF_models/",
         "batch_size": 4,
         "cuda_device_id": 1,
         "chunk_length_s": 30,
@@ -105,14 +105,14 @@ VAD_OPTIONS = SileroVadOptions(
     max_speech_duration_s=30,
     min_silence_duration_ms=500,
     window_size_samples=1024,
-    speech_pad_ms=50,
+    speech_pad_ms=400,
 )
 
 # Algorithm options for audio processing
 ALGO_OPTIONS = AlgoOptions(
     audio_chunk_duration=0.6,
-    started_talking_threshold=0.2,
-    speech_threshold=0.1,
+    started_talking_threshold=0.3,
+    speech_threshold=0.2,
 )
 
 class AudioProcessor:
@@ -145,17 +145,17 @@ class AudioProcessor:
         try:
             logger.info("Initializing LLM and agent...")
             self.llm_model = init_chat_model(
-                "ollama:qwen2.5:7b-instruct", 
+                "ollama:qwen2.5:14b-instruct", 
+                # "anthropic:claude-3-5-sonnet-20241022",
                 temperature=0.1
             )
-            
+            self.llm_model.invoke("") #Please keep responses concise (30 words or less). 
             self.agent = create_react_agent(
                 model=self.llm_model,
                 tools=[],
                 prompt=(
                     "You are a debt collection specialist from Cartrack Account Department. "
-                    "Your name is Trung. Please keep responses concise (20 words or less). "
-                    "Be professional and helpful."
+                    "Your name is AI Agent. If users interrupt you, please listen to them"
                 ),
                 checkpointer=self.checkpointer
             )
@@ -171,12 +171,14 @@ class AudioProcessor:
         try:
             logger.info("Initializing STT model...")
             self.stt_model = create_stt_model(STT_CONFIG)
+            # self.stt_model = get_stt_model(model="moonshine/base")
             
             # Warm up with dummy input
             logger.info("Warming up STT model...")
             warmup_audio = np.zeros((16000,), dtype=np.float32)
-            input_file = audio_to_file((16000, warmup_audio))
-            self.stt_model.transcribe(input_file)
+            # input_file = audio_to_file((16000, warmup_audio))
+            self.stt_model.transcribe((16000, warmup_audio))
+            # self.stt_model.stt((16000, warmup_audio))
             logger.info("STT model warmup complete")
             
         except Exception as e:
@@ -230,7 +232,7 @@ class AudioProcessor:
             thread_id = self.current_thread_id
             
         sample_rate, audio_array = audio_input
-        logger.info(f"Processing audio - SR: {sample_rate}Hz, Shape: {audio_array.shape}")
+        logger.info(f"Processing audio - SR: {sample_rate}Hz, Shape: {audio_array.shape}, Type: {audio_array.dtype}, Max. Value: {np.max(audio_array[0,:])}")
         
         # Check if models are available
         if not self.stt_model:
@@ -249,12 +251,14 @@ class AudioProcessor:
             input_audio_int16 = audio_to_int16(audio_array)
             output_audio_int16 = audio_to_int16(audio_array.copy())
             
-            input_file = audio_to_file((sample_rate, input_audio_int16))
+            input_file = audio_to_file(audio_input)
             output_file = audio_to_file((sample_rate, output_audio_int16))
             
             # Transcribe audio
-            transcription_result = self.stt_model.transcribe(output_file)
+            transcription_result = self.stt_model.transcribe(audio_input)
             new_transcription = transcription_result.get('text', '').strip()
+
+            # new_transcription = self.stt_model.stt(audio_input)
             
             if new_transcription:
                 # Update combined transcript
@@ -391,12 +395,12 @@ def create_gradio_interface():
         hum_vad_model = HumAwareVADModel()
         audio_stream.stream(
             fn=ReplyOnPause(
-                audio_processor.process_audio_input,
+                fn=audio_processor.process_audio_input,
                 input_sample_rate=16000,
                 algo_options=ALGO_OPTIONS,
                 model_options=VAD_OPTIONS,
-                model=hum_vad_model,
-                can_interrupt=False,
+                # model=hum_vad_model,
+                can_interrupt=True,
             ),
             inputs=[audio_stream, transcript],
             outputs=[audio_stream],
@@ -444,7 +448,7 @@ def main():
     demo = create_gradio_interface()
     demo.launch(
         share=False,
-        server_port=7861,
+        server_port=7862,
         server_name="0.0.0.0",
         show_error=True
     )

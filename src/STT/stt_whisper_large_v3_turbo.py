@@ -168,7 +168,12 @@ class OPENAIWhisperV3TurboModel(BaseSTTModel):
                 if len(audio_array.shape) > 1:
                     audio_array = audio_array.squeeze()
                 
-                return audio_array.astype("float32") / 32768.0
+                # Normalize by max absolute value
+                max_val = np.max(np.abs(audio_array))
+                if max_val > 0:  # Avoid division by zero
+                    return audio_array.astype("float32") / max_val
+                else:
+                    return audio_array.astype("float32")  # All zeros
             else:
                 raise ValueError(f"Unsupported audio array type: {type(audio_array)}")
         
@@ -179,18 +184,26 @@ class OPENAIWhisperV3TurboModel(BaseSTTModel):
             else:
                 audio_array = audio_data
             
-            return audio_array.astype("float32") / 32768.0
+            # Normalize by max absolute value
+            max_val = np.max(np.abs(audio_array))
+            if max_val > 0:  # Avoid division by zero
+                return audio_array.astype("float32") / max_val
+            else:
+                return audio_array.astype("float32")  # All zeros
         
         raise ValueError(f"Unsupported audio format: {type(audio_data)}")
     
-    def transcribe(self, audio_data: Any, task: str = "transcribe") -> Union[str, Dict[str, Any]]:
+    def transcribe(self, audio_data: Any, task: str = "translate") -> Union[str, Dict[str, Any]]:
         """Transcribe with optimal settings - Based on working implementation."""
         try:
             # Process audio into the right format
             processed_audio = self._process_audio_input(audio_data)
             
             # Run transcription without any generate_kwargs to avoid forced_decoder_ids issue
-            result = self.pipe(processed_audio, batch_size=self.config.batch_size)
+            result = self.pipe(processed_audio, 
+                               batch_size=self.config.batch_size,
+                               generate_kwargs={"language": "english", "task": task}, #translate, transcribe
+                               )
             
             return result
             

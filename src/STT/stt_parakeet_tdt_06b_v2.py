@@ -75,30 +75,44 @@ class NVIDIAParakeetModel(BaseSTTModel):
             logger.info(f"Loaded Parakeet-TDT model successfully")
     
     def _process_audio_input(self, audio_data: Any) -> Union[str, np.ndarray]:
+        """Process audio with optimal preprocessing - Based on working implementation."""
         if audio_data is None:
             raise ValueError("No audio data provided")
         
         # Handle file path
         if isinstance(audio_data, str):
-            if not os.path.exists(audio_data):
-                raise ValueError(f"Audio file not found: {audio_data}")
             return audio_data
         
-        # Handle WebRTC format (sample_rate, audio_array)
+        # Handle WebRTC tuple format (sample_rate, audio_array)
         if isinstance(audio_data, tuple) and len(audio_data) == 2:
             _, audio_array = audio_data
+            
             if isinstance(audio_array, np.ndarray):
-                audio_array = audio_array.squeeze()
-                if np.abs(audio_array).max() > 1.0:
-                    audio_array = audio_array.astype(np.float32) / 32768.0
-                return audio_array
+                if len(audio_array.shape) > 1:
+                    audio_array = audio_array.squeeze()
+                
+                # Normalize by max absolute value
+                max_val = np.max(np.abs(audio_array))
+                if max_val > 0:  # Avoid division by zero
+                    return audio_array.astype("float32") / max_val
+                else:
+                    return audio_array.astype("float32")  # All zeros
+            else:
+                raise ValueError(f"Unsupported audio array type: {type(audio_array)}")
         
         # Handle direct numpy array
         if isinstance(audio_data, np.ndarray):
-            audio_array = audio_data.squeeze()
-            if np.abs(audio_array).max() > 1.0:
-                audio_array = audio_array.astype(np.float32) / 32768.0
-            return audio_array
+            if len(audio_data.shape) > 1:
+                audio_array = audio_data.squeeze()
+            else:
+                audio_array = audio_data
+            
+            # Normalize by max absolute value
+            max_val = np.max(np.abs(audio_array))
+            if max_val > 0:  # Avoid division by zero
+                return audio_array.astype("float32") / max_val
+            else:
+                return audio_array.astype("float32")  # All zeros
         
         raise ValueError(f"Unsupported audio format: {type(audio_data)}")
     
