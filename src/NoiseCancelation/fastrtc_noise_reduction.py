@@ -352,7 +352,7 @@ class FastRTCNoiseReduction:
         
         # Resample if needed
         audio_for_model, was_resampled = self.model.resample_if_needed(audio, input_sample_rate)
-        logger.info(f"Audio was resampled: {was_resampled}. From sr:{input_sample_rate} Hz to sr: {self.model.sample_rate} Hz")
+        # logger.info(f"Audio was resampled: {was_resampled}. From sr:{input_sample_rate} Hz to sr: {self.model.sample_rate} Hz")
 
         # Enhance audio using direct tensor processing
         enhanced_audio = self.model.enhance_audio(audio_for_model)

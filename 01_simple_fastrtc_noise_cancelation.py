@@ -1,6 +1,6 @@
 """
 Real-time Audio Processing Application with Enhanced Features
-Uses EnhancedReplyOnPause with noise cancellation and turn detection
+Uses updated EnhancedReplyOnPause with noise cancellation and turn detection
 Optimized UI with audio processing insights and conversation tracking
 """
 
@@ -24,13 +24,8 @@ from fastrtc import (
     get_stt_model
 )
 
-# Enhanced imports
-from src.VAD_TurnDectection.enhanced_reply_on_pause import (
-    EnhancedReplyOnPause,
-    NoiseReductionConfig,
-    TurnDetectionConfig,
-    create_enhanced_handler
-)
+# Enhanced imports - Updated to use new class structure
+from src.VAD_TurnDectection.enhanced_reply_on_pause import EnhancedReplyOnPause
 
 # Utils imports
 from src.utils.logger_config import setup_logging
@@ -55,19 +50,18 @@ TOKEN = os.environ.get("HF_TOKEN")
 if not TOKEN:
     logger.warning("HF_TOKEN not found in environment variables")
 
-# Enhanced configurations
-ENHANCED_CONFIG = {
-    "noise_reduction": {
-        "enabled": True,
-        "model": "deepfilternet3",
-        "fallback_enabled": True
-    },
-    "turn_detection": {
-        "enabled": True,
-        "model": "livekit",
-        "confidence_threshold": 0.5,
-        "fallback_to_pause": True
-    }
+# Enhanced configurations - Simplified for new class structure
+NOISE_CONFIG = {
+    "enabled": True,
+    "model": "deepfilternet3",
+    "fallback_enabled": True
+}
+
+TURN_CONFIG = {
+    "enabled": True,
+    "model": "livekit",
+    "confidence_threshold": 0.5,
+    "fallback_to_pause": True
 }
 
 # Model configurations (simplified)
@@ -114,8 +108,22 @@ ALGO_OPTIONS = AlgoOptions(
     speech_threshold=0.1,
 )
 
+# Mock configuration classes for compatibility
+class NoiseReductionConfig:
+    def __init__(self, enabled=True, model="deepfilternet3", fallback_enabled=True):
+        self.enabled = enabled
+        self.model = model
+        self.fallback_enabled = fallback_enabled
 
-class EnhancedAudioProcessor:
+class TurnDetectionConfig:
+    def __init__(self, enabled=True, model="livekit", confidence_threshold=0.5, fallback_to_pause=True):
+        self.enabled = enabled
+        self.model = model
+        self.confidence_threshold = confidence_threshold
+        self.fallback_to_pause = fallback_to_pause
+
+
+class AudioProcessor:
     """Enhanced audio processor with conversation tracking and processing insights"""
     
     def __init__(self):
@@ -199,7 +207,8 @@ class EnhancedAudioProcessor:
         self.current_thread_id = str(uuid.uuid4())
         self.conversation_history = []
         if self.enhanced_handler:
-            self.enhanced_handler.conversation_history = []
+            # Reset enhanced handler conversation history
+            self.enhanced_handler.enhanced_state.conversation_history = []
         
         logger.info(f"New conversation started: {self.current_thread_id}")
         return self.current_thread_id, "", self._format_conversation()
@@ -217,28 +226,38 @@ class EnhancedAudioProcessor:
         return "\n\n".join(formatted)
     
     def process_audio_input(self, audio_input: Tuple[int, np.ndarray], transcript: str = "") -> Generator:
-        """Enhanced audio processing with insights"""
+        """Enhanced audio processing with insights from EnhancedReplyOnPause"""
         sample_rate, audio_array = audio_input
         logger.info(f"Processing audio: {sample_rate}Hz, {audio_array.shape}")
         
         if not self.stt_model or not self.agent:
-            yield AdditionalOutputs(None, None, "Models not available")
+            yield AdditionalOutputs(None, None, None, "Models not available")
             return
         
         try:
-            # Convert audio
-            input_audio_int16 = audio_to_int16(audio_array)
+            # Create original audio file
+            original_file = audio_to_file((sample_rate, audio_array))
             
-            # Create audio files for different processing stages
-            original_file = audio_to_file((sample_rate, input_audio_int16))
+            # Get debug info from enhanced handler if available
+            noise_reduced_file = None
+            vad_processed_file = None
             
-            # Get noise-reduced audio (simulated - would come from enhanced handler)
-            noise_reduced_file = original_file  # Placeholder
+            if self.enhanced_handler and hasattr(self.enhanced_handler, 'enhanced_state'):
+                debug_info = self.enhanced_handler.get_debug_audio_info(self.enhanced_handler.enhanced_state)
+                
+                # Create noise-reduced audio file if available
+                if debug_info.get('noise_reduced_audio') is not None:
+                    noise_reduced_audio = debug_info['noise_reduced_audio']
+                    noise_reduced_int16 = audio_to_int16(noise_reduced_audio)
+                    noise_reduced_file = audio_to_file((sample_rate, noise_reduced_int16))
+                
+                # Create VAD-processed audio file if available
+                if debug_info.get('vad_processed_audio') is not None:
+                    vad_audio = debug_info['vad_processed_audio']
+                    vad_int16 = audio_to_int16(vad_audio)
+                    vad_processed_file = audio_to_file((16000, vad_int16))  # VAD uses 16kHz
             
-            # Get VAD-processed audio (simulated)
-            vad_processed_file = original_file  # Placeholder
-            
-            # Transcribe
+            # Transcribe using original STT model
             transcription_result = self.stt_model.transcribe(original_file)
             new_transcription = transcription_result.get('text', '').strip()
             
@@ -274,54 +293,57 @@ class EnhancedAudioProcessor:
                     for audio_chunk in self.tts_model.stream_text_to_speech(response):
                         yield audio_chunk
                 
-                # Yield processing insights
+                # Yield processing insights with all audio stages
                 yield AdditionalOutputs(
-                    original_file,      # Original audio
-                    noise_reduced_file, # Noise-reduced audio
-                    vad_processed_file, # VAD-processed audio
-                    self._format_conversation()  # Formatted conversation
+                    original_file,                    # Original audio
+                    noise_reduced_file,              # Noise-reduced audio (or None)
+                    vad_processed_file,              # VAD-processed audio (or None)
+                    self._format_conversation()      # Formatted conversation
                 )
             else:
                 logger.info("No transcription detected")
-                yield AdditionalOutputs(original_file, None, None, transcript)
+                yield AdditionalOutputs(original_file, noise_reduced_file, vad_processed_file, transcript)
                 
         except Exception as e:
             logger.error(f"Audio processing error: {e}")
             yield AdditionalOutputs(None, None, None, f"Error: {str(e)}")
     
     def create_enhanced_handler(self) -> EnhancedReplyOnPause:
-        """Create enhanced handler with all features"""
+        """Create enhanced handler with all features using new class structure"""
+        # Create configuration objects for backwards compatibility
         noise_config = NoiseReductionConfig(
-            enabled=ENHANCED_CONFIG["noise_reduction"]["enabled"],
-            model=ENHANCED_CONFIG["noise_reduction"]["model"],
-            fallback_enabled=ENHANCED_CONFIG["noise_reduction"]["fallback_enabled"]
+            enabled=NOISE_CONFIG["enabled"],
+            model=NOISE_CONFIG["model"],
+            fallback_enabled=NOISE_CONFIG["fallback_enabled"]
         )
         
         turn_config = TurnDetectionConfig(
-            enabled=ENHANCED_CONFIG["turn_detection"]["enabled"],
-            model=ENHANCED_CONFIG["turn_detection"]["model"],
-            confidence_threshold=ENHANCED_CONFIG["turn_detection"]["confidence_threshold"],
-            fallback_to_pause=ENHANCED_CONFIG["turn_detection"]["fallback_to_pause"]
+            enabled=TURN_CONFIG["enabled"],
+            model=TURN_CONFIG["model"],
+            confidence_threshold=TURN_CONFIG["confidence_threshold"],
+            fallback_to_pause=TURN_CONFIG["fallback_to_pause"]
         )
         
         hum_vad_model = HumAwareVADModel()
         
+        # Create enhanced handler with new simplified interface
         self.enhanced_handler = EnhancedReplyOnPause(
             fn=self.process_audio_input,
-            algo_options=ALGO_OPTIONS,
-            model_options=VAD_OPTIONS,
-            model=hum_vad_model,
             stt_model=self.fastrtc_stt_model,
             noise_reduction_config=noise_config,
             turn_detection_config=turn_config,
+            algo_options=ALGO_OPTIONS,
+            model_options=VAD_OPTIONS,
+            model=hum_vad_model,
             input_sample_rate=16000,
             can_interrupt=False,
         )
         
+        logger.info("Enhanced handler created with new class structure")
         return self.enhanced_handler
     
     def get_system_status(self) -> str:
-        """Get system status"""
+        """Get comprehensive system status including enhanced handler info"""
         status_items = [
             f"🎙️ **STT Model**: {'✅ Ready' if self.stt_model else '❌ Failed'}",
             f"🔊 **TTS Model**: {'✅ Ready' if self.tts_model else '❌ Failed'}",
@@ -334,17 +356,52 @@ class EnhancedAudioProcessor:
             noise_status = handler_status.get("noise_reduction", {})
             turn_status = handler_status.get("turn_detection", {})
             
+            # Enhanced status with more details
+            noise_model = noise_status.get('model', 'Unknown')
+            turn_model = turn_status.get('model', 'Unknown')
+            
             status_items.extend([
-                f"🔇 **Noise Reduction**: {'✅ ' + noise_status.get('model', 'Ready') if noise_status.get('enabled') else '❌ Disabled'}",
-                f"🔄 **Turn Detection**: {'✅ ' + turn_status.get('model', 'Ready') if turn_status.get('enabled') else '❌ Disabled'}",
-                f"💬 **Conversation**: {len(self.conversation_history)} messages"
+                f"🔇 **Noise Reduction**: {'✅ ' + noise_model if noise_status.get('enabled') else '❌ Disabled'}",
+                f"🔄 **Turn Detection**: {'✅ ' + turn_model if turn_status.get('enabled') else '❌ Disabled'}",
+                f"💬 **Conversation**: {len(self.conversation_history)} messages",
+                f"📊 **Audio Rate**: {handler_status.get('audio_processing', {}).get('input_sample_rate', 'Unknown')}Hz"
             ])
+        else:
+            status_items.append("⚠️ **Enhanced Handler**: Not initialized")
         
         return "\n".join(status_items)
+    
+    def get_enhancement_stats(self) -> str:
+        """Get detailed enhancement statistics"""
+        if not self.enhanced_handler:
+            return "Enhanced handler not initialized"
+        
+        stats = self.enhanced_handler.get_enhancement_stats()
+        
+        formatted_stats = [
+            "🔧 **Enhancement Statistics**",
+            "",
+            f"🔇 **Noise Reduction**:",
+            f"  • Enabled: {stats['noise_reduction']['enabled']}",
+            f"  • Model: {stats['noise_reduction']['model']}",
+            f"  • Loaded: {stats['noise_reduction']['loaded']}",
+            "",
+            f"🔄 **Turn Detection**:",
+            f"  • Enabled: {stats['turn_detection']['enabled']}",
+            f"  • Model: {stats['turn_detection']['model']}",
+            f"  • Loaded: {stats['turn_detection']['loaded']}",
+            f"  • Threshold: {stats['turn_detection']['threshold']}",
+            "",
+            f"💬 **Conversation**:",
+            f"  • History Length: {stats['conversation']['history_length']}",
+            f"  • Last Transcript: {stats['conversation']['last_transcript'][:50]}..."
+        ]
+        
+        return "\n".join(formatted_stats)
 
 
 # Global processor instance
-audio_processor = EnhancedAudioProcessor()
+audio_processor = AudioProcessor()
 
 async def get_credentials():
     """Get TURN credentials"""
@@ -364,16 +421,17 @@ def create_gradio_interface():
         .gradio-container { max-width: 1400px !important; }
         .conversation-box { background-color: #f8f9fa; border-radius: 8px; padding: 15px; }
         .status-box { background-color: #e3f2fd; border-radius: 8px; padding: 10px; }
+        .stats-box { background-color: #f3e5f5; border-radius: 8px; padding: 10px; }
         """
     ) as demo:
         
         gr.HTML("""
         <div style='text-align: center; margin-bottom: 20px;'>
             <h1 style='color: #1565c0; margin-bottom: 10px;'>
-                🎤 Enhanced FastRTC Audio Processing
+                🎤 Enhanced FastRTC Audio Processing v2.0
             </h1>
             <p style='color: #666; font-size: 16px;'>
-                Real-time conversation with noise cancellation and turn detection
+                Real-time conversation with noise cancellation and semantic turn detection
             </p>
         </div>
         """)
@@ -381,7 +439,14 @@ def create_gradio_interface():
         with gr.Row():
             # Left column - Controls and Status
             with gr.Column(scale=1):
-                gr.Markdown("### 🎛️ **Controls**")
+                gr.Markdown("### 🎙️ **Audio Stream**")
+                audio_stream = WebRTC(
+                    label="Voice Chat",
+                    mode="send-receive",
+                    modality="audio",
+                    track_constraints=AUDIO_CONSTRAINTS,
+                    rtc_configuration=get_credentials,
+                )
                 
                 new_conversation_btn = gr.Button(
                     "🔄 Start New Conversation",
@@ -409,13 +474,18 @@ def create_gradio_interface():
                     variant="secondary"
                 )
                 
-                gr.Markdown("### 🎙️ **Audio Stream**")
-                audio_stream = WebRTC(
-                    label="Voice Chat",
-                    mode="send-receive",
-                    modality="audio",
-                    track_constraints=AUDIO_CONSTRAINTS,
-                    rtc_configuration=get_credentials,
+                gr.Markdown("### 🔧 **Enhancement Stats**")
+                enhancement_stats = gr.Textbox(
+                    label="Enhancement Statistics",
+                    value="Initialize handler to see stats",
+                    interactive=False,
+                    lines=10,
+                    elem_classes=["stats-box"]
+                )
+                
+                refresh_stats_btn = gr.Button(
+                    "📊 Refresh Stats",
+                    variant="secondary"
                 )
             
             # Right column - Conversation and Audio Processing
@@ -430,20 +500,21 @@ def create_gradio_interface():
                     elem_classes=["conversation-box"]
                 )
                 
-                gr.Markdown("### 🔊 **Audio Processing Stages**")
+                gr.Markdown("### 🔊 **Audio Processing Pipeline**")
+                gr.Markdown("Compare audio quality at each processing stage:")
                 with gr.Row():
                     original_audio = gr.Audio(
-                        label="🎵 Original Audio",
+                        label="🎵 Original Input",
                         interactive=False,
                         show_download_button=True
                     )
                     noise_reduced_audio = gr.Audio(
-                        label="🔇 Noise Reduced",
+                        label="🔇 After Noise Reduction",
                         interactive=False,
                         show_download_button=True
                     )
                     vad_processed_audio = gr.Audio(
-                        label="🎯 VAD Processed",
+                        label="🎯 After VAD Processing",
                         interactive=False,
                         show_download_button=True
                     )
@@ -466,6 +537,12 @@ def create_gradio_interface():
             show_progress="hidden"
         )
         
+        refresh_stats_btn.click(
+            fn=audio_processor.get_enhancement_stats,
+            outputs=enhancement_stats,
+            show_progress="hidden"
+        )
+        
         # Setup enhanced audio streaming
         enhanced_handler = audio_processor.create_enhanced_handler()
         
@@ -477,13 +554,13 @@ def create_gradio_interface():
             concurrency_limit=3,
         )
         
-        # Handle processing insights
+        # Handle processing insights with proper audio stage handling
         audio_stream.on_additional_outputs(
             fn=lambda orig, noise_red, vad_proc, conv: (
-                orig,           # Original audio
-                noise_red,      # Noise reduced audio  
-                vad_proc,       # VAD processed audio
-                conv            # Updated conversation
+                orig if orig else None,           # Original audio
+                noise_red if noise_red else None, # Noise reduced audio (may be None)
+                vad_proc if vad_proc else None,   # VAD processed audio (may be None)
+                conv                              # Updated conversation
             ),
             outputs=[
                 original_audio,
@@ -494,12 +571,18 @@ def create_gradio_interface():
             queue=False,
             show_progress="hidden"
         )
+        
+        # Auto-refresh enhancement stats when handler is created
+        demo.load(
+            fn=audio_processor.get_enhancement_stats,
+            outputs=enhancement_stats
+        )
     
     return demo
 
 def main():
     """Main application entry point"""
-    print("🚀 Starting Enhanced FastRTC Audio Processing...")
+    print("🚀 Starting Enhanced FastRTC Audio Processing v2.0...")
     
     # Display initialization status
     status_items = [
@@ -516,9 +599,11 @@ def main():
     
     # Enhanced features status
     print(f"\n🔧 Enhanced Features:")
-    print(f"  🔇 Noise Reduction: {ENHANCED_CONFIG['noise_reduction']['model']}")
-    print(f"  🔄 Turn Detection: {ENHANCED_CONFIG['turn_detection']['model']}")
-    print(f"  🎯 Initial Thread: {audio_processor.current_thread_id}")
+    print(f"  🔇 Noise Reduction: {NOISE_CONFIG['model']} ({'enabled' if NOISE_CONFIG['enabled'] else 'disabled'})")
+    print(f"  🔄 Turn Detection: {TURN_CONFIG['model']} ({'enabled' if TURN_CONFIG['enabled'] else 'disabled'})")
+    print(f"  🎯 Audio Pipeline: Original → Noise Reduction → VAD → Turn Detection")
+    print(f"  🎛️ Initial Thread: {audio_processor.current_thread_id}")
+    print(f"  📊 New Features: Enhanced conversation tracking, audio pipeline debugging")
     
     if not any(status for _, status in status_items):
         print("\n⚠️  WARNING: Critical models failed to initialize!")

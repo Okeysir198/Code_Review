@@ -2207,3 +2207,1404 @@ AttributeError: 'NoneType' object has no attribute 'media'
 2025-06-16 14:37:17 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 59479) -> ('104.30.149.117', 30507)) State.IN_PROGRESS -> State.SUCCEEDED
 2025-06-16 14:37:28 - __main__ - INFO - Processing audio: 16000Hz, (1, 138240)
 2025-06-16 14:37:28 - __main__ - INFO - No transcription detected
+2025-06-16 16:19:26 - root - INFO - Logging configured with level: INFO
+2025-06-16 16:19:26 - __main__ - INFO - Initializing LLM...
+2025-06-16 16:19:26 - __main__ - INFO - LLM initialized successfully
+2025-06-16 16:19:26 - __main__ - INFO - Initializing custom STT model...
+2025-06-16 16:19:31 - __main__ - INFO - Initializing FastRTC STT model...
+2025-06-16 16:19:33 - __main__ - INFO - STT models initialized and warmed up
+2025-06-16 16:19:33 - __main__ - INFO - Initializing TTS model...
+2025-06-16 16:19:33 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'sample_rate': 24000, 'show_logs': True}
+2025-06-16 16:19:33 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 16:19:33 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 16:19:36 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 16:19:36 - __main__ - INFO - All models initialized successfully
+2025-06-16 16:19:37 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 16:19:37 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 16:19:37 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 16:19:37 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': 'cuda:0'}
+2025-06-16 16:19:37 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 16:19:38 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized (multilingual)
+2025-06-16 16:19:38 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 16:19:38 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True (deepfilternet3)
+2025-06-16 16:19:38 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True (livekit)
+2025-06-16 16:19:38 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 16:19:38 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 16:19:38 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 16:19:47 - __main__ - INFO - New conversation started: ff45cb41-bff4-4507-a710-6a492353870b
+2025-06-16 16:19:53 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 16:19:53 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 16:19:53 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 16:19:53 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 16:19:53 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': 'cuda:0'}
+2025-06-16 16:19:54 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized (multilingual)
+2025-06-16 16:19:54 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 16:19:54 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True (deepfilternet3)
+2025-06-16 16:19:54 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True (livekit)
+2025-06-16 16:19:54 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('192.168.190.121', 51396)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('192.168.190.121', 51396)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('192.168.190.121', 51396)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('192.168.190.121', 51396)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('192.168.190.121', 51396)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('192.168.190.121', 51396)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('192.168.190.121', 51396)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('192.168.190.121', 51396)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('118.69.244.141', 51396)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('118.69.244.141', 51396)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('118.69.244.141', 51396)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('118.69.244.141', 51396)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.149.235', 55511)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.149.235', 55511)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.149.235', 55511)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.149.235', 55511)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.144.243', 64642)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.149.235', 55511)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.149.117', 62537)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.147.214', 30221)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.149.117', 62537)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.149.235', 55511)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.144.243', 64642)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.149.117', 62537)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.147.214', 30221)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.149.235', 55511)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.144.243', 64642)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.149.117', 62537)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.147.214', 30221)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.144.243', 64642)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.149.235', 55511)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.144.243', 64642)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.149.117', 62537)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.147.214', 30221)) State.FROZEN -> State.WAITING
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.144.243', 64642)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.144.243', 64642)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.144.243', 64642)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.149.117', 62537)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.149.117', 62537)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.149.117', 62537)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.144.243', 64642)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.144.243', 64642)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.149.117', 62537)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('104.30.147.214', 30221)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.144.243', 64642)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.149.117', 62537)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:54 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 47955) -> ('104.30.147.214', 30221)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:55 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.149.117', 62537)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:55 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46060) -> ('104.30.147.214', 30221)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:55 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.149.117', 62537)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:55 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 34807) -> ('104.30.147.214', 30221)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:19:55 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 45874) -> ('192.168.190.121', 51396)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:19:55 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:55 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:56 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:57 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:58 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:59 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:59 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:59 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:59 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:59 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:59 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:19:59 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:00 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:00 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:00 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:00 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:00 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:00 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:00 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:00 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:01 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:01 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:01 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:01 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:01 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:01 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:02 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:02 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:02 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:02 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:02 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:02 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:04 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:04 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:04 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:04 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:04 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:04 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:04 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:05 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:05 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:05 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:05 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:05 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:05 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:30 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:30 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:30 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:30 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:31 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:31 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:31 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:31 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:31 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:20:32 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:03 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 16:21:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 16:21:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 16:21:03 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 16:21:03 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': 'cuda:0'}
+2025-06-16 16:21:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized (multilingual)
+2025-06-16 16:21:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 16:21:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True (deepfilternet3)
+2025-06-16 16:21:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True (livekit)
+2025-06-16 16:21:05 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('192.168.190.121', 51908)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('192.168.190.121', 51908)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('192.168.190.121', 51908)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('192.168.190.121', 51908)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('192.168.190.121', 51908)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('192.168.190.121', 51908)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('192.168.190.121', 51908)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('192.168.190.121', 51908)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('118.69.244.141', 51908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('118.69.244.141', 51908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('118.69.244.141', 51908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('118.69.244.141', 51908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.149.236', 48268)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.149.236', 48268)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.149.236', 48268)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.149.236', 48268)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.147.147', 59722)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.147.147', 59722)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.147.147', 59722)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.147.147', 59722)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.144.245', 44024)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.144.245', 44024)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.147.147', 59722)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.149.219', 44787)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.147.152', 13498)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.149.248', 37400)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.147.147', 59722)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.149.219', 44787)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.147.152', 13498)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.149.248', 37400)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.147.147', 59722)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.144.245', 44024)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.149.219', 44787)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.147.152', 13498)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.149.248', 37400)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.144.245', 44024)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.149.219', 44787)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.147.147', 59722)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.144.245', 44024)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.149.219', 44787)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.147.152', 13498)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.149.248', 37400)) State.FROZEN -> State.WAITING
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.144.245', 44024)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.144.245', 44024)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.149.219', 44787)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.149.219', 44787)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.149.219', 44787)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.149.219', 44787)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.147.152', 13498)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.149.219', 44787)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.147.152', 13498)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.149.219', 44787)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.147.152', 13498)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('192.168.190.121', 51908)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.147.152', 13498)) State.WAITING -> State.FAILED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 34288) -> ('104.30.149.248', 37400)) State.WAITING -> State.FAILED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 45021) -> ('104.30.149.248', 37400)) State.WAITING -> State.FAILED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 37149) -> ('104.30.149.248', 37400)) State.WAITING -> State.FAILED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 42454) -> ('104.30.149.248', 37400)) State.WAITING -> State.FAILED
+2025-06-16 16:21:05 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-16 16:21:05 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:06 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:07 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:08 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:09 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:10 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Turn ended by livekit detector (confidence: 0.745)
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:11 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:12 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:13 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:14 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:15 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:16 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:17 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:18 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:19 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:20 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:21 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:22 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Turn ended by livekit detector (confidence: 0.572)
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:23 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:24 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:25 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Turn ended by livekit detector (confidence: 0.523)
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:26 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:27 - __main__ - INFO - Processing audio: 16000Hz, (1, 69120)
+2025-06-16 16:21:28 - __main__ - INFO - No transcription detected
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:28 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:21:29 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Audio was resampled: True. From sr:16000 Hz to sr: 48000 Hz
+2025-06-16 16:22:24 - root - INFO - Logging configured with level: INFO
+2025-06-16 16:22:24 - __main__ - INFO - Initializing LLM...
+2025-06-16 16:22:24 - __main__ - INFO - LLM initialized successfully
+2025-06-16 16:22:24 - __main__ - INFO - Initializing custom STT model...
+2025-06-16 16:22:29 - __main__ - INFO - Initializing FastRTC STT model...
+2025-06-16 16:22:31 - __main__ - INFO - STT models initialized and warmed up
+2025-06-16 16:22:31 - __main__ - INFO - Initializing TTS model...
+2025-06-16 16:22:31 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'sample_rate': 24000, 'show_logs': True}
+2025-06-16 16:22:31 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 16:22:31 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 16:22:33 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 16:22:33 - __main__ - INFO - All models initialized successfully
+2025-06-16 16:22:34 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 16:22:34 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 16:22:34 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 16:22:34 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': 'cuda:0'}
+2025-06-16 16:22:34 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 16:22:35 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized (multilingual)
+2025-06-16 16:22:35 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 16:22:35 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True (deepfilternet3)
+2025-06-16 16:22:35 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True (livekit)
+2025-06-16 16:22:35 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 16:22:35 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 16:22:35 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 16:22:47 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 16:22:47 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: zrnh3nse68
+2025-06-16 16:22:47 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-16 16:22:47 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-16 16:22:47 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-16 16:22:47 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - Noise reduction initialized: {'model_name': 'deepfilternet3', 'sample_rate': 48000, 'is_ready': True, 'device': 'cuda:0'}
+2025-06-16 16:22:48 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - LiveKit turn detector initialized (multilingual)
+2025-06-16 16:22:48 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO - EnhancedReplyOnPause initialized:
+2025-06-16 16:22:48 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Noise reduction: True (deepfilternet3)
+2025-06-16 16:22:48 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - Turn detection: True (livekit)
+2025-06-16 16:22:48 - src.VAD_TurnDectection.enhanced_reply_on_pause - INFO -   - STT model: provided
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('118.69.244.141', 52798)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('118.69.244.141', 52798)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('118.69.244.141', 52798)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('118.69.244.141', 52798)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('118.69.244.141', 52798)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('118.69.244.141', 52798)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('118.69.244.141', 52798)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('118.69.244.141', 52798)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('104.30.147.145', 43730)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.147.145', 43730)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.147.145', 43730)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:48 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('104.30.147.145', 43730)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('104.30.147.216', 45982)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.147.216', 45982)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.147.216', 45982)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('104.30.147.216', 45982)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('104.30.144.245', 15850)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.144.245', 15850)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.147.216', 45982)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.147.145', 52678)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.149.236', 15367)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.149.219', 32732)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.147.145', 52678)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.147.216', 45982)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.144.245', 15850)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.147.145', 52678)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.149.236', 15367)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.149.219', 32732)) State.FROZEN -> State.WAITING
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.144.245', 15850)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.147.145', 52678)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.149.236', 15367)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.147.145', 52678)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.149.236', 15367)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.149.219', 32732)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.149.219', 32732)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.147.145', 52678)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.149.236', 15367)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('104.30.144.245', 15850)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('104.30.147.145', 52678)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('104.30.147.145', 52678)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.149.236', 15367)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 36720) -> ('104.30.149.219', 32732)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57824) -> ('104.30.149.219', 32732)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('104.30.149.236', 15367)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('104.30.149.236', 15367)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('104.30.149.219', 32732)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('104.30.149.219', 32732)) State.FROZEN -> State.FAILED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34886) -> ('104.30.147.145', 52678)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('104.30.144.245', 15850)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:22:49 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 59512) -> ('104.30.147.145', 52678)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 16:23:03 - __main__ - INFO - New conversation started: 66294035-43e3-4ad8-874f-bae0cdaf2db1
+2025-06-16 17:14:57 - root - INFO - Logging configured with level: INFO
+2025-06-16 17:14:57 - __main__ - INFO - Initializing LLM...
+2025-06-16 17:14:57 - __main__ - INFO - LLM initialized successfully
+2025-06-16 17:14:57 - __main__ - INFO - Initializing custom STT model...
+2025-06-16 17:15:02 - __main__ - INFO - Initializing FastRTC STT model...
+2025-06-16 17:15:04 - __main__ - INFO - STT models initialized and warmed up
+2025-06-16 17:15:04 - __main__ - INFO - Initializing TTS model...
+2025-06-16 17:15:04 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'sample_rate': 24000, 'show_logs': True}
+2025-06-16 17:15:04 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 17:15:04 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 17:15:06 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 17:15:06 - __main__ - INFO - All models initialized successfully
+2025-06-16 17:15:07 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 17:19:31 - root - INFO - Logging configured with level: INFO
+2025-06-16 17:19:31 - __main__ - INFO - Initializing LLM...
+2025-06-16 17:19:31 - __main__ - INFO - LLM initialized successfully
+2025-06-16 17:19:31 - __main__ - INFO - Initializing custom STT model...
+2025-06-16 17:19:36 - __main__ - INFO - Initializing FastRTC STT model...
+2025-06-16 17:19:38 - __main__ - INFO - STT models initialized and warmed up
+2025-06-16 17:19:38 - __main__ - INFO - Initializing TTS model...
+2025-06-16 17:19:38 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'sample_rate': 24000, 'show_logs': True}
+2025-06-16 17:19:38 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 17:19:38 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 17:19:40 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 17:19:40 - __main__ - INFO - All models initialized successfully
+2025-06-16 17:19:41 - __main__ - INFO - Enhanced handler created with new class structure
+2025-06-16 17:19:41 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 17:19:41 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 17:19:41 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 17:20:06 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 17:20:06 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:06 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:06 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:06 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:06 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:07 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:07 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:07 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:07 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:07 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:07 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:08 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:08 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:08 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:08 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:08 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:08 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:08 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: 14gbae3rk4yf
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:13 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: lsxob5kbko
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: lsxob5kbko
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:17 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 17:20:20 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:20 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: fjbbr776o3c
+2025-06-16 17:20:24 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 17:20:24 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:24 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:24 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:24 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:25 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: ifa4mo4b5a
+2025-06-16 17:20:28 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:28 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: uc1vxh7skwn
+2025-06-16 17:20:32 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:32 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:20:33 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: rvx6dioc30c
+2025-06-16 17:21:42 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 17:21:42 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:42 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
+2025-06-16 17:21:43 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: jf02yrs8ah
