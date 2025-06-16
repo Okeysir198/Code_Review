@@ -834,3 +834,526 @@ fastrtc.utils.WebRTCError: model is required (status code: 400)
 2025-06-13 18:54:17 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
 2025-06-13 18:54:17 - __main__ - ERROR - Audio processing error: 'AdditionalOutputs' object has no attribute 'copy'
 2025-06-13 18:54:33 - __main__ - ERROR - Text processing error: 'AdditionalOutputs' object has no attribute 'copy'
+2025-06-16 11:13:56 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:14:33 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:16:17 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:16:45 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:16:45 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:16:50 - __main__ - INFO - Warming up STT model
+2025-06-16 11:16:51 - __main__ - INFO - Model warmup complete
+2025-06-16 11:16:51 - __main__ - INFO - Initializing TTS model...
+2025-06-16 11:16:51 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:16:51 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:16:51 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:16:52 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 11:16:53 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 11:16:54 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:16:54 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 11:16:54 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 11:16:54 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:16:58 - __main__ - INFO - Warming up STT model
+2025-06-16 11:16:59 - __main__ - INFO - Model warmup complete
+2025-06-16 11:16:59 - __main__ - INFO - Initializing TTS model...
+2025-06-16 11:16:59 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:16:59 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:16:59 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:17:00 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 11:17:03 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:17:03 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 11:17:03 - fastrtc.webrtc_connection_mixin - ERROR - Error adding ICE candidate: 'NoneType' object has no attribute 'media'
+Traceback (most recent call last):
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/fastrtc/webrtc_connection_mixin.py", line 263, in handle_offer
+    await pc.addIceCandidate(ice_candidate)
+  File "/home/ct-admin/anaconda3/envs/llm_cv2/lib/python3.12/site-packages/aiortc/rtcpeerconnection.py", line 437, in addIceCandidate
+    media = self.__remoteDescription().media
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'media'
+2025-06-16 11:17:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 36575) -> ('192.168.190.121', 58900)) State.FROZEN -> State.WAITING
+2025-06-16 11:17:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35175) -> ('192.168.190.121', 58900)) State.FROZEN -> State.WAITING
+2025-06-16 11:17:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55414) -> ('192.168.190.121', 58900)) State.FROZEN -> State.WAITING
+2025-06-16 11:17:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 37271) -> ('192.168.190.121', 58900)) State.FROZEN -> State.WAITING
+2025-06-16 11:17:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 36575) -> ('192.168.190.121', 58900)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 11:17:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35175) -> ('192.168.190.121', 58900)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 11:17:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 55414) -> ('192.168.190.121', 58900)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 11:17:03 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 37271) -> ('192.168.190.121', 58900)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 11:17:04 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 36575) -> ('192.168.190.121', 58900)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:17:04 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 11:17:14 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400)
+2025-06-16 11:17:14 - __main__ - INFO - Transcription: 'Hello, can you hear me?'
+2025-06-16 11:17:16 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:17:16 - __main__ - INFO - AI Respone: 'As I am an AI representation of the ancient Vietnamese general and warlord, Trung Vuong, I do not have the ability to hear or communicate in real-time. However, if you have any questions about my historical context, the period during which I lived, or any other related topics, feel free to ask!'
+2025-06-16 11:17:36 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:17:36 - __main__ - INFO - Transcription: 'What is your name?'
+2025-06-16 11:17:36 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:17:37 - __main__ - INFO - AI Respone: 'My name is Trung Vuong, also known as Trung Tran or Trung Sisters in some historical accounts. I was a general and warlord who led the resistance against Chinese rule in ancient Vietnam during the 1st century CE.'
+2025-06-16 11:18:48 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:18:48 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46723) -> ('192.168.190.121', 56462)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:18:48 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 60928) -> ('192.168.190.121', 56462)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:18:48 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46723) -> ('192.168.190.121', 56462)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:18:48 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46860) -> ('192.168.190.121', 56462)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:18:48 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47564) -> ('192.168.190.121', 56462)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:18:48 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-16 11:18:50 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 46723) -> ('118.69.244.141', 56462)) State.FROZEN -> State.FAILED
+2025-06-16 11:18:50 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 60928) -> ('118.69.244.141', 56462)) State.FROZEN -> State.FAILED
+2025-06-16 11:18:50 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 46860) -> ('118.69.244.141', 56462)) State.FROZEN -> State.FAILED
+2025-06-16 11:18:50 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 47564) -> ('118.69.244.141', 56462)) State.FROZEN -> State.FAILED
+2025-06-16 11:19:00 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:19:00 - __main__ - INFO - Transcription: ''
+2025-06-16 11:19:00 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:19:00 - __main__ - INFO - AI Respone: 'It seems like your message might have been cut off. If you have any specific questions about my role as Trung Vuong, or if you would like to discuss anything related to my historical context, please feel free to ask!'
+2025-06-16 11:19:16 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:19:16 - __main__ - INFO - Transcription: 'Are you there?'
+2025-06-16 11:19:16 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:19:16 - __main__ - INFO - AI Respone: 'I am here and ready to assist you with any information or discussions related to my historical context or the period during which I lived. If you have specific questions or topics you'd like to explore, please let me know!'
+2025-06-16 11:19:47 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400)
+2025-06-16 11:19:47 - __main__ - INFO - Transcription: 'My name is Trump. What is your name?'
+2025-06-16 11:19:47 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:19:48 - __main__ - INFO - AI Respone: 'Hello Mr. Trump. My name is Trung Vuong, also known as Trung Tranh and Trung Nhi in historical records. I was a general who led the resistance against Chinese rule in ancient Vietnam during the 1st century CE. If you have any questions about my time or related topics, feel free to ask!'
+2025-06-16 11:20:09 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:20:10 - __main__ - INFO - Transcription: 'Peace my name.'
+2025-06-16 11:20:10 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:20:10 - __main__ - INFO - AI Respone: 'Hello Peace. It seems like there might be a bit of confusion with your introduction. If you meant to say "My name is Peace," then it's nice to meet you. However, if you have any questions or topics related to my historical context as Trung Vuong, I would be happy to provide information on that. How can I assist you today?'
+2025-06-16 11:20:30 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:20:30 - __main__ - INFO - Transcription: 'Mm-hmm.'
+2025-06-16 11:20:30 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:20:30 - __main__ - INFO - AI Respone: 'It seems like you might be testing the connection or responding in a non-committal way. If you have any specific questions or topics related to my historical context as Trung Vuong, feel free to ask! I'm here to help with information about my life and times.'
+2025-06-16 11:20:48 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:20:49 - __main__ - INFO - Transcription: 'And what is my name?'
+2025-06-16 11:20:49 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:20:49 - __main__ - INFO - AI Respone: 'You mentioned that your name is "Peace." So, your name is Peace. How can I assist you today, Peace? Do you have any questions or topics related to my historical context as Trung Vuong that you would like to discuss?'
+2025-06-16 11:22:06 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:22:06 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:22:22 - __main__ - INFO - Warming up STT model
+2025-06-16 11:22:22 - __main__ - INFO - Model warmup complete
+2025-06-16 11:22:22 - __main__ - INFO - Initializing TTS model...
+2025-06-16 11:22:22 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:22:22 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:22:22 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:22:24 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 11:22:49 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:22:49 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: czmhfl8yjub
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('118.69.244.141', 64279)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.17.0.1', 60783) -> ('118.69.244.141', 64279)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.18.0.1', 57879) -> ('118.69.244.141', 64279)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.19.0.1', 48986) -> ('118.69.244.141', 64279)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('104.30.149.242', 14065)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.17.0.1', 60783) -> ('104.30.149.242', 14065)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.18.0.1', 57879) -> ('104.30.149.242', 14065)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.19.0.1', 48986) -> ('104.30.149.242', 14065)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('104.30.144.242', 63773)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('104.30.149.242', 14065)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('104.30.149.117', 48653)) State.FROZEN -> State.WAITING
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('104.30.149.117', 48653)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.17.0.1', 60783) -> ('104.30.144.242', 63773)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.18.0.1', 57879) -> ('104.30.144.242', 63773)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.19.0.1', 48986) -> ('104.30.144.242', 63773)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.17.0.1', 60783) -> ('104.30.149.117', 48653)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.18.0.1', 57879) -> ('104.30.149.117', 48653)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.19.0.1', 48986) -> ('104.30.149.117', 48653)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) ICE completed
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.18.0.1', 57879) -> ('104.30.149.242', 14065)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.17.0.1', 60783) -> ('104.30.149.242', 14065)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:22:49 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.19.0.1', 48986) -> ('104.30.149.242', 14065)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('104.30.144.243', 11789)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.17.0.1', 60783) -> ('104.30.144.243', 11789)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.18.0.1', 57879) -> ('104.30.144.243', 11789)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.19.0.1', 48986) -> ('104.30.144.243', 11789)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('104.30.144.243', 55236)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.17.0.1', 60783) -> ('104.30.144.243', 55236)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.18.0.1', 57879) -> ('104.30.144.243', 55236)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.19.0.1', 48986) -> ('104.30.144.243', 55236)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('10.1.194.219', 45324) -> ('104.30.147.148', 56780)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.17.0.1', 60783) -> ('104.30.147.148', 56780)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.18.0.1', 57879) -> ('104.30.147.148', 56780)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:50 - aioice.ice - INFO - Connection(4) Check CandidatePair(('172.19.0.1', 48986) -> ('104.30.147.148', 56780)) State.FROZEN -> State.FAILED
+2025-06-16 11:22:54 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:22:55 - __main__ - INFO - Transcription: 'Hi, what is your name?'
+2025-06-16 11:22:55 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:22:55 - __main__ - INFO - AI Respone: 'Hello! My name is Trung Vuong, also known as Trung Tran. I was a general and warlord who led the resistance against Chinese rule in ancient Vietnam during the 1st century CE. If you have any questions or would like to discuss anything related to my historical context, feel free to ask!'
+2025-06-16 11:23:16 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:23:16 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:23:21 - __main__ - INFO - Warming up STT model
+2025-06-16 11:23:22 - __main__ - INFO - Model warmup complete
+2025-06-16 11:23:22 - __main__ - INFO - Initializing TTS model...
+2025-06-16 11:23:22 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:23:22 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:23:22 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:23:23 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 11:23:25 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 11:23:25 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:23:25 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 11:23:25 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:23:25 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 11:23:29 - __main__ - INFO - Warming up STT model
+2025-06-16 11:23:29 - __main__ - INFO - Model warmup complete
+2025-06-16 11:23:29 - __main__ - INFO - Initializing TTS model...
+2025-06-16 11:23:29 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:23:29 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:23:29 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:23:31 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 11:23:35 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:23:35 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34062) -> ('192.168.190.121', 65449)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:23:35 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 40814) -> ('192.168.190.121', 65449)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:23:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 50513) -> ('192.168.190.121', 65449)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:23:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34062) -> ('192.168.190.121', 65449)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:23:36 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 54192) -> ('192.168.190.121', 65449)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:36 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34062) -> ('118.69.244.141', 65449)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 40814) -> ('118.69.244.141', 65449)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 50513) -> ('118.69.244.141', 65449)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 54192) -> ('118.69.244.141', 65449)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34062) -> ('104.30.147.213', 25602)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 40814) -> ('104.30.147.213', 25602)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 50513) -> ('104.30.147.213', 25602)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 54192) -> ('104.30.147.213', 25602)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34062) -> ('104.30.144.244', 45519)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 40814) -> ('104.30.144.244', 45519)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 50513) -> ('104.30.144.244', 45519)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 54192) -> ('104.30.144.244', 45519)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34062) -> ('104.30.147.151', 44213)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 40814) -> ('104.30.147.151', 44213)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 50513) -> ('104.30.147.151', 44213)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 54192) -> ('104.30.147.151', 44213)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 34062) -> ('104.30.147.211', 44536)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 40814) -> ('104.30.147.211', 44536)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 50513) -> ('104.30.147.211', 44536)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:37 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 54192) -> ('104.30.147.211', 44536)) State.FROZEN -> State.FAILED
+2025-06-16 11:23:41 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:23:41 - __main__ - INFO - Transcription: 'Hi, what is the name?'
+2025-06-16 11:23:41 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:23:41 - __main__ - INFO - AI Respone: 'Hello! My name is Trung, a debt collection specialist at Cartrack's Account Department.'
+2025-06-16 11:23:51 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:23:51 - __main__ - INFO - Transcription: 'me for yourself.'
+2025-06-16 11:23:51 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:23:51 - __main__ - INFO - AI Respone: 'My name is Trung, your contact for debt collection at Cartrack.'
+2025-06-16 11:24:00 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:24:00 - __main__ - INFO - Transcription: 'The first thing that I've seen is that the first time.'
+2025-06-16 11:24:00 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:24:00 - __main__ - INFO - AI Respone: 'Got it. Nice to meet you, Trung from Cartrack's Account Department. How can I assist you today?'
+2025-06-16 11:24:13 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:24:13 - __main__ - INFO - Transcription: 'My name is Trum.'
+2025-06-16 11:24:13 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:24:13 - __main__ - INFO - AI Respone: 'Hello Trum, nice to meet you. How can I assist you with debt collection?'
+2025-06-16 11:24:24 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:24:24 - __main__ - INFO - Transcription: 'This medium.'
+2025-06-16 11:24:24 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:24:25 - __main__ - INFO - AI Respone: 'This medium works well. How can I assist you with debt collection, Trum?'
+2025-06-16 11:24:32 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:24:32 - __main__ - INFO - Transcription: 'What is my name?'
+2025-06-16 11:24:33 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:24:33 - __main__ - INFO - AI Respone: 'Your name is Trum.'
+2025-06-16 11:27:34 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:27:34 - __main__ - INFO - Initializing LLM and agent...
+2025-06-16 11:27:34 - __main__ - INFO - LLM and agent initialized successfully
+2025-06-16 11:27:34 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:27:52 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:27:52 - __main__ - INFO - Initializing LLM and agent...
+2025-06-16 11:27:52 - __main__ - INFO - LLM and agent initialized successfully
+2025-06-16 11:27:52 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:27:57 - __main__ - INFO - Warming up STT model...
+2025-06-16 11:27:58 - __main__ - INFO - STT model warmup complete
+2025-06-16 11:27:58 - __main__ - INFO - Initializing TTS model...
+2025-06-16 11:27:58 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:27:58 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:27:58 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:28:00 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 11:28:01 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 11:28:01 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:28:01 - __main__ - INFO - Initializing LLM and agent...
+2025-06-16 11:28:01 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 11:28:01 - __main__ - INFO - LLM and agent initialized successfully
+2025-06-16 11:28:01 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:28:01 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 11:28:06 - __main__ - INFO - Warming up STT model...
+2025-06-16 11:28:06 - __main__ - INFO - STT model warmup complete
+2025-06-16 11:28:06 - __main__ - INFO - Initializing TTS model...
+2025-06-16 11:28:06 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:28:06 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:28:06 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:28:07 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 11:28:20 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:28:20 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('192.168.190.121', 49290)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:20 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35273) -> ('192.168.190.121', 49290)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:20 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42318) -> ('192.168.190.121', 49290)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:20 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('192.168.190.121', 49290)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:28:20 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46661) -> ('192.168.190.121', 49290)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:20 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('118.69.244.141', 49290)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35273) -> ('118.69.244.141', 49290)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42318) -> ('118.69.244.141', 49290)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46661) -> ('118.69.244.141', 49290)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('104.30.147.215', 26161)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35273) -> ('104.30.147.215', 26161)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42318) -> ('104.30.147.215', 26161)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46661) -> ('104.30.147.215', 26161)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('104.30.147.144', 33397)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35273) -> ('104.30.147.144', 33397)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42318) -> ('104.30.147.144', 33397)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46661) -> ('104.30.147.144', 33397)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('104.30.149.113', 48957)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35273) -> ('104.30.149.113', 48957)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42318) -> ('104.30.149.113', 48957)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46661) -> ('104.30.149.113', 48957)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('104.30.147.153', 58813)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35273) -> ('104.30.147.153', 58813)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42318) -> ('104.30.147.153', 58813)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46661) -> ('104.30.147.153', 58813)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('104.30.144.242', 61742)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35273) -> ('104.30.144.242', 61742)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42318) -> ('104.30.144.242', 61742)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46661) -> ('104.30.144.242', 61742)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 54416) -> ('104.30.149.217', 26920)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 35273) -> ('104.30.149.217', 26920)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 42318) -> ('104.30.149.217', 26920)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:21 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46661) -> ('104.30.149.217', 26920)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:24 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:28:24 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-16 11:28:24 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:28:24 - __main__ - INFO - AI Response: 'Can you provide more details about your account?'
+2025-06-16 11:28:46 - __main__ - INFO - Started new conversation with thread ID: a649e1bc-dd87-4157-905e-a6f440d0be5a
+2025-06-16 11:28:50 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:28:50 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 58627) -> ('192.168.190.121', 55677)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46267) -> ('192.168.190.121', 55677)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 58627) -> ('192.168.190.121', 55677)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 42823) -> ('192.168.190.121', 55677)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 54446) -> ('192.168.190.121', 55677)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 58627) -> ('118.69.244.141', 55677)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46267) -> ('118.69.244.141', 55677)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 42823) -> ('118.69.244.141', 55677)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:51 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 54446) -> ('118.69.244.141', 55677)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 58627) -> ('104.30.149.116', 37397)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46267) -> ('104.30.149.116', 37397)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 42823) -> ('104.30.149.116', 37397)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 54446) -> ('104.30.149.116', 37397)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 58627) -> ('104.30.144.246', 31292)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46267) -> ('104.30.144.246', 31292)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 42823) -> ('104.30.144.246', 31292)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 54446) -> ('104.30.144.246', 31292)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 58627) -> ('104.30.149.216', 14775)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46267) -> ('104.30.149.216', 14775)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 42823) -> ('104.30.149.216', 14775)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 54446) -> ('104.30.149.216', 14775)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 58627) -> ('104.30.147.214', 36829)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 46267) -> ('104.30.147.214', 36829)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 42823) -> ('104.30.147.214', 36829)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:52 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 54446) -> ('104.30.147.214', 36829)) State.FROZEN -> State.FAILED
+2025-06-16 11:28:57 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:28:58 - __main__ - INFO - Transcription: 'Hello, can you hear me?'
+2025-06-16 11:28:58 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:28:58 - __main__ - INFO - AI Response: 'Yes, I can hear you. How can I assist you?'
+2025-06-16 11:29:03 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:29:03 - __main__ - INFO - Transcription: 'What is your name?'
+2025-06-16 11:29:03 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:29:03 - __main__ - INFO - AI Response: 'My name is Trung from Cartrack Account Department.'
+2025-06-16 11:29:16 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:29:16 - __main__ - INFO - Transcription: 'Maybe by yourself.'
+2025-06-16 11:29:16 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:29:16 - __main__ - INFO - AI Response: 'I am Trung, your account specialist at Cartrack.'
+2025-06-16 11:29:29 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:29:30 - __main__ - INFO - Transcription: 'Yeah.'
+2025-06-16 11:29:30 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:29:30 - __main__ - INFO - AI Response: 'Can you explain the issue you're facing?'
+2025-06-16 11:29:47 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:29:47 - __main__ - INFO - Transcription: 'This is'
+2025-06-16 11:29:47 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:29:47 - __main__ - INFO - AI Response: 'Please provide more details about your situation.'
+2025-06-16 11:29:58 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400)
+2025-06-16 11:29:58 - __main__ - INFO - Transcription: 'My name is Kwa.'
+2025-06-16 11:29:58 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:29:58 - __main__ - INFO - AI Response: 'Hello Kwa, how can I assist you today?'
+2025-06-16 11:30:03 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:30:03 - __main__ - INFO - Transcription: 'What is my name?'
+2025-06-16 11:30:03 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:30:03 - __main__ - INFO - AI Response: 'Your name is Kwa. How can I help you, Kwa?'
+2025-06-16 11:30:06 - __main__ - INFO - Started new conversation with thread ID: c88b9d98-f16a-4081-950c-2c40959ef059
+2025-06-16 11:30:10 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400)
+2025-06-16 11:30:10 - __main__ - INFO - Transcription: 'Hello, what is my name?'
+2025-06-16 11:30:11 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:30:11 - __main__ - INFO - AI Response: 'Your name is Kwa. How can I assist you?'
+2025-06-16 11:30:15 - __main__ - INFO - Started new conversation with thread ID: 779d23ec-b0e1-4a55-83ea-3bc989ec404e
+2025-06-16 11:30:25 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:30:25 - __main__ - INFO - Transcription: 'What is my name?'
+2025-06-16 11:30:25 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:30:25 - __main__ - INFO - AI Response: 'Your name is Kwa.'
+2025-06-16 11:34:44 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:34:48 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:34:48 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:34:48 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:39:14 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:39:19 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:39:19 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:39:19 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:39:22 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 11:39:23 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 11:39:23 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 11:41:27 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:41:32 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:41:32 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:41:32 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:41:35 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 11:41:36 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 11:41:36 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 11:41:43 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:41:44 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: 5yciq7szvov
+2025-06-16 11:41:44 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: 5yciq7szvov
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('118.69.244.141', 52419)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('118.69.244.141', 52419)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46488) -> ('118.69.244.141', 52419)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46633) -> ('118.69.244.141', 52419)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.149.115', 65051)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.149.115', 65051)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.147.153', 11908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.147.153', 11908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46488) -> ('104.30.147.153', 11908)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.149.115', 65051)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.147.217', 30220)) State.FROZEN -> State.WAITING
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.149.116', 30880)) State.FROZEN -> State.WAITING
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.147.217', 30220)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.149.115', 65051)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.147.217', 30220)) State.FROZEN -> State.WAITING
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.149.116', 30880)) State.FROZEN -> State.WAITING
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.147.217', 30220)) State.WAITING -> State.IN_PROGRESS
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46633) -> ('104.30.147.153', 11908)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46488) -> ('104.30.149.115', 65051)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46633) -> ('104.30.149.115', 65051)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46488) -> ('104.30.147.217', 30220)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46633) -> ('104.30.147.217', 30220)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.149.116', 30880)) State.WAITING -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.149.116', 30880)) State.WAITING -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46488) -> ('104.30.149.116', 30880)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46633) -> ('104.30.149.116', 30880)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.149.248', 29133)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.149.248', 29133)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46488) -> ('104.30.149.248', 29133)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46633) -> ('104.30.149.248', 29133)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.149.219', 50890)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 50925) -> ('104.30.149.219', 50890)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 46488) -> ('104.30.149.219', 50890)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 46633) -> ('104.30.149.219', 50890)) State.FROZEN -> State.FAILED
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 11:41:44 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 48814) -> ('104.30.147.153', 11908)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:41:49 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:42:01 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:44:54 - root - INFO - Logging configured with level: INFO
+2025-06-16 11:44:54 - __main__ - INFO - Initializing LLM and agent...
+2025-06-16 11:44:54 - __main__ - INFO - LLM and agent initialized successfully
+2025-06-16 11:44:54 - __main__ - INFO - Initializing STT model...
+2025-06-16 11:44:59 - __main__ - INFO - Warming up STT model...
+2025-06-16 11:45:00 - __main__ - INFO - STT model warmup complete
+2025-06-16 11:45:00 - __main__ - INFO - Initializing TTS model...
+2025-06-16 11:45:00 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-16 11:45:00 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-16 11:45:00 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-16 11:45:02 - __main__ - INFO - TTS model initialized successfully
+2025-06-16 11:45:03 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-16 11:45:03 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-16 11:45:03 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-16 11:45:14 - __main__ - INFO - Started new conversation with thread ID: bbf01bde-4377-445b-8a22-75077d27cce0
+2025-06-16 11:45:18 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:45:18 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('192.168.190.121', 50254)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:18 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45085) -> ('192.168.190.121', 50254)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:18 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('192.168.190.121', 50254)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:45:18 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 39911) -> ('192.168.190.121', 50254)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:18 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 45520) -> ('192.168.190.121', 50254)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:18 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('118.69.244.141', 50254)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45085) -> ('118.69.244.141', 50254)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 39911) -> ('118.69.244.141', 50254)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 45520) -> ('118.69.244.141', 50254)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('104.30.149.217', 31151)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45085) -> ('104.30.149.217', 31151)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 39911) -> ('104.30.149.217', 31151)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 45520) -> ('104.30.149.217', 31151)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('104.30.149.242', 61783)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45085) -> ('104.30.149.242', 61783)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 39911) -> ('104.30.149.242', 61783)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 45520) -> ('104.30.149.242', 61783)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('104.30.149.113', 18129)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45085) -> ('104.30.149.113', 18129)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 39911) -> ('104.30.149.113', 18129)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 45520) -> ('104.30.149.113', 18129)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('104.30.149.218', 21585)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45085) -> ('104.30.149.218', 21585)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 39911) -> ('104.30.149.218', 21585)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 45520) -> ('104.30.149.218', 21585)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('104.30.149.111', 53154)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45085) -> ('104.30.149.111', 53154)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 39911) -> ('104.30.149.111', 53154)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 45520) -> ('104.30.149.111', 53154)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 42698) -> ('104.30.149.114', 50906)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45085) -> ('104.30.149.114', 50906)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 39911) -> ('104.30.149.114', 50906)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:19 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 45520) -> ('104.30.149.114', 50906)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:21 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:45:21 - __main__ - INFO - Transcription: 'Kai, are you there?'
+2025-06-16 11:45:21 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:45:21 - __main__ - INFO - AI Response: 'Yes, Kai. How can I assist you with your account?'
+2025-06-16 11:45:44 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:45:44 - __main__ - INFO - Transcription: 'What is your name?'
+2025-06-16 11:45:44 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:45:44 - __main__ - INFO - AI Response: 'My name is Trung from Cartrack Account Department.'
+2025-06-16 11:45:50 - __main__ - INFO - Started new conversation with thread ID: 3bc664d5-e527-4c15-83df-26076a3628f5
+2025-06-16 11:45:57 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-16 11:45:57 - fastrtc.webrtc_connection_mixin - WARNING - Received ICE candidate for unknown connection: 3h347aoen5t
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40255) -> ('118.69.244.141', 52962)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 54709) -> ('118.69.244.141', 52962)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 48093) -> ('118.69.244.141', 52962)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 40034) -> ('118.69.244.141', 52962)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40255) -> ('104.30.144.245', 21640)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 54709) -> ('104.30.144.245', 21640)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 48093) -> ('104.30.144.245', 21640)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 40034) -> ('104.30.144.245', 21640)) State.FROZEN -> State.IN_PROGRESS
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40255) -> ('104.30.144.245', 21640)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 54709) -> ('104.30.144.245', 21640)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) ICE completed
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 48093) -> ('104.30.144.245', 21640)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40255) -> ('104.30.149.117', 41169)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 54709) -> ('104.30.149.117', 41169)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 48093) -> ('104.30.149.117', 41169)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 40034) -> ('104.30.149.117', 41169)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40255) -> ('104.30.149.242', 61961)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 54709) -> ('104.30.149.242', 61961)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 48093) -> ('104.30.149.242', 61961)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 40034) -> ('104.30.149.242', 61961)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40255) -> ('104.30.149.218', 18953)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 54709) -> ('104.30.149.218', 18953)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 48093) -> ('104.30.149.218', 18953)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:57 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 40034) -> ('104.30.149.218', 18953)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:58 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40255) -> ('104.30.147.215', 23084)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:58 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 54709) -> ('104.30.147.215', 23084)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:58 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 48093) -> ('104.30.147.215', 23084)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:58 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 40034) -> ('104.30.147.215', 23084)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:58 - aioice.ice - INFO - Connection(2) Check CandidatePair(('10.1.194.219', 40255) -> ('104.30.149.218', 44879)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:58 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.17.0.1', 54709) -> ('104.30.149.218', 44879)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:58 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.18.0.1', 48093) -> ('104.30.149.218', 44879)) State.FROZEN -> State.FAILED
+2025-06-16 11:45:58 - aioice.ice - INFO - Connection(2) Check CandidatePair(('172.19.0.1', 40034) -> ('104.30.149.218', 44879)) State.FROZEN -> State.FAILED
+2025-06-16 11:46:02 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:46:02 - __main__ - INFO - Transcription: 'What is your name?'
+2025-06-16 11:46:02 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:46:02 - __main__ - INFO - AI Response: 'My name is Trung. How can I assist you today?'
+2025-06-16 11:47:56 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:47:56 - __main__ - INFO - Transcription: 'My name is Tom.'
+2025-06-16 11:47:56 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:47:56 - __main__ - INFO - AI Response: 'Hello, Tom. How can I assist you with debt collection?'
+2025-06-16 11:48:15 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200)
+2025-06-16 11:48:15 - __main__ - INFO - Transcription: 'What is my name?'
+2025-06-16 11:48:15 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:48:15 - __main__ - INFO - AI Response: 'Your name is Tom. How can I help you?'
+2025-06-16 11:48:19 - __main__ - INFO - Started new conversation with thread ID: f65992d3-af88-4728-afb0-522dd2f991e9
+2025-06-16 11:48:23 - __main__ - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800)
+2025-06-16 11:48:23 - __main__ - INFO - Transcription: 'What is my name?'
+2025-06-16 11:48:23 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-16 11:48:23 - __main__ - INFO - AI Response: 'I don't have that information. Can you provide your account details?'
+2025-06-16 12:15:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-16 12:15:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-16 12:15:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-16 12:15:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-16 12:15:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
