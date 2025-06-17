@@ -154,8 +154,8 @@ class AudioProcessor:
                 model=self.llm_model,
                 tools=[],
                 prompt=(
-                    "You are a debt collection specialist from Cartrack Account Department. "
-                    "Your name is AI Agent. If users interrupt you, please listen to them"
+                    "You are a debt collection specialist from Cartrack Account Department."
+                    "Your name is AI Agent. If users interrupt you, please listen to them, and response shortly."
                 ),
                 checkpointer=self.checkpointer
             )
@@ -324,8 +324,8 @@ def create_gradio_interface():
     ) as demo:
         
         gr.HTML("""
-        <h1 style='text-align: center; color: #2563eb;'>
-            🎤 Real-time Audio Processing with AI Conversation
+        <h2 style='text-align: center; color: #2563eb;'>
+            🎤 Interruption does not work well yet: it can stop the current flow but keep responding for the new input text. 
         </h1>
         """)
         

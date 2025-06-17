@@ -193,7 +193,7 @@ class OPENAIWhisperV3TurboModel(BaseSTTModel):
         
         raise ValueError(f"Unsupported audio format: {type(audio_data)}")
     
-    def transcribe(self, audio_data: Any, task: str = "translate") -> Union[str, Dict[str, Any]]:
+    def transcribe(self, audio_data: Any, task: str = "transcribe") -> Union[str, Dict[str, Any]]:
         """Transcribe with optimal settings - Based on working implementation."""
         try:
             # Process audio into the right format

@@ -6548,3 +6548,187 @@ Could you tell me more about the issue you're facing or what you would like to c
 2025-06-17 04:31:52 - simple_fastrtc - INFO - Transcription: 'Let's not.'
 2025-06-17 04:31:52 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
 2025-06-17 04:31:52 - simple_fastrtc - INFO - AI Response: 'I understand if you need some time. If you decide you'd like to discuss your account or have any questions in the future, please feel free to reach out. How can I assist you today, or would you prefer to pause this conversation?'
+2025-06-17 09:16:13 - root - INFO - Logging configured with level: INFO
+2025-06-17 09:16:13 - simple_fastrtc - INFO - Initializing LLM and agent...
+2025-06-17 09:16:15 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:16:15 - simple_fastrtc - INFO - LLM and agent initialized successfully
+2025-06-17 09:16:15 - simple_fastrtc - INFO - Initializing STT model...
+2025-06-17 09:16:15 - src.STT.stt_model_provider - WARNING - No optimal config for openai/whisper-large-v3-turbo, using defaults
+2025-06-17 09:16:19 - simple_fastrtc - INFO - Warming up STT model...
+2025-06-17 09:16:21 - simple_fastrtc - INFO - STT model warmup complete
+2025-06-17 09:16:21 - simple_fastrtc - INFO - Initializing TTS model...
+2025-06-17 09:16:21 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-17 09:16:21 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-17 09:16:21 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-17 09:16:23 - simple_fastrtc - INFO - TTS model initialized successfully
+2025-06-17 09:16:24 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:16:24 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:16:24 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:16:24 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:16:25 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-17 09:16:25 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-06-17 09:16:26 - httpx - INFO - HTTP Request: GET https://api.gradio.app/v3/tunnel-request "HTTP/1.1 200 OK"
+2025-06-17 09:16:44 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Initializing deepfilternet3...
+2025-06-17 09:16:44 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - DeepFilterNet3 initialized on cuda:0
+2025-06-17 09:16:44 - src.NoiseCancelation.fastrtc_noise_reduction - INFO - Successfully initialized deepfilternet3 on cuda:0
+2025-06-17 09:16:58 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:17:04 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:17:07 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:17:10 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:17:22 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:17:35 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:17:53 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:17:59 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 41450) -> ('192.168.190.116', 63280)) State.FROZEN -> State.WAITING
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 41940) -> ('192.168.190.116', 63280)) State.FROZEN -> State.WAITING
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 43277) -> ('192.168.190.116', 63280)) State.FROZEN -> State.WAITING
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36361) -> ('192.168.190.116', 63280)) State.FROZEN -> State.WAITING
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 41450) -> ('192.168.190.116', 63280)) State.WAITING -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 41940) -> ('192.168.190.116', 63280)) State.WAITING -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 43277) -> ('192.168.190.116', 63280)) State.WAITING -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36361) -> ('192.168.190.116', 63280)) State.WAITING -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 41450) -> ('118.69.244.141', 63280)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 41940) -> ('118.69.244.141', 63280)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 43277) -> ('118.69.244.141', 63280)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36361) -> ('118.69.244.141', 63280)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 41450) -> ('104.30.149.117', 60350)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 41450) -> ('104.30.149.117', 37788)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 41940) -> ('104.30.149.117', 37788)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 43277) -> ('104.30.149.117', 37788)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 41450) -> ('104.30.149.117', 60350)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36361) -> ('104.30.149.117', 37788)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 41450) -> ('104.30.149.117', 37788)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 41940) -> ('104.30.149.117', 60350)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 43277) -> ('104.30.149.117', 60350)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 41940) -> ('104.30.149.117', 37788)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 43277) -> ('104.30.149.117', 37788)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:17:59 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36361) -> ('104.30.149.117', 60350)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:18:00 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36361) -> ('104.30.149.117', 37788)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:18:00 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 41940) -> ('104.30.149.117', 60350)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:18:00 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 43277) -> ('104.30.149.117', 60350)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:18:00 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36361) -> ('104.30.149.117', 60350)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:18:00 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 41450) -> ('192.168.190.116', 63280)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:18:00 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-17 09:18:04 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 38400), Type: int16, Max. Value: 7869
+2025-06-17 09:18:04 - simple_fastrtc - INFO - Transcription: 'Hi, are you there? Can you hear me well?'
+2025-06-17 09:18:04 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:18:04 - simple_fastrtc - INFO - AI Response: 'Hello! Yes, I can hear you clearly. How may I assist you today?'
+2025-06-17 09:18:13 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800), Type: int16, Max. Value: 17218
+2025-06-17 09:18:13 - simple_fastrtc - INFO - Transcription: 'You're talking too long.'
+2025-06-17 09:18:13 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:18:13 - simple_fastrtc - INFO - AI Response: 'I understand. Let's get to your query. How can I assist you regarding your account?'
+2025-06-17 09:18:21 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800), Type: int16, Max. Value: 12673
+2025-06-17 09:18:22 - simple_fastrtc - INFO - Transcription: 'Can you hear me?'
+2025-06-17 09:18:22 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:18:22 - simple_fastrtc - INFO - AI Response: 'Yes, I can hear you clearly. How can I assist you today?'
+2025-06-17 09:18:33 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800), Type: int16, Max. Value: 18020
+2025-06-17 09:18:33 - simple_fastrtc - INFO - Transcription: 'Who are you?'
+2025-06-17 09:18:33 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:18:33 - simple_fastrtc - INFO - AI Response: 'I'm AI Agent from the Cartrack Account Department. How can I assist you with regards to your account or any queries you have?'
+2025-06-17 09:18:43 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16, Max. Value: 2229
+2025-06-17 09:18:44 - simple_fastrtc - INFO - Transcription: 'BIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDSBIRDS'
+2025-06-17 09:18:45 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:18:45 - simple_fastrtc - INFO - AI Response: 'It seems there was an interruption. Could you please tell me how I can assist you? Are you looking for information about your account or have a specific question?'
+2025-06-17 09:18:46 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16, Max. Value: 7101
+2025-06-17 09:18:46 - simple_fastrtc - INFO - Transcription: 'So...'
+2025-06-17 09:18:46 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:18:47 - simple_fastrtc - INFO - AI Response: 'Sure, how can I assist you today? Do you have any specific questions or concerns regarding your account?'
+2025-06-17 09:19:53 - root - INFO - Logging configured with level: INFO
+2025-06-17 09:19:53 - simple_fastrtc - INFO - Initializing LLM and agent...
+2025-06-17 09:19:53 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:19:53 - simple_fastrtc - INFO - LLM and agent initialized successfully
+2025-06-17 09:19:53 - simple_fastrtc - INFO - Initializing STT model...
+2025-06-17 09:19:53 - src.STT.stt_model_provider - WARNING - No optimal config for openai/whisper-large-v3-turbo, using defaults
+2025-06-17 09:19:57 - simple_fastrtc - INFO - Warming up STT model...
+2025-06-17 09:19:58 - simple_fastrtc - INFO - STT model warmup complete
+2025-06-17 09:19:58 - simple_fastrtc - INFO - Initializing TTS model...
+2025-06-17 09:19:58 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-17 09:19:58 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-17 09:19:58 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-17 09:20:00 - simple_fastrtc - INFO - TTS model initialized successfully
+2025-06-17 09:20:01 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:20:01 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:20:01 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:20:01 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:20:02 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-17 09:20:02 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-06-17 09:20:03 - httpx - INFO - HTTP Request: GET https://api.gradio.app/v3/tunnel-request "HTTP/1.1 200 OK"
+2025-06-17 09:20:16 - httpx - INFO - HTTP Request: GET https://turn.fastrtc.org/credentials?ttl=600 "HTTP/1.1 200 OK"
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('192.168.190.116', 53487)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45478) -> ('192.168.190.116', 53487)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('192.168.190.116', 53487)) State.IN_PROGRESS -> State.SUCCEEDED
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57778) -> ('192.168.190.116', 53487)) State.FROZEN -> State.IN_PROGRESS
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36771) -> ('192.168.190.116', 53487)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) ICE completed
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('118.69.244.141', 53487)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45478) -> ('118.69.244.141', 53487)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57778) -> ('118.69.244.141', 53487)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:16 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36771) -> ('118.69.244.141', 53487)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('104.30.149.215', 63906)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45478) -> ('104.30.149.215', 63906)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57778) -> ('104.30.149.215', 63906)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36771) -> ('104.30.149.215', 63906)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('104.30.144.242', 62307)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45478) -> ('104.30.144.242', 62307)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57778) -> ('104.30.144.242', 62307)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36771) -> ('104.30.144.242', 62307)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('104.30.147.217', 63865)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45478) -> ('104.30.147.217', 63865)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57778) -> ('104.30.147.217', 63865)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36771) -> ('104.30.147.217', 63865)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('104.30.147.146', 65404)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45478) -> ('104.30.147.146', 65404)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57778) -> ('104.30.147.146', 65404)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36771) -> ('104.30.147.146', 65404)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('104.30.147.147', 13970)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45478) -> ('104.30.147.147', 13970)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57778) -> ('104.30.147.147', 13970)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36771) -> ('104.30.147.147', 13970)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('10.1.194.219', 56675) -> ('104.30.149.217', 22158)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.17.0.1', 45478) -> ('104.30.149.217', 22158)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.18.0.1', 57778) -> ('104.30.149.217', 22158)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:17 - aioice.ice - INFO - Connection(0) Check CandidatePair(('172.19.0.1', 36771) -> ('104.30.149.217', 22158)) State.FROZEN -> State.FAILED
+2025-06-17 09:20:19 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16, Max. Value: 7432
+2025-06-17 09:20:19 - simple_fastrtc - INFO - Transcription: 'Hello. Are you'
+2025-06-17 09:20:19 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:20:19 - simple_fastrtc - INFO - AI Response: 'Hello! I'm AI Agent from the Cartrack Account Department. How can I assist you today? If you have any questions or need to discuss an account, feel free to let me know.'
+2025-06-17 09:20:54 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800), Type: int16, Max. Value: 10569
+2025-06-17 09:20:55 - simple_fastrtc - INFO - Transcription: 'Hello, are you there?'
+2025-06-17 09:20:55 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:20:55 - simple_fastrtc - INFO - AI Response: 'Yes, I'm here. How can I assist you today?'
+2025-06-17 09:21:00 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16, Max. Value: 5745
+2025-06-17 09:21:00 - simple_fastrtc - INFO - Transcription: 'Hello.'
+2025-06-17 09:21:00 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:21:00 - simple_fastrtc - INFO - AI Response: 'Hello! How can I assist you today? If you have any questions or need help with your account, feel free to let me know.'
+2025-06-17 09:21:08 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 28800), Type: int16, Max. Value: 8693
+2025-06-17 09:21:09 - simple_fastrtc - INFO - Transcription: 'Hello, are you there?'
+2025-06-17 09:21:09 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:21:09 - simple_fastrtc - INFO - AI Response: 'Yes, I'm here. How can I assist you today?'
+2025-06-17 09:21:15 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16, Max. Value: 5239
+2025-06-17 09:21:16 - simple_fastrtc - INFO - Transcription: 'I don't know.'
+2025-06-17 09:21:16 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:21:16 - simple_fastrtc - INFO - AI Response: 'No problem at all. If you have any questions about your account or need assistance with anything related to Cartrack, please let me know and I'll be happy to help. How can I assist you further?'
+2025-06-17 09:21:23 - simple_fastrtc - INFO - Processing audio - SR: 16000Hz, Shape: (1, 19200), Type: int16, Max. Value: 7935
+2025-06-17 09:21:23 - simple_fastrtc - INFO - Transcription: 'Stop.'
+2025-06-17 09:21:23 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:21:24 - simple_fastrtc - INFO - AI Response: 'Sure, no problem. If you need to pause the conversation or have any concerns, feel free to let me know when you're ready to continue. Is there anything specific you would like to address now?'
+2025-06-17 09:32:16 - root - INFO - Logging configured with level: INFO
+2025-06-17 09:32:16 - simple_fastrtc - INFO - Initializing LLM and agent...
+2025-06-17 09:32:18 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:32:18 - simple_fastrtc - INFO - LLM and agent initialized successfully
+2025-06-17 09:32:18 - simple_fastrtc - INFO - Initializing STT model...
+2025-06-17 09:32:18 - src.STT.stt_model_provider - WARNING - No optimal config for openai/whisper-large-v3-turbo, using defaults
+2025-06-17 09:32:23 - simple_fastrtc - INFO - Warming up STT model...
+2025-06-17 09:32:23 - simple_fastrtc - INFO - STT model warmup complete
+2025-06-17 09:32:23 - simple_fastrtc - INFO - Initializing TTS model...
+2025-06-17 09:32:23 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-17 09:32:23 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-17 09:32:23 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-17 09:32:25 - simple_fastrtc - INFO - TTS model initialized successfully
+2025-06-17 09:32:26 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:32:26 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:32:26 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:32:26 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:32:27 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-17 09:32:27 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-06-17 09:32:28 - httpx - INFO - HTTP Request: GET https://api.gradio.app/v3/tunnel-request "HTTP/1.1 200 OK"
