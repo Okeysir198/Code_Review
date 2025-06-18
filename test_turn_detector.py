@@ -216,7 +216,7 @@ def create_turn_detection_demo():
                     lines=8,
                     placeholder="Enter messages in 'role:content' format or JSON...",
                     label="Conversation Messages",
-                    value="assistant:How can I help you today?\nuser:Tell me about yourself. ah, let me think, please say something"
+                    value="assistant:what can i help you with\nuser:well i was thinking maybe you could"
                 )
                 
                 threshold_slider = gr.Slider(

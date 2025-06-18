@@ -47,7 +47,7 @@ if __name__ == "__main__":
     demo = create_combined_interface()
     demo.launch(
         share=True,
-        server_port=7860,
+        # server_port=7860,
         server_name="0.0.0.0",
         show_error=True
     )

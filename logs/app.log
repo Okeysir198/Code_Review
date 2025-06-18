@@ -6732,3 +6732,241 @@ Could you tell me more about the issue you're facing or what you would like to c
 2025-06-17 09:32:27 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
 2025-06-17 09:32:27 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
 2025-06-17 09:32:28 - httpx - INFO - HTTP Request: GET https://api.gradio.app/v3/tunnel-request "HTTP/1.1 200 OK"
+2025-06-17 09:35:40 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:37:27 - root - INFO - Logging configured with level: INFO
+2025-06-17 09:37:27 - simple_fastrtc - INFO - Initializing LLM and agent...
+2025-06-17 09:37:29 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:37:29 - simple_fastrtc - INFO - LLM and agent initialized successfully
+2025-06-17 09:37:29 - simple_fastrtc - INFO - Initializing STT model...
+2025-06-17 09:37:29 - src.STT.stt_model_provider - WARNING - No optimal config for openai/whisper-large-v3-turbo, using defaults
+2025-06-17 09:37:33 - simple_fastrtc - INFO - Warming up STT model...
+2025-06-17 09:37:33 - simple_fastrtc - INFO - STT model warmup complete
+2025-06-17 09:37:33 - simple_fastrtc - INFO - Initializing TTS model...
+2025-06-17 09:37:33 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-17 09:37:33 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-17 09:37:33 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-17 09:37:35 - simple_fastrtc - INFO - TTS model initialized successfully
+2025-06-17 09:37:36 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:37:37 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:37:37 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:37:37 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:38:00 - root - INFO - Logging configured with level: INFO
+2025-06-17 09:38:00 - simple_fastrtc - INFO - Initializing LLM and agent...
+2025-06-17 09:38:00 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 09:38:00 - simple_fastrtc - INFO - LLM and agent initialized successfully
+2025-06-17 09:38:00 - simple_fastrtc - INFO - Initializing STT model...
+2025-06-17 09:38:00 - src.STT.stt_model_provider - WARNING - No optimal config for openai/whisper-large-v3-turbo, using defaults
+2025-06-17 09:38:05 - simple_fastrtc - INFO - Warming up STT model...
+2025-06-17 09:38:05 - simple_fastrtc - INFO - STT model warmup complete
+2025-06-17 09:38:05 - simple_fastrtc - INFO - Initializing TTS model...
+2025-06-17 09:38:05 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-17 09:38:05 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-17 09:38:05 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-17 09:38:07 - simple_fastrtc - INFO - TTS model initialized successfully
+2025-06-17 09:38:08 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:38:08 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:38:08 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:38:08 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 09:38:09 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-17 09:38:09 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-06-17 09:38:10 - httpx - INFO - HTTP Request: GET https://api.gradio.app/v3/tunnel-request "HTTP/1.1 200 OK"
+2025-06-17 10:08:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 10:08:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 10:08:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 10:08:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 10:08:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 10:33:00 - root - INFO - Logging configured with level: INFO
+2025-06-17 10:33:00 - simple_fastrtc - INFO - Initializing LLM and agent...
+2025-06-17 10:33:01 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 10:33:02 - simple_fastrtc - INFO - LLM and agent initialized successfully
+2025-06-17 10:33:02 - simple_fastrtc - INFO - Initializing STT model...
+2025-06-17 10:33:02 - src.STT.stt_model_provider - WARNING - No optimal config for openai/whisper-large-v3-turbo, using defaults
+2025-06-17 10:33:06 - simple_fastrtc - INFO - Warming up STT model...
+2025-06-17 10:33:06 - simple_fastrtc - INFO - STT model warmup complete
+2025-06-17 10:33:06 - simple_fastrtc - INFO - Initializing TTS model...
+2025-06-17 10:33:06 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-17 10:33:06 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-17 10:33:06 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-17 10:33:08 - simple_fastrtc - INFO - TTS model initialized successfully
+2025-06-17 10:33:09 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 10:33:09 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 10:33:09 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 10:33:09 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 10:33:10 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-17 10:33:10 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-06-17 10:33:11 - httpx - INFO - HTTP Request: GET https://api.gradio.app/v3/tunnel-request "HTTP/1.1 200 OK"
+2025-06-17 10:33:30 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 10:33:33 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 10:33:46 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 11:03:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 11:03:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 11:03:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 11:03:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 11:03:10 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 11:33:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 11:33:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 11:33:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 11:33:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 11:33:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 12:03:44 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 12:03:44 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 12:03:44 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 12:03:44 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 12:03:44 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 12:34:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 12:34:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 12:34:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 12:34:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 12:34:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 13:04:18 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 13:04:18 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 13:04:18 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 13:04:18 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 13:04:18 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 13:34:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1817s)
+2025-06-17 13:34:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 13:34:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 13:34:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 13:34:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 14:04:53 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 14:04:53 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 14:04:53 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 14:04:53 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 14:04:53 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 14:35:12 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 14:35:12 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 14:35:12 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 14:35:12 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 14:35:12 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 15:05:29 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 15:05:29 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 15:05:29 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 15:05:29 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 15:05:29 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 15:35:46 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 15:35:46 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 15:35:46 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 15:35:46 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 15:35:46 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 16:06:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1817s)
+2025-06-17 16:06:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 16:06:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 16:06:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 16:06:04 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 16:36:21 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 16:36:21 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 16:36:21 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 16:36:21 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 16:36:21 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 17:06:42 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1820s)
+2025-06-17 17:06:42 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1818s)
+2025-06-17 17:06:42 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 17:06:42 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 17:06:42 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 17:37:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1818s)
+2025-06-17 17:37:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 17:37:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 17:37:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 17:37:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 18:07:20 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1818s)
+2025-06-17 18:07:20 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 18:07:20 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 18:07:20 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 18:07:20 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 18:37:39 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1817s)
+2025-06-17 18:37:39 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 18:37:39 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 18:37:39 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 18:37:39 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 19:07:56 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 19:07:56 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 19:07:56 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 19:07:56 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 19:07:56 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 19:38:14 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 19:38:14 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 19:38:14 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 19:38:14 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 19:38:14 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 20:08:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1820s)
+2025-06-17 20:08:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1819s)
+2025-06-17 20:08:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1817s)
+2025-06-17 20:08:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 20:08:36 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 20:38:55 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1818s)
+2025-06-17 20:38:55 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 20:38:55 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 20:38:55 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 20:38:55 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 21:09:13 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1817s)
+2025-06-17 21:09:13 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 21:09:13 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 21:09:13 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 21:09:13 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-17 21:20:03 - root - INFO - Logging configured with level: INFO
+2025-06-17 21:20:03 - simple_fastrtc - INFO - Initializing LLM and agent...
+2025-06-17 21:20:05 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 21:20:05 - simple_fastrtc - INFO - LLM and agent initialized successfully
+2025-06-17 21:20:05 - simple_fastrtc - INFO - Initializing STT model...
+2025-06-17 21:20:05 - src.STT.stt_model_provider - WARNING - No optimal config for openai/whisper-large-v3-turbo, using defaults
+2025-06-17 21:20:10 - simple_fastrtc - INFO - Warming up STT model...
+2025-06-17 21:20:10 - simple_fastrtc - INFO - STT model warmup complete
+2025-06-17 21:20:10 - simple_fastrtc - INFO - Initializing TTS model...
+2025-06-17 21:20:10 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-17 21:20:10 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-17 21:20:10 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-17 21:20:13 - simple_fastrtc - INFO - TTS model initialized successfully
+2025-06-17 21:20:14 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 21:20:14 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 21:20:14 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 21:20:14 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 21:21:08 - root - INFO - Logging configured with level: INFO
+2025-06-17 21:21:08 - simple_fastrtc - INFO - Initializing LLM and agent...
+2025-06-17 21:21:08 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-06-17 21:21:08 - simple_fastrtc - INFO - LLM and agent initialized successfully
+2025-06-17 21:21:08 - simple_fastrtc - INFO - Initializing STT model...
+2025-06-17 21:21:08 - src.STT.stt_model_provider - WARNING - No optimal config for openai/whisper-large-v3-turbo, using defaults
+2025-06-17 21:21:12 - simple_fastrtc - INFO - Warming up STT model...
+2025-06-17 21:21:12 - simple_fastrtc - INFO - STT model warmup complete
+2025-06-17 21:21:12 - simple_fastrtc - INFO - Initializing TTS model...
+2025-06-17 21:21:12 - src.TTS.tts_model_provider - INFO - Creating kokorov2 TTS model with config: {'voice': 'am_michael', 'speed': 1.3, 'language': 'a', 'use_gpu': True, 'fallback_to_cpu': True, 'sample_rate': 24000, 'preload_voices': ['af_heart'], 'show_logs': True}
+2025-06-17 21:21:12 - src.TTS.tts_kokoro_modelv2 - INFO - Initializing Kokoro TTS model V2 with settings: voice=am_michael, speed=1.3, use_gpu=True
+2025-06-17 21:21:12 - src.TTS.tts_kokoro_modelv2 - INFO - Using device: cuda
+2025-06-17 21:21:14 - simple_fastrtc - INFO - TTS model initialized successfully
+2025-06-17 21:21:15 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 21:21:15 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 21:21:15 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 21:21:15 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-06-17 21:21:16 - httpx - INFO - HTTP Request: GET http://localhost:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-06-17 21:21:16 - httpx - INFO - HTTP Request: HEAD http://localhost:7861/ "HTTP/1.1 200 OK"
+2025-06-17 21:21:17 - httpx - INFO - HTTP Request: GET https://api.gradio.app/v3/tunnel-request "HTTP/1.1 200 OK"
+2025-06-17 21:39:31 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 21:39:31 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 21:39:31 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 21:39:31 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 21:39:31 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 22:09:49 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 22:09:49 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 22:09:49 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 22:09:49 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 22:09:49 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 22:40:07 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1817s)
+2025-06-17 22:40:07 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 22:40:07 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 22:40:07 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 22:40:07 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 23:10:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1817s)
+2025-06-17 23:10:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 23:10:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1814s)
+2025-06-17 23:10:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 23:10:26 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1811s)
+2025-06-17 23:40:43 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-17 23:40:43 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-17 23:40:43 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-17 23:40:43 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-17 23:40:43 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
+2025-06-18 00:11:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1816s)
+2025-06-18 00:11:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1815s)
+2025-06-18 00:11:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1813s)
+2025-06-18 00:11:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1812s)
+2025-06-18 00:11:01 - src.Database.CartrackSQLDatabase - INFO - Closing idle connection (idle for 1810s)
